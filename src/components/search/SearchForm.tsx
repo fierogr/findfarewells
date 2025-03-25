@@ -22,7 +22,7 @@ const SearchForm = ({ location, onLocationChange, onSubmit }: SearchFormProps) =
           value={location}
           onChange={(e) => onLocationChange(e.target.value)}
           className="pl-10"
-          placeholder="Αλλαγή τοποθεσίας"
+          placeholder="Αναζήτηση ανά περιοχή εξυπηρέτησης"
           required
         />
       </div>

@@ -8,6 +8,7 @@ const initializeFuneralHomes = (): FuneralHome[] => {
   try {
     const storedHomes = localStorage.getItem('funeralHomes');
     if (storedHomes) {
+      console.log("Found stored funeral homes in localStorage:", JSON.parse(storedHomes).length);
       return JSON.parse(storedHomes);
     }
   } catch (error) {
@@ -15,17 +16,19 @@ const initializeFuneralHomes = (): FuneralHome[] => {
   }
   
   // If no data in localStorage or error, use mock data and save it
+  console.log("No stored homes found, initializing with mock data");
   localStorage.setItem('funeralHomes', JSON.stringify(mockFuneralHomes));
   return [...mockFuneralHomes];
 };
 
 // Create a reference to our funeral homes that persists between renders
-const persistentFuneralHomes = initializeFuneralHomes();
+let persistentFuneralHomes = initializeFuneralHomes();
 
 // Helper function to save funeral homes to localStorage
 const saveFuneralHomes = () => {
   try {
     localStorage.setItem('funeralHomes', JSON.stringify(persistentFuneralHomes));
+    console.log("Saved funeral homes to localStorage:", persistentFuneralHomes.length);
   } catch (error) {
     console.error("Error saving funeral homes to localStorage:", error);
   }
@@ -69,6 +72,46 @@ export const addFuneralHome = (funeralHome: FuneralHome): Promise<FuneralHome> =
     // Simulate API call delay
     setTimeout(() => {
       resolve(completeHome);
+    }, 500);
+  });
+};
+
+// Function to update an existing funeral home
+export const updateFuneralHome = (id: string, updatedFuneralHome: FuneralHome): Promise<FuneralHome> => {
+  return new Promise((resolve, reject) => {
+    // Find the index of the funeral home to update
+    const index = persistentFuneralHomes.findIndex(home => home.id === id);
+    
+    if (index === -1) {
+      reject(new Error(`Funeral home with ID ${id} not found`));
+      return;
+    }
+    
+    // Update the funeral home
+    persistentFuneralHomes[index] = updatedFuneralHome;
+    
+    // Save to localStorage
+    saveFuneralHomes();
+    
+    // Simulate API call delay
+    setTimeout(() => {
+      resolve(updatedFuneralHome);
+    }, 500);
+  });
+};
+
+// Function to delete a funeral home
+export const deleteFuneralHome = (id: string): Promise<boolean> => {
+  return new Promise((resolve) => {
+    // Filter out the funeral home to delete
+    persistentFuneralHomes = persistentFuneralHomes.filter(home => home.id !== id);
+    
+    // Save to localStorage
+    saveFuneralHomes();
+    
+    // Simulate API call delay
+    setTimeout(() => {
+      resolve(true);
     }, 500);
   });
 };

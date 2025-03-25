@@ -5,6 +5,6 @@ import { getFuneralHomes } from "@/services/funeralHomeService";
 export const useFuneralHomes = () => {
   return useQuery({
     queryKey: ["funeralHomes"],
-    queryFn: () => getFuneralHomes(),
+    queryFn: getFuneralHomes,
   });
 };

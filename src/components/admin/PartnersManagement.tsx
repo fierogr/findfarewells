@@ -6,14 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Search, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { FuneralHome } from "@/types/funeralHome";
+import { addFuneralHome } from "@/services/funeralHomeService";
+import PartnerForm from "./PartnerForm";
 
 interface PartnersManagementProps {
   onPartnerSelect: (partnerId: string) => void;
 }
 
 const PartnersManagement = ({ onPartnerSelect }: PartnersManagementProps) => {
-  const { data: funeralHomes, isLoading, error } = useFuneralHomes();
+  const { data: funeralHomes, isLoading, error, refetch } = useFuneralHomes();
   const [searchTerm, setSearchTerm] = useState("");
+  const [isAddPartnerOpen, setIsAddPartnerOpen] = useState(false);
 
   const filteredHomes = funeralHomes?.filter(
     (home) =>
@@ -21,6 +25,11 @@ const PartnersManagement = ({ onPartnerSelect }: PartnersManagementProps) => {
       home.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
       home.state.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleAddPartner = async (partnerData: FuneralHome) => {
+    await addFuneralHome(partnerData);
+    refetch();
+  };
 
   if (isLoading) {
     return <div className="text-center py-4">Φόρτωση συνεργατών...</div>;
@@ -43,7 +52,7 @@ const PartnersManagement = ({ onPartnerSelect }: PartnersManagementProps) => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button>
+        <Button onClick={() => setIsAddPartnerOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Προσθήκη Συνεργάτη
         </Button>
       </div>
@@ -101,6 +110,12 @@ const PartnersManagement = ({ onPartnerSelect }: PartnersManagementProps) => {
           </TableBody>
         </Table>
       </div>
+
+      <PartnerForm
+        open={isAddPartnerOpen}
+        onClose={() => setIsAddPartnerOpen(false)}
+        onSave={handleAddPartner}
+      />
     </div>
   );
 };

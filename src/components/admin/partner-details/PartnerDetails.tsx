@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useFuneralHome } from "@/hooks/useFuneralHome";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,8 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
 
   useEffect(() => {
     if (funeralHome) {
-      console.log("Loaded funeral home with regions:", funeralHome.regions);
+      console.log("PartnerDetails: Loaded funeral home:", funeralHome.id);
+      console.log("PartnerDetails: Loaded regions:", funeralHome.regions);
       
       // Make a deep copy to ensure we don't have reference issues
       setEditedHome({
@@ -43,7 +45,7 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
   const handleSave = async () => {
     if (editedHome) {
       try {
-        console.log("Saving partner with regions:", editedHome.regions);
+        console.log("PartnerDetails: Saving partner with regions:", editedHome.regions);
         const updatedHome = await updateFuneralHome(editedHome.id, editedHome);
         if (updatedHome) {
           queryClient.invalidateQueries({ queryKey: ["funeralHomes"] });
@@ -151,10 +153,10 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
             editedHome={editedHome} 
             onRegionsChange={(regions) => {
               if (editedHome) {
-                console.log("Updating regions in PartnerDetails:", regions);
-                setEditedHome({ 
-                  ...editedHome, 
-                  regions 
+                console.log("PartnerDetails: Updating regions to:", regions);
+                setEditedHome({
+                  ...editedHome,
+                  regions
                 });
               }
             }}

@@ -14,6 +14,14 @@ export const updateFuneralHome = (id: string, updates: Partial<FuneralHome>): Pr
       return;
     }
     
+    console.log("Updating funeral home with ID:", id);
+    console.log("Updates to be applied:", updates);
+    
+    // Ensure regions is always an array
+    if (updates.regions === undefined) {
+      updates.regions = mockFuneralHomes[index].regions || [];
+    }
+    
     // Update the funeral home
     const updatedHome = {
       ...mockFuneralHomes[index],
@@ -22,6 +30,8 @@ export const updateFuneralHome = (id: string, updates: Partial<FuneralHome>): Pr
     
     // Replace the old funeral home with the updated one
     mockFuneralHomes[index] = updatedHome;
+    
+    console.log("Updated funeral home:", updatedHome);
     
     // Simulate API call delay
     setTimeout(() => {

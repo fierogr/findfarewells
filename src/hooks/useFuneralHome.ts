@@ -12,6 +12,9 @@ export const useFuneralHome = (id: string) => {
         home.regions = [];
       }
       console.log("Fetched funeral home:", home);
+      if (home && home.regions) {
+        console.log("Regions from API:", home.regions);
+      }
       return home;
     },
     enabled: !!id,

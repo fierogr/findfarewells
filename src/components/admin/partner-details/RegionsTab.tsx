@@ -15,13 +15,12 @@ interface RegionsTabProps {
 const RegionsTab = ({ editedHome, onRegionsChange }: RegionsTabProps) => {
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   
-  // Use a more robust useEffect to initialize regions
   useEffect(() => {
     if (editedHome) {
       // Ensure we have an array, even if regions is undefined or null
       const regions = Array.isArray(editedHome.regions) ? [...editedHome.regions] : [];
       setSelectedRegions(regions);
-      console.log("RegionsTab initialized with regions:", regions, "from editedHome:", editedHome);
+      console.log("RegionsTab: Current edited home:", editedHome.id, "with regions:", regions);
     }
   }, [editedHome]);
 

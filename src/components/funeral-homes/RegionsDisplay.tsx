@@ -12,6 +12,8 @@ export const RegionsDisplay = ({ regions }: RegionsDisplayProps) => {
     return null;
   }
 
+  console.log("RegionsDisplay: Displaying regions:", regions);
+
   return (
     <div className="mt-4">
       <div className="flex items-center gap-2 mb-2">

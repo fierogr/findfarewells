@@ -1,38 +1,10 @@
 
 import { FuneralHome } from '@/types/funeralHome';
-import { mockFuneralHomes } from '@/data/mockFuneralHomes';
 import { createDefaultFuneralHome } from './funeralHomeUtils';
-
-// Initialize the funeral home data from localStorage if available
-const initializeFuneralHomes = (): FuneralHome[] => {
-  try {
-    const storedHomes = localStorage.getItem('funeralHomes');
-    if (storedHomes) {
-      console.log("Found stored funeral homes in localStorage:", JSON.parse(storedHomes).length);
-      return JSON.parse(storedHomes);
-    }
-  } catch (error) {
-    console.error("Error loading funeral homes from localStorage:", error);
-  }
-  
-  // If no data in localStorage or error, use mock data and save it
-  console.log("No stored homes found, initializing with mock data");
-  localStorage.setItem('funeralHomes', JSON.stringify(mockFuneralHomes));
-  return [...mockFuneralHomes];
-};
+import { initializeData, saveData } from './storageService';
 
 // Create a reference to our funeral homes that persists between renders
-let persistentFuneralHomes = initializeFuneralHomes();
-
-// Helper function to save funeral homes to localStorage
-const saveFuneralHomes = () => {
-  try {
-    localStorage.setItem('funeralHomes', JSON.stringify(persistentFuneralHomes));
-    console.log("Saved funeral homes to localStorage:", persistentFuneralHomes.length);
-  } catch (error) {
-    console.error("Error saving funeral homes to localStorage:", error);
-  }
-};
+let persistentFuneralHomes = initializeData();
 
 // Function to simulate fetching funeral homes by location
 export const getFuneralHomes = (location?: string): Promise<FuneralHome[]> => {
@@ -67,7 +39,7 @@ export const addFuneralHome = (funeralHome: FuneralHome): Promise<FuneralHome> =
     persistentFuneralHomes.push(completeHome);
     
     // Save to localStorage
-    saveFuneralHomes();
+    saveData(persistentFuneralHomes);
     
     // Simulate API call delay
     setTimeout(() => {
@@ -91,7 +63,7 @@ export const updateFuneralHome = (id: string, updatedFuneralHome: FuneralHome): 
     persistentFuneralHomes[index] = updatedFuneralHome;
     
     // Save to localStorage
-    saveFuneralHomes();
+    saveData(persistentFuneralHomes);
     
     // Simulate API call delay
     setTimeout(() => {
@@ -107,7 +79,7 @@ export const deleteFuneralHome = (id: string): Promise<boolean> => {
     persistentFuneralHomes = persistentFuneralHomes.filter(home => home.id !== id);
     
     // Save to localStorage
-    saveFuneralHomes();
+    saveData(persistentFuneralHomes);
     
     // Simulate API call delay
     setTimeout(() => {
@@ -116,25 +88,5 @@ export const deleteFuneralHome = (id: string): Promise<boolean> => {
   });
 };
 
-// Function to calculate distance between two points using Haversine formula
-export const calculateDistance = (
-  lat1: number, 
-  lon1: number, 
-  lat2: number, 
-  lon2: number
-): number => {
-  const R = 6371; // Radius of the earth in km
-  const dLat = deg2rad(lat2 - lat1);
-  const dLon = deg2rad(lon2 - lon1);
-  const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2); 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-  const distance = R * c; // Distance in km
-  return distance;
-};
-
-function deg2rad(deg: number): number {
-  return deg * (Math.PI/180);
-}
+// Export distance calculation for backward compatibility
+export { calculateDistance } from '@/utils/distanceUtils';

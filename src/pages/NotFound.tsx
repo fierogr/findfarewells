@@ -17,10 +17,10 @@ const NotFound = () => {
     <div className="container flex flex-col items-center justify-center min-h-[70vh] py-16 animate-fadeIn">
       <h1 className="text-6xl md:text-8xl font-bold text-primary mb-6">404</h1>
       <p className="text-xl md:text-2xl text-muted-foreground mb-8 text-center max-w-md">
-        We couldn't find the page you were looking for.
+        Δεν μπορέσαμε να βρούμε τη σελίδα που αναζητάτε.
       </p>
       <Link to="/">
-        <Button className="px-6">Return Home</Button>
+        <Button className="px-6">Επιστροφή στην Αρχική</Button>
       </Link>
     </div>
   );

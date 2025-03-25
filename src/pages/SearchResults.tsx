@@ -25,8 +25,8 @@ const SearchResults = () => {
     } else {
       setLoading(false);
       toast({
-        title: "Location Required",
-        description: "Please enter a location to search for funeral homes.",
+        title: "Απαιτείται Τοποθεσία",
+        description: "Παρακαλώ εισάγετε μια τοποθεσία για αναζήτηση γραφείων τελετών.",
         variant: "destructive",
       });
     }
@@ -40,8 +40,8 @@ const SearchResults = () => {
     } catch (error) {
       console.error("Error fetching funeral homes:", error);
       toast({
-        title: "Error",
-        description: "Failed to load funeral homes. Please try again.",
+        title: "Σφάλμα",
+        description: "Αποτυχία φόρτωσης γραφείων τελετών. Παρακαλώ δοκιμάστε ξανά.",
         variant: "destructive",
       });
     } finally {
@@ -70,7 +70,7 @@ const SearchResults = () => {
     <div className="container py-8 md:py-12">
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-semibold mb-6 animate-fadeIn">
-          Funeral Homes in {location}
+          Γραφεία Τελετών στην περιοχή {location}
         </h1>
         
         <form onSubmit={handleSearch} className="flex gap-2 mb-8 animate-fadeIn delay-100">
@@ -83,23 +83,23 @@ const SearchResults = () => {
               value={newLocation}
               onChange={(e) => setNewLocation(e.target.value)}
               className="pl-10"
-              placeholder="Change location"
+              placeholder="Αλλαγή τοποθεσίας"
               required
             />
           </div>
-          <Button type="submit">Search</Button>
+          <Button type="submit">Αναζήτηση</Button>
         </form>
         
         <div className="flex justify-between items-center mb-4 animate-fadeIn delay-200">
           <p className="text-muted-foreground">
-            {loading ? "Searching..." : `${funeralHomes.length} funeral homes found`}
+            {loading ? "Αναζήτηση..." : `${funeralHomes.length} γραφεία τελετών βρέθηκαν`}
           </p>
           <Button 
             variant="outline" 
             className="flex items-center gap-2"
             onClick={toggleSortOrder}
           >
-            Price {sortOrder === "asc" ? "Low to High" : "High to Low"}
+            Τιμή {sortOrder === "asc" ? "Χαμηλή προς Υψηλή" : "Υψηλή προς Χαμηλή"}
             {sortOrder === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </div>
@@ -108,13 +108,13 @@ const SearchResults = () => {
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2 text-lg">Loading funeral homes...</span>
+          <span className="ml-2 text-lg">Φόρτωση γραφείων τελετών...</span>
         </div>
       ) : funeralHomes.length === 0 ? (
         <div className="text-center py-12 bg-secondary rounded-lg animate-fadeIn">
-          <p className="text-xl mb-4">No funeral homes found in this area.</p>
-          <p className="text-muted-foreground mb-6">Try searching for a different location or expanding your search area.</p>
-          <Button onClick={() => history.back()}>Go Back</Button>
+          <p className="text-xl mb-4">Δεν βρέθηκαν γραφεία τελετών σε αυτήν την περιοχή.</p>
+          <p className="text-muted-foreground mb-6">Δοκιμάστε να αναζητήσετε σε διαφορετική τοποθεσία ή διευρύνετε την περιοχή αναζήτησής σας.</p>
+          <Button onClick={() => history.back()}>Επιστροφή</Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 animate-fadeIn delay-300">
@@ -130,7 +130,7 @@ const SearchResults = () => {
                     />
                     {home.featured && (
                       <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
-                        Featured
+                        Προτεινόμενο
                       </div>
                     )}
                   </div>
@@ -162,7 +162,7 @@ const SearchResults = () => {
                           </svg>
                         ))}
                       </div>
-                      <span className="text-sm text-muted-foreground">({home.reviewCount} reviews)</span>
+                      <span className="text-sm text-muted-foreground">({home.reviewCount} κριτικές)</span>
                     </div>
                     
                     <p className="line-clamp-2 text-sm text-muted-foreground mb-4">{home.description}</p>
@@ -170,7 +170,7 @@ const SearchResults = () => {
                     {!isMobile && (
                       <div className="mt-auto">
                         <Link to={`/funeral-home/${home.id}`}>
-                          <Button variant="outline" className="w-full">View Details</Button>
+                          <Button variant="outline" className="w-full">Προβολή Λεπτομερειών</Button>
                         </Link>
                       </div>
                     )}
@@ -178,9 +178,9 @@ const SearchResults = () => {
                   
                   <div className="p-4 md:p-6 bg-secondary flex flex-col">
                     <div className="text-center mb-4">
-                      <p className="text-sm text-muted-foreground mb-1">Basic Service Starting At</p>
+                      <p className="text-sm text-muted-foreground mb-1">Βασική Υπηρεσία Από</p>
                       <p className="text-3xl font-semibold text-primary">${home.basicPrice.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground">Plus applicable taxes</p>
+                      <p className="text-xs text-muted-foreground">Συν ΦΠΑ</p>
                     </div>
                     
                     <div className="space-y-2 mb-4">
@@ -193,15 +193,15 @@ const SearchResults = () => {
                         </div>
                       ))}
                       {home.services.length > 3 && (
-                        <p className="text-xs text-muted-foreground">+{home.services.length - 3} more services</p>
+                        <p className="text-xs text-muted-foreground">+{home.services.length - 3} επιπλέον υπηρεσίες</p>
                       )}
                     </div>
                     
                     <div className="mt-auto space-y-2">
                       <Link to={`/funeral-home/${home.id}`}>
-                        <Button className="w-full">View Details</Button>
+                        <Button className="w-full">Προβολή Λεπτομερειών</Button>
                       </Link>
-                      <Button variant="outline" className="w-full">Contact</Button>
+                      <Button variant="outline" className="w-full">Επικοινωνία</Button>
                     </div>
                   </div>
                 </div>

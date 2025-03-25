@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Form } from "@/components/ui/form";
-import { RegistrationConfirmDialog } from "./RegistrationConfirmDialog";
+import { RegistrationConfirmDialog } from "./registration/RegistrationConfirmDialog";
 import { BusinessInfoFields } from "./registration/BusinessInfoFields";
 import { ContactInfoFields } from "./registration/ContactInfoFields";
 import { AddressFields } from "./registration/AddressFields";

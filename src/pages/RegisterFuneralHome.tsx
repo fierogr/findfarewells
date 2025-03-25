@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +17,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { addFuneralHome } from "@/services/funeralHomeService";
 
 const formSchema = z.object({
   businessName: z.string().min(3, {
@@ -76,42 +76,44 @@ const RegisterFuneralHome = () => {
     console.log("Form submitted:", data);
     
     try {
-      const newFuneralHome = {
-        id: crypto.randomUUID(), // Using browser's native crypto API
-        name: data.businessName,
-        address: data.address,
-        city: data.city,
-        state: "GR",
-        zip: data.postalCode,
-        phone: data.phone,
-        email: data.email,
-        website: data.website || "",
-        hours: "Δευ-Παρ: 9πμ-5μμ, Σαβ: 10πμ-2μμ, Κυρ: Κλειστά",
-        description: data.description,
-        about: data.description,
-        imageUrl: "https://images.unsplash.com/photo-1599946347371-68eb71b16afc",
-        rating: 0,
-        reviewCount: 0,
-        services: data.services ? data.services.split(',').map(s => s.trim()) : [],
-        basicPrice: 0,
-        featured: false,
-        amenities: [],
-        packages: [],
-        additionalServices: []
-      };
+      // Instead of saving to platform, we'll simulate sending an email notification
+      // This would normally be handled by a backend service
       
-      await addFuneralHome(newFuneralHome);
+      // Log the data that would be sent via email
+      console.log("Data to be sent via email:", {
+        subject: `Νέα αίτηση συνεργάτη: ${data.businessName}`,
+        body: `
+          Επωνυμία: ${data.businessName}
+          Ιδιοκτήτης: ${data.ownerName}
+          Email: ${data.email}
+          Τηλέφωνο: ${data.phone}
+          Διεύθυνση: ${data.address}
+          Πόλη: ${data.city}
+          ΤΚ: ${data.postalCode}
+          Ιστοσελίδα: ${data.website || "Δεν παρέχεται"}
+          Περιγραφή: ${data.description}
+          Υπηρεσίες: ${data.services || "Δεν παρέχεται"}
+          Ημερομηνία αίτησης: ${new Date().toLocaleString('el-GR')}
+        `
+      });
       
-      toast.success("Η εγγραφή σας υποβλήθηκε με επιτυχία", {
-        description: "Το γραφείο τελετών σας έχει προστεθεί στην πλατφόρμα μας."
+      // In a real implementation, this would be an API call to send an email
+      // You would connect this to your email service provider
+
+      // Display success message to user
+      toast.success("Η αίτηση σας υποβλήθηκε με επιτυχία", {
+        description: "Θα επικοινωνήσουμε μαζί σας σύντομα για να ολοκληρώσουμε τη διαδικασία εγγραφής."
       });
       
       form.reset();
       
-      navigate('/search');
+      // Redirect user to home page after submission
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
     } catch (error) {
-      console.error("Error adding funeral home:", error);
-      toast.error("Σφάλμα κατά την εγγραφή", {
+      console.error("Error submitting form:", error);
+      toast.error("Σφάλμα κατά την υποβολή", {
         description: "Παρουσιάστηκε ένα πρόβλημα κατά την υποβολή της φόρμας. Παρακαλώ δοκιμάστε ξανά."
       });
     }

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useFuneralHome } from "@/hooks/useFuneralHome";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -29,15 +29,24 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (funeralHome) {
-      setEditedHome(funeralHome);
+      console.log("Loaded funeral home with regions:", funeralHome.regions);
+      
+      // Βεβαιωνόμαστε ότι το regions είναι πάντα ένας πίνακας
+      const safeRegions = funeralHome.regions || [];
+      
+      setEditedHome({
+        ...funeralHome,
+        regions: safeRegions
+      });
     }
   }, [funeralHome]);
 
   const handleSave = async () => {
     if (editedHome) {
       try {
+        console.log("Saving partner with regions:", editedHome.regions);
         const updatedHome = await updateFuneralHome(editedHome.id, editedHome);
         if (updatedHome) {
           queryClient.invalidateQueries({ queryKey: ["funeralHomes"] });
@@ -145,6 +154,7 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
             editedHome={editedHome} 
             onRegionsChange={(regions) => {
               if (editedHome) {
+                console.log("Updating regions in PartnerDetails:", regions);
                 setEditedHome({ ...editedHome, regions });
               }
             }}

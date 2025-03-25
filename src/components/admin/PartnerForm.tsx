@@ -88,6 +88,7 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
         regions: selectedRegions
       };
       
+      console.log("Saving partner with regions:", selectedRegions);
       await onSave(partnerData);
       toast.success(initialData ? "Ο συνεργάτης ενημερώθηκε με επιτυχία!" : "Ο συνεργάτης προστέθηκε με επιτυχία!");
       onClose();

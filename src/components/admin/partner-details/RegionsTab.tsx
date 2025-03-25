@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,16 @@ interface RegionsTabProps {
 }
 
 const RegionsTab = ({ editedHome, onRegionsChange }: RegionsTabProps) => {
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  
+  useEffect(() => {
+    // Ενημέρωση των επιλεγμένων περιοχών όταν αλλάζει το editedHome
+    if (editedHome && editedHome.regions) {
+      setSelectedRegions(editedHome.regions);
+      console.log("RegionsTab initialized with regions:", editedHome.regions);
+    }
+  }, [editedHome]);
+
   const greekRegions = [
     "Νομός Θεσσαλονίκης",
     "Νομός Σερρών",
@@ -23,12 +33,13 @@ const RegionsTab = ({ editedHome, onRegionsChange }: RegionsTabProps) => {
   ];
 
   const handleRegionToggle = (region: string) => {
-    const currentRegions = editedHome.regions || [];
-    const updatedRegions = currentRegions.includes(region)
-      ? currentRegions.filter(r => r !== region)
-      : [...currentRegions, region];
+    const updatedRegions = selectedRegions.includes(region)
+      ? selectedRegions.filter(r => r !== region)
+      : [...selectedRegions, region];
     
+    setSelectedRegions(updatedRegions);
     onRegionsChange(updatedRegions);
+    console.log("Region toggled:", region, "New regions:", updatedRegions);
   };
 
   return (
@@ -47,7 +58,7 @@ const RegionsTab = ({ editedHome, onRegionsChange }: RegionsTabProps) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {greekRegions.map((region) => {
-              const isChecked = (editedHome.regions || []).includes(region);
+              const isChecked = selectedRegions.includes(region);
               return (
                 <div key={region} className="flex items-center space-x-2">
                   <Checkbox 
@@ -66,11 +77,11 @@ const RegionsTab = ({ editedHome, onRegionsChange }: RegionsTabProps) => {
             })}
           </div>
 
-          {(editedHome.regions || []).length > 0 && (
+          {selectedRegions.length > 0 && (
             <div className="mt-4">
               <h4 className="text-sm font-medium mb-2">Επιλεγμένες Περιοχές Εξυπηρέτησης:</h4>
               <div className="flex flex-wrap gap-2">
-                {(editedHome.regions || []).map((region) => (
+                {selectedRegions.map((region) => (
                   <Badge key={region} variant="secondary" className="px-3 py-1">
                     {region}
                     <Button

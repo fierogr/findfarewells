@@ -1,9 +1,9 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { 
   Form,
   FormControl,
@@ -16,8 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { addFuneralHome } from "@/services/funeralHomeService";
 
-// Define form schema with validation
 const formSchema = z.object({
   businessName: z.string().min(3, {
     message: "Το όνομα επιχείρησης πρέπει να έχει τουλάχιστον 3 χαρακτήρες"
@@ -45,15 +45,16 @@ const formSchema = z.object({
     message: "Η περιγραφή πρέπει να έχει τουλάχιστον 20 χαρακτήρες"
   }),
   services: z.string().optional(),
-  termsAccepted: z.literal(true, {
-    errorMap: () => ({ message: "Πρέπει να αποδεχτείτε τους όρους και τις προϋποθέσεις" })
+  termsAccepted: z.boolean().refine(val => val === true, {
+    message: "Πρέπει να αποδεχτείτε τους όρους και τις προϋποθέσεις"
   })
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 const RegisterFuneralHome = () => {
-  // Initialize form
+  const navigate = useNavigate();
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -71,17 +72,46 @@ const RegisterFuneralHome = () => {
     }
   });
 
-  // Form submission handler
-  function onSubmit(data: FormValues) {
+  async function onSubmit(data: FormValues) {
     console.log("Form submitted:", data);
     
-    // Here you would typically send the data to your backend
-    // For now, we'll just show a success toast
-    toast.success("Η εγγραφή σας υποβλήθηκε με επιτυχία", {
-      description: "Θα επικοινωνήσουμε μαζί σας σύντομα για την επιβεβαίωση."
-    });
-    
-    form.reset();
+    try {
+      const newFuneralHome = {
+        id: String(Date.now()),
+        name: data.businessName,
+        address: data.address,
+        city: data.city,
+        state: "GR",
+        zip: data.postalCode,
+        phone: data.phone,
+        email: data.email,
+        website: data.website || "",
+        hours: "Δευ-Παρ: 9πμ-5μμ, Σαβ: 10πμ-2μμ, Κυρ: Κλειστά",
+        description: data.description,
+        about: data.description,
+        imageUrl: "https://images.unsplash.com/photo-1599946347371-68eb71b16afc",
+        rating: 0,
+        reviewCount: 0,
+        services: data.services ? data.services.split(',').map(s => s.trim()) : [],
+        basicPrice: 0,
+        featured: false
+      };
+      
+      await addFuneralHome(newFuneralHome);
+      
+      toast.success("Η εγγραφή σας υποβλήθηκε με επιτυχία", {
+        description: "Το γραφείο τελετών σας έχει προστεθεί στην πλατφόρμα μας."
+      });
+      
+      form.reset();
+      
+      navigate('/search');
+    } catch (error) {
+      console.error("Error adding funeral home:", error);
+      toast.error("Σφάλμα κατά την εγγραφή", {
+        description: "Παρουσιάστηκε ένα πρόβλημα κατά την υποβολή της φόρμας. Παρακαλώ δοκιμάστε ξανά."
+      });
+    }
   }
 
   return (

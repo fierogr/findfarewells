@@ -757,3 +757,29 @@ export const getFuneralHomeById = (id: string): Promise<FuneralHome | null> => {
     }, 800);
   });
 };
+
+// Function to add a new funeral home to the list
+export const addFuneralHome = (funeralHome: FuneralHome): Promise<FuneralHome> => {
+  return new Promise((resolve) => {
+    // In a real app, this would be an API call to create a new record
+    // For our demo, we'll just add it to the mockFuneralHomes array
+    
+    // Add any missing properties with default values
+    const completeHome: FuneralHome = {
+      ...funeralHome,
+      coverImageUrl: funeralHome.coverImageUrl || "https://images.unsplash.com/photo-1468779065891-103dac4a7c48",
+      amenities: funeralHome.amenities || [],
+      packages: funeralHome.packages || [],
+      additionalServices: funeralHome.additionalServices || [],
+      reviews: funeralHome.reviews || []
+    };
+    
+    // Add the new funeral home to the array
+    mockFuneralHomes.push(completeHome);
+    
+    // Simulate API call delay
+    setTimeout(() => {
+      resolve(completeHome);
+    }, 500);
+  });
+};

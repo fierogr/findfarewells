@@ -4,12 +4,12 @@ import { mockFuneralHomes } from '@/data/mockFuneralHomes';
 import { createDefaultFuneralHome } from './funeralHomeUtils';
 
 // Function to simulate fetching funeral homes by location
-export const getFuneralHomes = (location: string = ""): Promise<FuneralHome[]> => {
+export const getFuneralHomes = (location?: string): Promise<FuneralHome[]> => {
   return new Promise((resolve) => {
     // Simulate API call delay
     setTimeout(() => {
-      // In a real app, this would filter based on the location
-      // Here we just return all mock data since it's a demo
+      // In a real app, this would filter based on the location from the backend
+      // Here we return all mock data since filtering will be done in the useSearchResults hook
       resolve(mockFuneralHomes);
     }, 1000);
   });

@@ -6,6 +6,7 @@ import { BusinessInfoFields } from "./registration/BusinessInfoFields";
 import { ContactInfoFields } from "./registration/ContactInfoFields";
 import { AddressFields } from "./registration/AddressFields";
 import { DescriptionFields } from "./registration/DescriptionFields";
+import { RegionsFields } from "./registration/RegionsFields";
 import { TermsAndConditionsField } from "./registration/TermsAndConditionsField";
 import { SubmitButton } from "./registration/SubmitButton";
 import { useRegistrationForm } from "./registration/useRegistrationForm";
@@ -15,6 +16,8 @@ export const RegisterForm = () => {
     form,
     isSubmitting,
     showConfirmDialog,
+    selectedRegions,
+    setSelectedRegions,
     handleOpenConfirmDialog,
     handleCloseConfirmDialog,
     onSubmitConfirmed
@@ -31,6 +34,13 @@ export const RegisterForm = () => {
           </div>
           
           <DescriptionFields form={form} />
+          
+          <RegionsFields 
+            form={form} 
+            selectedRegions={selectedRegions} 
+            setSelectedRegions={setSelectedRegions} 
+          />
+          
           <TermsAndConditionsField form={form} />
           
           <SubmitButton 
@@ -44,7 +54,7 @@ export const RegisterForm = () => {
         isOpen={showConfirmDialog}
         onClose={handleCloseConfirmDialog}
         onConfirm={onSubmitConfirmed}
-        formData={form.getValues()}
+        formData={{...form.getValues(), regions: selectedRegions}}
         isLoading={isSubmitting}
       />
     </>

@@ -11,6 +11,7 @@ export function useRegistrationForm() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   
   const form = useForm<RegistrationFormValues>({
     resolver: zodResolver(registrationFormSchema),
@@ -43,7 +44,7 @@ export function useRegistrationForm() {
   };
 
   async function onSubmitConfirmed() {
-    const data = form.getValues();
+    const data = {...form.getValues(), regions: selectedRegions};
     console.log("Form submitted:", data);
     
     setIsSubmitting(true);
@@ -62,6 +63,7 @@ export function useRegistrationForm() {
       });
       
       form.reset();
+      setSelectedRegions([]);
       
       // Redirect user to home page after submission
       setTimeout(() => {
@@ -82,6 +84,8 @@ export function useRegistrationForm() {
     form,
     isSubmitting,
     showConfirmDialog,
+    selectedRegions,
+    setSelectedRegions,
     handleOpenConfirmDialog,
     handleCloseConfirmDialog,
     onSubmitConfirmed

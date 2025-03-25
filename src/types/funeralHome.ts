@@ -23,6 +23,7 @@ export interface FuneralHome {
   packages: ServicePackage[];
   additionalServices: AdditionalService[];
   reviews?: Review[];
+  regions?: string[]; // Added regions field
 }
 
 export interface ServicePackage {

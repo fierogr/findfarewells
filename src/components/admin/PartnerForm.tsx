@@ -13,6 +13,7 @@ import { partnerFormSchema, PartnerFormValues } from "./forms/combinedFormSchema
 import BasicInfoForm from "./forms/BasicInfoForm";
 import DetailsForm from "./forms/DetailsForm";
 import PackagesForm from "./forms/PackagesForm";
+import RegionsForm from "./forms/RegionsForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface PartnerFormProps {
@@ -26,6 +27,7 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
   const [imageUrl, setImageUrl] = useState<string>(initialData?.imageUrl || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [packages, setPackages] = useState<ServicePackage[]>(initialData?.packages || []);
+  const [selectedRegions, setSelectedRegions] = useState<string[]>(initialData?.regions || []);
 
   const form = useForm<PartnerFormValues>({
     resolver: zodResolver(partnerFormSchema),
@@ -82,7 +84,8 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
         amenities: initialData?.amenities || [],
         packages: packages,
         additionalServices: initialData?.additionalServices || [],
-        reviews: initialData?.reviews || []
+        reviews: initialData?.reviews || [],
+        regions: selectedRegions
       };
       
       await onSave(partnerData);
@@ -111,9 +114,10 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid grid-cols-3 mb-6">
+              <TabsList className="grid grid-cols-4 mb-6">
                 <TabsTrigger value="basic">Βασικά Στοιχεία</TabsTrigger>
                 <TabsTrigger value="details">Λεπτομέρειες</TabsTrigger>
+                <TabsTrigger value="regions">Περιοχές</TabsTrigger>
                 <TabsTrigger value="packages">Πακέτα</TabsTrigger>
               </TabsList>
               
@@ -123,6 +127,14 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
               
               <TabsContent value="details">
                 <DetailsForm form={form} imageUrl={imageUrl} setImageUrl={setImageUrl} />
+              </TabsContent>
+              
+              <TabsContent value="regions">
+                <RegionsForm 
+                  form={form} 
+                  selectedRegions={selectedRegions} 
+                  setSelectedRegions={setSelectedRegions} 
+                />
               </TabsContent>
               
               <TabsContent value="packages">

@@ -43,9 +43,14 @@ export const useSearchResults = (initialLocation: string) => {
   const fetchFuneralHomes = async (searchLocation: string) => {
     setLoading(true);
     try {
-      const homes = await getFuneralHomes(searchLocation);
-      setFuneralHomes(homes);
-      setFilteredHomes(homes);
+      // Get all funeral homes first
+      const homes = await getFuneralHomes();
+      
+      // Filter homes based on the specified location
+      const filteredByRegion = filterHomesByRegion(homes, searchLocation);
+      
+      setFuneralHomes(filteredByRegion);
+      setFilteredHomes(filteredByRegion);
     } catch (error) {
       console.error("Error fetching funeral homes:", error);
       toast({
@@ -56,6 +61,56 @@ export const useSearchResults = (initialLocation: string) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper function to filter homes by region based on search location
+  const filterHomesByRegion = (homes: FuneralHome[], searchLocation: string): FuneralHome[] => {
+    // Normalize the search location (remove case sensitivity, accents, etc.)
+    const normalizedLocation = searchLocation.toLowerCase().trim();
+    
+    // Map of possible region keywords to the full region names
+    const regionKeywords: Record<string, string> = {
+      'θεσσαλονικη': 'Νομός Θεσσαλονίκης',
+      'θεσσαλονίκη': 'Νομός Θεσσαλονίκης',
+      'σερρες': 'Νομός Σερρών',
+      'σέρρες': 'Νομός Σερρών',
+      'κιλκις': 'Νομός Κιλκίς',
+      'κιλκίς': 'Νομός Κιλκίς',
+      'πελλα': 'Νομός Πέλλας',
+      'πέλλα': 'Νομός Πέλλας',
+      'ημαθια': 'Νομός Ημαθίας',
+      'ημαθία': 'Νομός Ημαθίας',
+      'χαλκιδικη': 'Νομός Χαλκιδικής',
+      'χαλκιδική': 'Νομός Χαλκιδικής'
+    };
+    
+    // Try to match the search location to a region
+    let matchedRegion = '';
+    for (const [keyword, region] of Object.entries(regionKeywords)) {
+      if (normalizedLocation.includes(keyword)) {
+        matchedRegion = region;
+        break;
+      }
+    }
+    
+    // If we found a matching region, filter homes by that region
+    if (matchedRegion) {
+      return homes.filter(home => 
+        home.regions?.includes(matchedRegion) || 
+        // Also check if the home's state field matches the region
+        home.state.toLowerCase().includes(matchedRegion.toLowerCase())
+      );
+    }
+    
+    // If no specific region is found, try to match by city or general location
+    return homes.filter(home => 
+      home.city.toLowerCase().includes(normalizedLocation) || 
+      home.state.toLowerCase().includes(normalizedLocation) || 
+      home.address.toLowerCase().includes(normalizedLocation) ||
+      (home.regions && home.regions.some(region => 
+        region.toLowerCase().includes(normalizedLocation)
+      ))
+    );
   };
 
   const toggleSortOrder = () => {

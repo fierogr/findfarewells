@@ -13,6 +13,7 @@ export const partnerFormSchema = z.object({
   services: z.string().optional(),
   website: z.string().url({ message: "Παρακαλώ εισάγετε ένα έγκυρο URL" }).optional().or(z.literal("")),
   featured: z.boolean().default(false),
+  regions: z.array(z.string()).optional(),
 });
 
 export type PartnerFormValues = z.infer<typeof partnerFormSchema>;

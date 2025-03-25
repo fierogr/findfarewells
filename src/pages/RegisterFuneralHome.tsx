@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { crypto } from "crypto";
 import { 
   Form,
   FormControl,
@@ -77,7 +78,7 @@ const RegisterFuneralHome = () => {
     
     try {
       const newFuneralHome = {
-        id: String(Date.now()),
+        id: crypto.randomUUID(),
         name: data.businessName,
         address: data.address,
         city: data.city,

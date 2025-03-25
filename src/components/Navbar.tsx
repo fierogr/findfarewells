@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { MapPin, UserPlus } from "lucide-react";
+import { MapPin, UserPlus, Shield } from "lucide-react";
 import { Button } from "./ui/button";
 
 const Navbar = () => {
@@ -39,6 +39,13 @@ const Navbar = () => {
               <UserPlus className="mr-1.5 h-4 w-4" />
               <span className="hidden sm:inline">Εγγραφή Γραφείου Τελετών</span>
               <span className="sm:hidden">Εγγραφή</span>
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/admin" className="flex items-center">
+              <Shield className="mr-1.5 h-4 w-4" />
+              <span className="hidden sm:inline">Διαχείριση</span>
+              <span className="sm:hidden">Admin</span>
             </Link>
           </Button>
         </div>

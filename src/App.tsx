@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import SearchResults from "./pages/SearchResults";
 import FuneralHomeDetails from "./pages/FuneralHomeDetails";
 import RegisterFuneralHome from "./pages/RegisterFuneralHome";
+import AdminPanel from "./pages/AdminPanel";
 import Layout from "./components/Layout";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/search" element={<SearchResults />} />
             <Route path="/funeral-home/:id" element={<FuneralHomeDetails />} />
             <Route path="/register-funeral-home" element={<RegisterFuneralHome />} />
+            <Route path="/admin" element={<AdminPanel />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

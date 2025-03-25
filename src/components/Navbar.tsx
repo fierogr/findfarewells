@@ -48,6 +48,7 @@ const Navbar = () => {
               <span className="sm:hidden">Εγγραφή</span>
             </Link>
           </Button>
+          
           {isAuthenticated ? (
             <>
               <Button variant="ghost" size="sm" asChild>
@@ -59,7 +60,7 @@ const Navbar = () => {
               </Button>
               <Button 
                 variant="ghost" 
-                size="sm" 
+                size="sm"
                 className="flex items-center"
                 onClick={logout}
               >

@@ -25,7 +25,7 @@ const formSchema = z.object({
   address: z.string().min(5, { message: "Η διεύθυνση είναι απαραίτητη" }),
   city: z.string().min(2, { message: "Η πόλη είναι απαραίτητη" }),
   state: z.string().min(2, { message: "Ο νομός είναι απαραίτητος" }),
-  zipCode: z.string().min(5, { message: "Ο ταχυδρομικός κώδικας είναι απαραίτητος" }),
+  zip: z.string().min(5, { message: "Ο ταχυδρομικός κώδικας είναι απαραίτητος" }),
   phone: z.string().min(10, { message: "Το τηλέφωνο είναι απαραίτητο" }),
   email: z.string().email({ message: "Παρακαλώ εισάγετε ένα έγκυρο email" }),
   description: z.string().min(20, { message: "Η περιγραφή πρέπει να έχει τουλάχιστον 20 χαρακτήρες" }),
@@ -42,7 +42,7 @@ interface PartnerFormProps {
 }
 
 const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) => {
-  const [photoURL, setPhotoURL] = useState<string>(initialData?.photoURL || "");
+  const [imageUrl, setImageUrl] = useState<string>(initialData?.imageUrl || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -52,7 +52,7 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
       address: initialData.address,
       city: initialData.city,
       state: initialData.state,
-      zipCode: initialData.zipCode,
+      zip: initialData.zip,
       phone: initialData.phone,
       email: initialData.email,
       description: initialData.description,
@@ -64,7 +64,7 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
       address: "",
       city: "",
       state: "",
-      zipCode: "",
+      zip: "",
       phone: "",
       email: "",
       description: "",
@@ -80,7 +80,7 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
       // In a real app, we would upload this to a server or cloud storage
       // For demo purposes, we're creating a local URL
       const url = URL.createObjectURL(file);
-      setPhotoURL(url);
+      setImageUrl(url);
     }
   };
 
@@ -94,20 +94,23 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
         address: data.address,
         city: data.city,
         state: data.state,
-        zipCode: data.zipCode,
+        zip: data.zip,
         phone: data.phone,
         email: data.email,
         description: data.description,
         services: data.services ? data.services.split(',').map(s => s.trim()) : [],
-        photoURL: photoURL || "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80",
-        website: data.website || undefined,
+        imageUrl: imageUrl || "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80",
+        website: data.website || "",
+        hours: initialData?.hours || "",
+        about: initialData?.about || "",
         rating: initialData?.rating || 0,
         reviewCount: initialData?.reviewCount || 0,
         basicPrice: initialData?.basicPrice || 0,
         featured: data.featured,
         amenities: initialData?.amenities || [],
         packages: initialData?.packages || [],
-        additionalServices: initialData?.additionalServices || []
+        additionalServices: initialData?.additionalServices || [],
+        reviews: initialData?.reviews || []
       };
       
       await onSave(partnerData);
@@ -198,7 +201,7 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="zipCode"
+                    name="zip"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Τ.Κ.</FormLabel>
@@ -257,15 +260,15 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
               <div className="space-y-4">
                 <div className="mb-4">
                   <FormLabel className="block mb-2">Φωτογραφία</FormLabel>
-                  {photoURL ? (
+                  {imageUrl ? (
                     <div className="relative w-full h-40 rounded-md overflow-hidden">
-                      <img src={photoURL} alt="Partner" className="object-cover w-full h-full" />
+                      <img src={imageUrl} alt="Partner" className="object-cover w-full h-full" />
                       <Button 
                         type="button" 
                         variant="destructive" 
                         size="icon" 
                         className="absolute top-2 right-2"
-                        onClick={() => setPhotoURL("")}
+                        onClick={() => setImageUrl("")}
                       >
                         <X className="h-4 w-4" />
                       </Button>

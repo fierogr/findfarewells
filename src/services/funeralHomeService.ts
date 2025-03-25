@@ -736,7 +736,7 @@ const mockFuneralHomes: FuneralHome[] = [
 ];
 
 // Function to simulate fetching funeral homes by location
-export const getFuneralHomes = (location: string): Promise<FuneralHome[]> => {
+export const getFuneralHomes = (location: string = ""): Promise<FuneralHome[]> => {
   return new Promise((resolve) => {
     // Simulate API call delay
     setTimeout(() => {

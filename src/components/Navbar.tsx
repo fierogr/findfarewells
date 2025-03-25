@@ -10,7 +10,11 @@ const Navbar = () => {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center">
           <Link to="/" className="mr-6 flex items-center space-x-2">
-            <span className="font-semibold text-xl">Riprice</span>
+            <img 
+              src="/lovable-uploads/cf99ce96-ddda-41a2-aae6-1dad8d00e818.png" 
+              alt="Restinprice Logo" 
+              className="h-10" 
+            />
           </Link>
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
             <Link

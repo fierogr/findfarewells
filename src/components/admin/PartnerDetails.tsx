@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useFuneralHome } from "@/hooks/useFuneralHome";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +24,8 @@ import {
   AlertDialogHeader, 
   AlertDialogTitle 
 } from "@/components/ui/alert-dialog";
-import { deleteFuneralHome, updateFuneralHome } from "@/services/adminFuneralHomeService";
+import { useDeleteFuneralHome } from "@/hooks/useDeleteFuneralHome";
+import { updateFuneralHome } from "@/services/adminFuneralHomeService";
 
 interface PartnerDetailsProps {
   partnerId: string;
@@ -35,7 +37,7 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
   const [editedHome, setEditedHome] = useState<FuneralHome | null>(null);
   const [newService, setNewService] = useState("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const deleteFuneralHomeMutation = useDeleteFuneralHome();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -70,21 +72,13 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
   };
 
   const handleDelete = async () => {
-    setIsDeleting(true);
     try {
-      const success = await deleteFuneralHome(partnerId);
-      if (success) {
-        queryClient.invalidateQueries({ queryKey: ["funeralHomes"] });
-        
-        toast({
-          title: "Διαγραφή επιτυχής",
-          description: "Ο συνεργάτης διαγράφηκε με επιτυχία.",
-        });
-        
-        onBack();
-      } else {
-        throw new Error("Failed to delete partner");
-      }
+      await deleteFuneralHomeMutation.mutateAsync(partnerId);
+      toast({
+        title: "Διαγραφή επιτυχής",
+        description: "Ο συνεργάτης διαγράφηκε με επιτυχία.",
+      });
+      onBack();
     } catch (err) {
       toast({
         title: "Σφάλμα",
@@ -93,7 +87,6 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
       });
       console.error("Error deleting partner:", err);
     } finally {
-      setIsDeleting(false);
       setIsDeleteDialogOpen(false);
     }
   };
@@ -160,7 +153,7 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
           <Button 
             variant="destructive" 
             onClick={() => setIsDeleteDialogOpen(true)}
-            disabled={isDeleting}
+            disabled={deleteFuneralHomeMutation.isPending}
           >
             <Trash2 className="mr-2 h-4 w-4" /> Διαγραφή
           </Button>
@@ -500,6 +493,29 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Διαγραφή Συνεργάτη</AlertDialogTitle>
+            <AlertDialogDescription>
+              Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτόν τον συνεργάτη; Η ενέργεια αυτή δεν μπορεί να αναιρεθεί.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Άκυρο</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteFuneralHomeMutation.isPending}
+            >
+              {deleteFuneralHomeMutation.isPending ? 'Διαγραφή...' : 'Διαγραφή'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
 
-
-
+export default PartnerDetails;

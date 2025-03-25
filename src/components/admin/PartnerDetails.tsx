@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useFuneralHome } from "@/hooks/useFuneralHome";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, Trash2, Upload, Plus, X } from "lucide-react";
+import { ArrowLeft, Save, Trash2, Upload, Plus, X, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,6 +38,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface PartnerDetailsProps {
   partnerId: string;
@@ -191,7 +192,6 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
         description: "Το πακέτο προστέθηκε επιτυχώς."
       });
       
-      // Reset form and close dialog
       packageForm.reset();
       setIncludedServices([]);
       setIsPackageDialogOpen(false);
@@ -202,6 +202,26 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
     packageForm.reset();
     setIncludedServices([]);
     setIncludedServiceInput("");
+  };
+
+  const greekRegions = [
+    "Νομός Θεσσαλονίκης",
+    "Νομός Σερρών",
+    "Νομός Κιλκίς",
+    "Νομός Πέλλας",
+    "Νομός Ημαθίας",
+    "Νομός Χαλκιδικής"
+  ];
+
+  const handleRegionToggle = (region: string) => {
+    if (editedHome) {
+      const currentRegions = editedHome.regions || [];
+      const updatedRegions = currentRegions.includes(region)
+        ? currentRegions.filter(r => r !== region)
+        : [...currentRegions, region];
+      
+      setEditedHome({ ...editedHome, regions: updatedRegions });
+    }
   };
 
   if (isLoading) {
@@ -245,6 +265,7 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
           <TabsTrigger value="services">Υπηρεσίες</TabsTrigger>
           <TabsTrigger value="packages">Πακέτα</TabsTrigger>
           <TabsTrigger value="additional">Επιπλέον Υπηρεσίες</TabsTrigger>
+          <TabsTrigger value="regions">Περιοχές Εξυπηρέτησης</TabsTrigger>
           <TabsTrigger value="photos">Φωτογραφίες</TabsTrigger>
         </TabsList>
 
@@ -504,6 +525,62 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="regions">
+          <Card>
+            <CardHeader>
+              <CardTitle>Περιοχές Εξυπηρέτησης</CardTitle>
+              <CardDescription>
+                Διαχειριστείτε τις περιοχές στις οποίες δραστηριοποιείται το γραφείο τελετών.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Επιλέξτε τις περιοχές στις οποίες δραστηριοποιείται το γραφείο τελετών.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {greekRegions.map((region) => (
+                    <div key={region} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`region-${region}`}
+                        checked={(editedHome.regions || []).includes(region)}
+                        onCheckedChange={() => handleRegionToggle(region)}
+                      />
+                      <label
+                        htmlFor={`region-${region}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {region}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+
+                {(editedHome.regions || []).length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium mb-2">Επιλεγμένες Περιοχές Εξυπηρέτησης:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {(editedHome.regions || []).map((region) => (
+                        <Badge key={region} variant="secondary" className="px-3 py-1">
+                          {region}
+                          <Button
+                            variant="ghost"
+                            className="h-4 w-4 p-0 ml-1"
+                            onClick={() => handleRegionToggle(region)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="photos">
           <Card>
             <CardHeader>
@@ -557,7 +634,7 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
                     ) : (
                       <div className="flex flex-col items-center justify-center h-40 bg-muted rounded-md">
                         <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                        <p className="text-sm text-muted-foreground">Δεν υπάρχει εικόνα εξώφυλλου</p>
+                        <p className="text-sm text-muted-foreground">Δεν υπάρχει εικόνα εξώφυλου</p>
                       </div>
                     )}
                     <Button variant="outline" className="mt-4">

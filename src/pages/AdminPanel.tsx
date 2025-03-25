@@ -1,17 +1,24 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 import PartnersManagement from "@/components/admin/PartnersManagement";
 import UserRequests from "@/components/admin/UserRequests";
 import PartnerDetails from "@/components/admin/PartnerDetails";
 import EmailSettings from "@/components/admin/EmailSettings";
 import { useFuneralHomes } from "@/hooks/useFuneralHomes";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const AdminPanel = () => {
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
   const { data: funeralHomes } = useFuneralHomes();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const handlePartnerSelect = (partnerId: string) => {
     setSelectedPartnerId(partnerId);
@@ -19,6 +26,11 @@ const AdminPanel = () => {
 
   const handleBackToList = () => {
     setSelectedPartnerId(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
   };
 
   // Calculate some basic statistics
@@ -31,7 +43,18 @@ const AdminPanel = () => {
 
   return (
     <div className="container py-8">
-      <h1 className="text-3xl font-bold mb-6">Πίνακας Διαχείρισης</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Πίνακας Διαχείρισης</h1>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleLogout}
+          className="flex items-center gap-2"
+        >
+          <LogOut className="h-4 w-4" />
+          Αποσύνδεση
+        </Button>
+      </div>
 
       {selectedPartnerId ? (
         <PartnerDetails partnerId={selectedPartnerId} onBack={handleBackToList} />

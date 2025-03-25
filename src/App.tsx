@@ -10,27 +10,38 @@ import SearchResults from "./pages/SearchResults";
 import FuneralHomeDetails from "./pages/FuneralHomeDetails";
 import RegisterFuneralHome from "./pages/RegisterFuneralHome";
 import AdminPanel from "./pages/AdminPanel";
+import AdminLogin from "./pages/AdminLogin";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/search" element={<SearchResults />} />
-            <Route path="/funeral-home/:id" element={<FuneralHomeDetails />} />
-            <Route path="/register-funeral-home" element={<RegisterFuneralHome />} />
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/search" element={<SearchResults />} />
+              <Route path="/funeral-home/:id" element={<FuneralHomeDetails />} />
+              <Route path="/register-funeral-home" element={<RegisterFuneralHome />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
+              
+              {/* Protected Admin Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/admin" element={<AdminPanel />} />
+              </Route>
+              
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

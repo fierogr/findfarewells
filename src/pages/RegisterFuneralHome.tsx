@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { sendPartnerRegistrationNotification } from "@/services/emailService";
 
 const formSchema = z.object({
   businessName: z.string().min(3, {
@@ -76,29 +76,12 @@ const RegisterFuneralHome = () => {
     console.log("Form submitted:", data);
     
     try {
-      // Instead of saving to platform, we'll simulate sending an email notification
-      // This would normally be handled by a backend service
+      // Send email notification with partner data
+      const emailSent = await sendPartnerRegistrationNotification(data);
       
-      // Log the data that would be sent via email
-      console.log("Data to be sent via email:", {
-        subject: `Νέα αίτηση συνεργάτη: ${data.businessName}`,
-        body: `
-          Επωνυμία: ${data.businessName}
-          Ιδιοκτήτης: ${data.ownerName}
-          Email: ${data.email}
-          Τηλέφωνο: ${data.phone}
-          Διεύθυνση: ${data.address}
-          Πόλη: ${data.city}
-          ΤΚ: ${data.postalCode}
-          Ιστοσελίδα: ${data.website || "Δεν παρέχεται"}
-          Περιγραφή: ${data.description}
-          Υπηρεσίες: ${data.services || "Δεν παρέχεται"}
-          Ημερομηνία αίτησης: ${new Date().toLocaleString('el-GR')}
-        `
-      });
-      
-      // In a real implementation, this would be an API call to send an email
-      // You would connect this to your email service provider
+      if (!emailSent) {
+        throw new Error("Failed to send email notification");
+      }
 
       // Display success message to user
       toast.success("Η αίτηση σας υποβλήθηκε με επιτυχία", {

@@ -16,6 +16,10 @@ const Index = () => {
     }
   };
 
+  const handleSampleSearch = () => {
+    setLocation("Portland, OR 97205");
+  };
+
   return (
     <div className="relative overflow-hidden">
       {/* Hero Section */}
@@ -51,6 +55,15 @@ const Index = () => {
                   <Search className="h-5 w-5 mr-2" />
                   Search
                 </Button>
+              </div>
+              <div className="mt-3 text-center">
+                <button 
+                  type="button" 
+                  onClick={handleSampleSearch}
+                  className="text-primary text-sm hover:underline focus:outline-none"
+                >
+                  Try with sample: Portland, OR 97205
+                </button>
               </div>
             </form>
           </div>

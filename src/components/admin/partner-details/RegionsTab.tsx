@@ -1,10 +1,10 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { X, Plus } from "lucide-react";
 import { FuneralHome } from "@/types/funeralHome";
 
 interface RegionsTabProps {
@@ -13,6 +13,7 @@ interface RegionsTabProps {
 }
 
 const RegionsTab = ({ editedHome, onRegionsChange }: RegionsTabProps) => {
+  const [newRegion, setNewRegion] = useState("");
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   
   useEffect(() => {
@@ -24,27 +25,17 @@ const RegionsTab = ({ editedHome, onRegionsChange }: RegionsTabProps) => {
     }
   }, [editedHome]);
 
-  const greekRegions = [
-    "Νομός Θεσσαλονίκης",
-    "Νομός Σερρών",
-    "Νομός Κιλκίς",
-    "Νομός Πέλλας",
-    "Νομός Ημαθίας",
-    "Νομός Χαλκιδικής"
-  ];
-
-  const handleRegionToggle = (region: string) => {
-    let updatedRegions: string[];
-    
-    if (selectedRegions.includes(region)) {
-      updatedRegions = selectedRegions.filter(r => r !== region);
-    } else {
-      updatedRegions = [...selectedRegions, region];
+  const handleRegionAdd = () => {
+    if (newRegion.trim()) {
+      const updatedRegions = [...selectedRegions, newRegion.trim()];
+      setSelectedRegions(updatedRegions);
+      onRegionsChange(updatedRegions);
+      setNewRegion("");
     }
-    
-    console.log("RegionsTab: Region toggled:", region);
-    console.log("RegionsTab: New regions after toggle:", updatedRegions);
-    
+  };
+
+  const handleRegionRemove = (regionToRemove: string) => {
+    const updatedRegions = selectedRegions.filter(region => region !== regionToRemove);
     setSelectedRegions(updatedRegions);
     onRegionsChange(updatedRegions);
   };
@@ -54,55 +45,39 @@ const RegionsTab = ({ editedHome, onRegionsChange }: RegionsTabProps) => {
       <CardHeader>
         <CardTitle>Περιοχές Εξυπηρέτησης</CardTitle>
         <CardDescription>
-          Διαχειριστείτε τις περιοχές στις οποίες δραστηριοποιείται το γραφείο τελετών.
+          Διαχείριση των περιοχών που εξυπηρετεί το γραφείο τελετών.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <p className="text-sm text-muted-foreground mb-4">
-            Επιλέξτε τις περιοχές στις οποίες δραστηριοποιείται το γραφείο τελετών.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {greekRegions.map((region) => {
-              const isChecked = selectedRegions.includes(region);
-              return (
-                <div key={region} className="flex items-center space-x-2">
-                  <Checkbox 
-                    id={`region-${region}`}
-                    checked={isChecked}
-                    onCheckedChange={() => handleRegionToggle(region)}
-                  />
-                  <label
-                    htmlFor={`region-${region}`}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {region}
-                  </label>
-                </div>
-              );
-            })}
-          </div>
-
-          {selectedRegions.length > 0 && (
-            <div className="mt-4">
-              <h4 className="text-sm font-medium mb-2">Επιλεγμένες Περιοχές Εξυπηρέτησης:</h4>
-              <div className="flex flex-wrap gap-2">
-                {selectedRegions.map((region) => (
-                  <Badge key={region} variant="secondary" className="px-3 py-1">
-                    {region}
-                    <Button
-                      variant="ghost"
-                      className="h-4 w-4 p-0 ml-1"
-                      onClick={() => handleRegionToggle(region)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
+      <CardContent className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Προσθήκη νέας περιοχής"
+            value={newRegion}
+            onChange={(e) => setNewRegion(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleRegionAdd();
+              }
+            }}
+          />
+          <Button onClick={handleRegionAdd}>
+            <Plus className="h-4 w-4 mr-1" /> Προσθήκη
+          </Button>
+        </div>
+        <div className="flex flex-wrap gap-2 mt-4">
+          {selectedRegions.map((region, index) => (
+            <Badge key={index} variant="secondary" className="py-2 px-3 text-sm">
+              {region}
+              <Button
+                variant="ghost"
+                className="h-4 w-4 p-0 ml-2"
+                onClick={() => handleRegionRemove(region)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </Badge>
+          ))}
         </div>
       </CardContent>
     </Card>

@@ -27,8 +27,8 @@ export const RegionsDisplay = ({ regions }: RegionsDisplayProps) => {
         <h3 className="text-lg font-medium">Περιοχές Εξυπηρέτησης</h3>
       </div>
       <div className="flex flex-wrap gap-2">
-        {regions.map((region) => (
-          <Badge key={region} variant="outline" className="px-3 py-1">
+        {regions.map((region, index) => (
+          <Badge key={index} variant="outline" className="px-3 py-1">
             {region}
           </Badge>
         ))}

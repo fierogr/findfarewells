@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useFuneralHomes } from "@/hooks/useFuneralHomes";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, FileExport } from "lucide-react";
+import { Search, Plus, FileDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FuneralHome } from "@/types/funeralHome";
@@ -71,7 +71,7 @@ const PartnersManagement = ({ onPartnerSelect }: PartnersManagementProps) => {
           />
         </div>
         <Button variant="outline" onClick={handleExport}>
-          <FileExport className="mr-2 h-4 w-4" /> Εξαγωγή
+          <FileDown className="mr-2 h-4 w-4" /> Εξαγωγή
         </Button>
         <Button onClick={() => setIsAddPartnerOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Προσθήκη Συνεργάτη

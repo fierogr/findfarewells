@@ -19,6 +19,20 @@ const formSchema = z.object({
   featured: z.boolean().default(false),
 });
 
+// Common funeral services in Greece
+const availableServices = [
+  { id: "funeral", label: "Κηδεία" },
+  { id: "memorial", label: "Μνημόσυνο" },
+  { id: "transport", label: "Μεταφορά σορού" },
+  { id: "cremation", label: "Αποτέφρωση" },
+  { id: "embalming", label: "Ταρίχευση" },
+  { id: "flowers", label: "Άνθη/Στεφάνια" },
+  { id: "documentation", label: "Έγγραφα/Άδειες" },
+  { id: "obituary", label: "Αγγελία/Νεκρολογία" },
+  { id: "catering", label: "Μπουφές/Καφές" },
+  { id: "chapel", label: "Ιδιωτικό παρεκκλήσι" },
+];
+
 interface DetailsFormProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
   imageUrl: string;
@@ -26,6 +40,28 @@ interface DetailsFormProps {
 }
 
 const DetailsForm = ({ form, imageUrl, setImageUrl }: DetailsFormProps) => {
+  const selectedServices = form.watch("services") ? form.watch("services").split(",").map(s => s.trim()) : [];
+  
+  const handleServiceToggle = (serviceId: string, checked: boolean) => {
+    const currentServices = selectedServices;
+    let newServices: string[];
+    
+    if (checked) {
+      // Add the service if it's not already included
+      if (!currentServices.includes(serviceId)) {
+        newServices = [...currentServices, serviceId];
+      } else {
+        newServices = currentServices;
+      }
+    } else {
+      // Remove the service
+      newServices = currentServices.filter(s => s !== serviceId);
+    }
+    
+    // Update the form
+    form.setValue("services", newServices.join(", "), { shouldValidate: true });
+  };
+
   return (
     <div className="space-y-4">
       <ImageUpload imageUrl={imageUrl} setImageUrl={setImageUrl} />
@@ -48,23 +84,41 @@ const DetailsForm = ({ form, imageUrl, setImageUrl }: DetailsFormProps) => {
         )}
       />
       
-      <FormField
-        control={form.control}
-        name="services"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Υπηρεσίες (χωρισμένες με κόμμα)</FormLabel>
-            <FormControl>
-              <Textarea 
-                placeholder="Κηδεία, Μνημόσυνο, Μεταφορά σορού..." 
-                className="min-h-[80px]" 
-                {...field} 
+      <div className="space-y-2">
+        <FormLabel>Διαθέσιμες Υπηρεσίες</FormLabel>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 border rounded-md p-3">
+          {availableServices.map((service) => (
+            <div key={service.id} className="flex items-center space-x-2">
+              <Checkbox 
+                id={`service-${service.id}`}
+                checked={selectedServices.includes(service.id)}
+                onCheckedChange={(checked) => 
+                  handleServiceToggle(service.id, checked as boolean)
+                }
               />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+              <label
+                htmlFor={`service-${service.id}`}
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {service.label}
+              </label>
+            </div>
+          ))}
+        </div>
+        
+        <FormField
+          control={form.control}
+          name="services"
+          render={({ field }) => (
+            <FormItem className="hidden">
+              <FormControl>
+                <Textarea {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
       
       <FormField
         control={form.control}

@@ -112,7 +112,7 @@ const Index = () => {
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-semibold mb-6 animate-slideUp">Γιατί να Επιλέξετε την ΑνεύρεσηΚηδειών</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold mb-6 animate-slideUp">Γιατί να Επιλέξετε την Riprice</h2>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3 animate-slideLeft delay-100">
                   <div className="mt-1 bg-primary/10 rounded-full p-1">
@@ -193,7 +193,7 @@ const Index = () => {
                 </div>
               </div>
               <p className="text-muted-foreground mb-4">
-                "Η ΑνεύρεσηΚηδειών έκανε μια δύσκολη στιγμή πολύ πιο εύκολη για την οικογένειά μας. Μπορέσαμε να συγκρίνουμε επιλογές χωρίς την πίεση των επισκέψεων αυτοπροσώπως."
+                "Η Riprice έκανε μια δύσκολη στιγμή πολύ πιο εύκολη για την οικογένειά μας. Μπορέσαμε να συγκρίνουμε επιλογές χωρίς την πίεση των επισκέψεων αυτοπροσώπως."
               </p>
               <div className="font-medium">Μαρία Κ.</div>
             </div>

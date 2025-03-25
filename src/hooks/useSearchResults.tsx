@@ -57,7 +57,8 @@ export const useSearchResults = (initialLocation: string) => {
         const filteredByRegion = await filterHomesByRegion(homes, searchLocation);
         console.log("Filtered by region:", filteredByRegion);
         
-        setFuneralHomes(homes);
+        // Set funeralHomes to only those within the 50km range
+        setFuneralHomes(filteredByRegion);
         setFilteredHomes(filteredByRegion);
         setLoading(false);
       } catch (error) {
@@ -135,13 +136,48 @@ export const useSearchResults = (initialLocation: string) => {
       );
     });
     
-    // If we have exact matches, no need to check distance
+    // If we have exact matches, check their distance before including them
+    let distanceFilteredExactMatches: FuneralHome[] = [];
     if (exactMatches.length > 0) {
-      return exactMatches;
+      const searchCoords = await geocodeLocation(searchLocation);
+      if (searchCoords) {
+        // Check each exact match against the distance threshold
+        for (const home of exactMatches) {
+          const homeRegions = Array.isArray(home.regions) ? home.regions : [];
+          if (homeRegions.length === 0) continue;
+          
+          // Check if any of the home's regions are within 50km
+          let isWithin50km = false;
+          for (const region of homeRegions) {
+            const regionCoords = await geocodeLocation(region);
+            if (!regionCoords) continue;
+            
+            const distance = calculateDistance(
+              searchCoords.lat,
+              searchCoords.lng,
+              regionCoords.lat,
+              regionCoords.lng
+            );
+            
+            console.log(`Distance from "${searchLocation}" to "${region}": ${distance.toFixed(2)}km`);
+            
+            if (distance <= 50) {
+              isWithin50km = true;
+              break;
+            }
+          }
+          
+          if (isWithin50km) {
+            distanceFilteredExactMatches.push(home);
+          }
+        }
+        
+        return distanceFilteredExactMatches;
+      }
     }
     
     // Otherwise, check for homes within 50km of the search location
-    console.log("No exact matches found, checking for homes within 50km...");
+    console.log("Checking for homes within 50km...");
     
     const proximityMatches = await Promise.all(
       homes.map(async home => {

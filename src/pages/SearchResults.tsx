@@ -48,7 +48,7 @@ const SearchResults = () => {
         
         <div className="mb-6 text-sm text-muted-foreground flex items-center">
           <MapPin className="h-4 w-4 mr-1" />
-          <span>Περιλαμβάνονται αποτελέσματα σε ακτίνα έως 50χλμ από την αναζήτησή σας</span>
+          <span>Εμφανίζονται μόνο αποτελέσματα σε ακτίνα έως 50χλμ από την αναζήτησή σας</span>
         </div>
         
         <SearchForm 
@@ -62,7 +62,7 @@ const SearchResults = () => {
             <p className="text-muted-foreground">
               {loading 
                 ? "Αναζήτηση..." 
-                : `${filteredHomes.length} από ${funeralHomes.length} γραφεία τελετών`}
+                : `${filteredHomes.length} γραφεία τελετών εντός 50χλμ`}
             </p>
             <SelectedFiltersDisplay 
               selectedFiltersCount={selectedServices.length}
@@ -107,3 +107,4 @@ const SearchResults = () => {
 };
 
 export default SearchResults;
+

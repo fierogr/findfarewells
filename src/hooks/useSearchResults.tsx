@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { getFuneralHomes } from "@/services/funeralHomeService";
@@ -42,55 +41,60 @@ export const useSearchResults = (initialLocation: string) => {
 
   const fetchFuneralHomes = async (searchLocation: string) => {
     setLoading(true);
-    try {
-      // Get all funeral homes first
-      const homes = await getFuneralHomes();
-      console.log("Fetched homes:", homes);
-      
-      // Filter homes based on the specified location
-      const filteredByRegion = filterHomesByRegion(homes, searchLocation);
-      console.log("Filtered by region:", filteredByRegion);
-      
-      setFuneralHomes(filteredByRegion);
-      setFilteredHomes(filteredByRegion);
-    } catch (error) {
-      console.error("Error fetching funeral homes:", error);
-      toast({
-        title: "Σφάλμα",
-        description: "Αποτυχία φόρτωσης γραφείων τελετών. Παρακαλώ δοκιμάστε ξανά.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    let retries = 0;
+    const maxRetries = 2;
+
+    const attempt = async () => {
+      try {
+        const homes = await getFuneralHomes();
+        console.log("Fetched homes:", homes);
+        
+        if (!homes || homes.length === 0) {
+          throw new Error("No funeral homes returned from service");
+        }
+        
+        const filteredByRegion = filterHomesByRegion(homes, searchLocation);
+        console.log("Filtered by region:", filteredByRegion);
+        
+        setFuneralHomes(homes);
+        setFilteredHomes(filteredByRegion);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching funeral homes:", error);
+        
+        if (retries < maxRetries) {
+          retries++;
+          console.log(`Retrying fetch attempt ${retries}...`);
+          setTimeout(attempt, 1000);
+        } else {
+          setLoading(false);
+          toast({
+            title: "Σφάλμα",
+            description: "Αποτυχία φόρτωσης γραφείων τελετών. Παρακαλώ δοκιμάστε ξανά.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    attempt();
   };
 
-  // Enhanced function to filter homes by region based on search location
   const filterHomesByRegion = (homes: FuneralHome[], searchLocation: string): FuneralHome[] => {
-    // Normalize the search location (remove case sensitivity, accents, etc.)
     const normalizedLocation = searchLocation.toLowerCase().trim();
     console.log("Searching for location:", normalizedLocation);
     
-    // Map of possible region keywords to the full region names
     const regionKeywords: Record<string, string[]> = {
       'θεσσαλονικη': ['Νομός Θεσσαλονίκης', 'θεσσαλονίκη', 'θεσσαλονικη'],
-      'θεσσαλονίκη': ['Νομός Θεσσαλονίκης', 'θεσσαλονίκη', 'θεσσαλονικη'],
       'σερρες': ['Νομός Σερρών', 'σέρρες', 'σερρες'],
-      'σέρρες': ['Νομός Σερρών', 'σέρρες', 'σερρες'],
       'κιλκις': ['Νομός Κιλκίς', 'κιλκίς', 'κιλκις'],
-      'κιλκίς': ['Νομός Κιλκίς', 'κιλκίς', 'κιλκις'],
       'πελλα': ['Νομός Πέλλας', 'πέλλα', 'πελλα'],
-      'πέλλα': ['Νομός Πέλλας', 'πέλλα', 'πελλα'],
       'ημαθια': ['Νομός Ημαθίας', 'ημαθία', 'ημαθια'],
-      'ημαθία': ['Νομός Ημαθίας', 'ημαθία', 'ημαθια'],
-      'χαλκιδικη': ['Νομός Χαλκιδικής', 'χαλκιδική', 'χαλκιδικη'],
-      'χαλκιδική': ['Νομός Χαλκιδικής', 'χαλκιδική', 'χαλκιδικη']
+      'χαλκιδικη': ['Νομός Χαλκιδικής', 'χαλκιδική', 'χαλκιδικη']
     };
     
-    // Try to match the search location to potential regions
     let matchedRegionVariants: string[] = [];
     
-    // Check if the location matches any known region keyword
     for (const [keyword, variants] of Object.entries(regionKeywords)) {
       if (normalizedLocation.includes(keyword)) {
         matchedRegionVariants = variants;
@@ -99,20 +103,16 @@ export const useSearchResults = (initialLocation: string) => {
       }
     }
     
-    // If we found matching region variants, filter homes by these variants
     if (matchedRegionVariants.length > 0) {
       return homes.filter(home => {
-        // Ensure regions is an array before working with it
         const homeRegions = Array.isArray(home.regions) ? home.regions : [];
         
-        // Look for any match between home regions and our region variants
         const regionMatch = homeRegions.some(region => 
           matchedRegionVariants.some(variant => 
             region.toLowerCase().includes(variant.toLowerCase())
           )
         );
         
-        // Also check state field as fallback
         const stateMatch = matchedRegionVariants.some(variant => 
           home.state.toLowerCase().includes(variant.toLowerCase())
         );
@@ -121,9 +121,7 @@ export const useSearchResults = (initialLocation: string) => {
       });
     }
     
-    // If no specific region is found, try to match by city or general location as a fallback
     return homes.filter(home => {
-      // Ensure regions is an array before working with it
       const homeRegions = Array.isArray(home.regions) ? home.regions : [];
       
       return (

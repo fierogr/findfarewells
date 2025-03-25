@@ -109,10 +109,17 @@ const SearchResults = () => {
     setSelectedServices([]);
   };
 
+  const getDisplayPrice = (home: FuneralHome) => {
+    if (home.packages && home.packages.length > 0) {
+      return home.packages[0].price;
+    }
+    return home.basicPrice;
+  };
+
   const sortedFuneralHomes = [...filteredHomes].sort((a, b) => {
-    return sortOrder === "asc" 
-      ? a.basicPrice - b.basicPrice 
-      : b.basicPrice - a.basicPrice;
+    const priceA = getDisplayPrice(a);
+    const priceB = getDisplayPrice(b);
+    return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
   });
 
   return (
@@ -324,8 +331,12 @@ const SearchResults = () => {
                   
                   <div className="p-4 md:p-6 bg-secondary flex flex-col">
                     <div className="text-center mb-4">
-                      <p className="text-sm text-muted-foreground mb-1">Βασική Υπηρεσία Από</p>
-                      <p className="text-3xl font-semibold text-primary">${home.basicPrice.toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        {home.packages && home.packages.length > 0 ? home.packages[0].name : "Βασική Υπηρεσία"} Από
+                      </p>
+                      <p className="text-3xl font-semibold text-primary">
+                        ${getDisplayPrice(home).toLocaleString()}
+                      </p>
                       <p className="text-xs text-muted-foreground">Συν ΦΠΑ</p>
                     </div>
                     
@@ -361,3 +372,4 @@ const SearchResults = () => {
 };
 
 export default SearchResults;
+

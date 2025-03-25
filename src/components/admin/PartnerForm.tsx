@@ -8,10 +8,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { FuneralHome } from "@/types/funeralHome";
+import { FuneralHome, ServicePackage } from "@/types/funeralHome";
 import { partnerFormSchema, PartnerFormValues } from "./forms/combinedFormSchema";
 import BasicInfoForm from "./forms/BasicInfoForm";
 import DetailsForm from "./forms/DetailsForm";
+import PackagesForm from "./forms/PackagesForm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface PartnerFormProps {
   open: boolean;
@@ -23,6 +25,7 @@ interface PartnerFormProps {
 const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) => {
   const [imageUrl, setImageUrl] = useState<string>(initialData?.imageUrl || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [packages, setPackages] = useState<ServicePackage[]>(initialData?.packages || []);
 
   const form = useForm<PartnerFormValues>({
     resolver: zodResolver(partnerFormSchema),
@@ -74,10 +77,10 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
         about: initialData?.about || "",
         rating: initialData?.rating || 0,
         reviewCount: initialData?.reviewCount || 0,
-        basicPrice: initialData?.basicPrice || 0,
+        basicPrice: packages.length > 0 ? packages[0].price : (initialData?.basicPrice || 0),
         featured: data.featured,
         amenities: initialData?.amenities || [],
-        packages: initialData?.packages || [],
+        packages: packages,
         additionalServices: initialData?.additionalServices || [],
         reviews: initialData?.reviews || []
       };
@@ -107,10 +110,25 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <BasicInfoForm form={form} />
-              <DetailsForm form={form} imageUrl={imageUrl} setImageUrl={setImageUrl} />
-            </div>
+            <Tabs defaultValue="basic" className="w-full">
+              <TabsList className="grid grid-cols-3 mb-6">
+                <TabsTrigger value="basic">Βασικά Στοιχεία</TabsTrigger>
+                <TabsTrigger value="details">Λεπτομέρειες</TabsTrigger>
+                <TabsTrigger value="packages">Πακέτα</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="basic">
+                <BasicInfoForm form={form} />
+              </TabsContent>
+              
+              <TabsContent value="details">
+                <DetailsForm form={form} imageUrl={imageUrl} setImageUrl={setImageUrl} />
+              </TabsContent>
+              
+              <TabsContent value="packages">
+                <PackagesForm packages={packages} setPackages={setPackages} />
+              </TabsContent>
+            </Tabs>
             
             <div className="flex justify-end space-x-2 pt-4">
               <Button 

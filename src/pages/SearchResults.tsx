@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { MapPin, Phone, Clock, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { MapPin, Phone, Clock, ChevronDown, ChevronUp, Loader2, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,14 +9,43 @@ import { toast } from "@/components/ui/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getFuneralHomes } from "@/services/funeralHomeService";
 import { FuneralHome } from "@/types/funeralHome";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+
+// Common services for filtering
+const commonServices = [
+  "Traditional Funeral Services",
+  "Cremation Services",
+  "Memorial Services",
+  "Pre-Planning Services",
+  "Reception Services",
+  "Catering Options",
+  "Video Tributes",
+  "Live Streaming",
+  "Flower Arrangements",
+  "Music Services",
+  "Green Burial Options",
+  "Pet Services"
+];
 
 const SearchResults = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = searchParams.get("location") || "";
   const [newLocation, setNewLocation] = useState(location);
   const [funeralHomes, setFuneralHomes] = useState<FuneralHome[]>([]);
+  const [filteredHomes, setFilteredHomes] = useState<FuneralHome[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -32,11 +61,28 @@ const SearchResults = () => {
     }
   }, [location]);
 
+  // Filter homes when selected services change
+  useEffect(() => {
+    if (selectedServices.length === 0) {
+      setFilteredHomes(funeralHomes);
+    } else {
+      const filtered = funeralHomes.filter(home => 
+        selectedServices.every(service => 
+          home.services.some(homeService => 
+            homeService.toLowerCase().includes(service.toLowerCase())
+          )
+        )
+      );
+      setFilteredHomes(filtered);
+    }
+  }, [selectedServices, funeralHomes]);
+
   const fetchFuneralHomes = async (searchLocation: string) => {
     setLoading(true);
     try {
       const homes = await getFuneralHomes(searchLocation);
       setFuneralHomes(homes);
+      setFilteredHomes(homes);
     } catch (error) {
       console.error("Error fetching funeral homes:", error);
       toast({
@@ -60,7 +106,19 @@ const SearchResults = () => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
 
-  const sortedFuneralHomes = [...funeralHomes].sort((a, b) => {
+  const toggleServiceSelection = (service: string) => {
+    setSelectedServices(prev => 
+      prev.includes(service)
+        ? prev.filter(s => s !== service)
+        : [...prev, service]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedServices([]);
+  };
+
+  const sortedFuneralHomes = [...filteredHomes].sort((a, b) => {
     return sortOrder === "asc" 
       ? a.basicPrice - b.basicPrice 
       : b.basicPrice - a.basicPrice;
@@ -91,17 +149,88 @@ const SearchResults = () => {
         </form>
         
         <div className="flex justify-between items-center mb-4 animate-fadeIn delay-200">
-          <p className="text-muted-foreground">
-            {loading ? "Αναζήτηση..." : `${funeralHomes.length} γραφεία τελετών βρέθηκαν`}
-          </p>
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2"
-            onClick={toggleSortOrder}
-          >
-            Τιμή {sortOrder === "asc" ? "Χαμηλή προς Υψηλή" : "Υψηλή προς Χαμηλή"}
-            {sortOrder === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <p className="text-muted-foreground">
+              {loading 
+                ? "Αναζήτηση..." 
+                : `${filteredHomes.length} από ${funeralHomes.length} γραφεία τελετών`}
+            </p>
+            {selectedServices.length > 0 && (
+              <div className="flex items-center">
+                <Separator orientation="vertical" className="h-4 mx-2" />
+                <p className="text-sm text-primary">
+                  {selectedServices.length} φίλτρα ενεργά
+                </p>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={clearFilters} 
+                  className="text-xs ml-1 h-auto py-1"
+                >
+                  Καθαρισμός
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  Φίλτρα
+                  {selectedServices.length > 0 && (
+                    <span className="ml-1 text-xs bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center">
+                      {selectedServices.length}
+                    </span>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-[300px] sm:w-[450px]">
+                <SheetHeader>
+                  <SheetTitle>Φίλτρα Υπηρεσιών</SheetTitle>
+                  <SheetDescription>
+                    Επιλέξτε τις υπηρεσίες που σας ενδιαφέρουν
+                  </SheetDescription>
+                </SheetHeader>
+                <Separator className="my-4" />
+                <div className="grid grid-cols-1 gap-4 my-4">
+                  {commonServices.map((service) => (
+                    <div key={service} className="flex items-start space-x-2">
+                      <Checkbox 
+                        id={`service-${service}`}
+                        checked={selectedServices.includes(service)}
+                        onCheckedChange={() => toggleServiceSelection(service)}
+                      />
+                      <label
+                        htmlFor={`service-${service}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {service}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={clearFilters}>
+                    Καθαρισμός
+                  </Button>
+                  <Button onClick={() => setIsFilterOpen(false)}>
+                    Εφαρμογή
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={toggleSortOrder}
+            >
+              Τιμή {sortOrder === "asc" ? "Χαμηλή προς Υψηλή" : "Υψηλή προς Χαμηλή"}
+              {sortOrder === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </div>
         </div>
       </div>
       
@@ -110,15 +239,15 @@ const SearchResults = () => {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="ml-2 text-lg">Φόρτωση γραφείων τελετών...</span>
         </div>
-      ) : funeralHomes.length === 0 ? (
+      ) : filteredHomes.length === 0 ? (
         <div className="text-center py-12 bg-secondary rounded-lg animate-fadeIn">
-          <p className="text-xl mb-4">Δεν βρέθηκαν γραφεία τελετών σε αυτήν την περιοχή.</p>
-          <p className="text-muted-foreground mb-6">Δοκιμάστε να αναζητήσετε σε διαφορετική τοποθεσία ή διευρύνετε την περιοχή αναζήτησής σας.</p>
-          <Button onClick={() => history.back()}>Επιστροφή</Button>
+          <p className="text-xl mb-4">Δεν βρέθηκαν γραφεία τελετών με τις επιλεγμένες υπηρεσίες.</p>
+          <p className="text-muted-foreground mb-6">Δοκιμάστε να αλλάξετε τα φίλτρα ή να αναζητήσετε σε διαφορετική τοποθεσία.</p>
+          <Button onClick={clearFilters}>Καθαρισμός Φίλτρων</Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 animate-fadeIn delay-300">
-          {sortedFuneralHomes.map((home, index) => (
+          {sortedFuneralHomes.map((home) => (
             <Card key={home.id} className="overflow-hidden transition-all duration-300 hover:shadow-lg">
               <CardContent className="p-0">
                 <div className="grid grid-cols-1 md:grid-cols-3 h-full">
@@ -166,6 +295,29 @@ const SearchResults = () => {
                     </div>
                     
                     <p className="line-clamp-2 text-sm text-muted-foreground mb-4">{home.description}</p>
+                    
+                    {/* Service tags */}
+                    <div className="mt-auto mb-4">
+                      <div className="flex flex-wrap gap-1">
+                        {home.services.slice(0, 3).map((service, idx) => (
+                          <span 
+                            key={idx}
+                            className={`text-xs px-2 py-1 rounded-full ${
+                              selectedServices.includes(service) 
+                                ? 'bg-primary/20 text-primary' 
+                                : 'bg-secondary text-secondary-foreground'
+                            }`}
+                          >
+                            {service}
+                          </span>
+                        ))}
+                        {home.services.length > 3 && (
+                          <span className="text-xs px-2 py-1 rounded-full bg-secondary text-secondary-foreground">
+                            +{home.services.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                     
                     {!isMobile && (
                       <div className="mt-auto">

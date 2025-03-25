@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
-import { getFuneralHomes } from "@/services/funeralHomeService";
+import { getFuneralHomes, calculateDistance } from "@/services/funeralHomeService";
 import { isWithinDistance, geocodeLocation } from "@/services/geocodingService";
 import { FuneralHome } from "@/types/funeralHome";
 
@@ -57,7 +57,6 @@ export const useSearchResults = (initialLocation: string) => {
         const filteredByRegion = await filterHomesByRegion(homes, searchLocation);
         console.log("Filtered by region:", filteredByRegion);
         
-        // Set funeralHomes to only those within the 50km range
         setFuneralHomes(filteredByRegion);
         setFilteredHomes(filteredByRegion);
         setLoading(false);
@@ -105,19 +104,16 @@ export const useSearchResults = (initialLocation: string) => {
       }
     }
     
-    // First, filter based on exact region matches
     const exactMatches = homes.filter(home => {
       const homeRegions = Array.isArray(home.regions) ? home.regions : [];
       
       if (matchedRegionVariants.length > 0) {
-        // Check if any of the home's regions match the search location
         const regionMatch = homeRegions.some(region => 
           matchedRegionVariants.some(variant => 
             region.toLowerCase().includes(variant.toLowerCase())
           )
         );
         
-        // Check if the state matches the search location
         const stateMatch = matchedRegionVariants.some(variant => 
           home.state.toLowerCase().includes(variant.toLowerCase())
         );
@@ -125,7 +121,6 @@ export const useSearchResults = (initialLocation: string) => {
         return regionMatch || stateMatch;
       }
       
-      // If no matched region variants, check for other matches
       return (
         home.city.toLowerCase().includes(normalizedLocation) || 
         home.state.toLowerCase().includes(normalizedLocation) || 
@@ -136,17 +131,14 @@ export const useSearchResults = (initialLocation: string) => {
       );
     });
     
-    // If we have exact matches, check their distance before including them
     let distanceFilteredExactMatches: FuneralHome[] = [];
     if (exactMatches.length > 0) {
       const searchCoords = await geocodeLocation(searchLocation);
       if (searchCoords) {
-        // Check each exact match against the distance threshold
         for (const home of exactMatches) {
           const homeRegions = Array.isArray(home.regions) ? home.regions : [];
           if (homeRegions.length === 0) continue;
           
-          // Check if any of the home's regions are within 50km
           let isWithin50km = false;
           for (const region of homeRegions) {
             const regionCoords = await geocodeLocation(region);
@@ -176,19 +168,14 @@ export const useSearchResults = (initialLocation: string) => {
       }
     }
     
-    // Otherwise, check for homes within 50km of the search location
-    console.log("Checking for homes within 50km...");
-    
     const proximityMatches = await Promise.all(
       homes.map(async home => {
         const homeRegions = Array.isArray(home.regions) ? home.regions : [];
         
-        // Skip homes with no regions
         if (homeRegions.length === 0) {
           return { home, withinDistance: false };
         }
         
-        // Check if any of the home's regions are within 50km of the search location
         const withinDistance = await isWithinDistance(searchLocation, homeRegions, 50);
         
         return { home, withinDistance };

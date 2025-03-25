@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import PartnersManagement from "@/components/admin/PartnersManagement";
 import UserRequests from "@/components/admin/UserRequests";
 import PartnerDetails from "@/components/admin/PartnerDetails";
+import EmailSettings from "@/components/admin/EmailSettings";
 import { useFuneralHomes } from "@/hooks/useFuneralHomes";
 
 const AdminPanel = () => {
@@ -41,6 +41,7 @@ const AdminPanel = () => {
             <TabsTrigger value="partners">Συνεργάτες</TabsTrigger>
             <TabsTrigger value="requests">Αιτήματα Χρηστών</TabsTrigger>
             <TabsTrigger value="stats">Στατιστικά</TabsTrigger>
+            <TabsTrigger value="settings">Ρυθμίσεις</TabsTrigger>
           </TabsList>
           <TabsContent value="partners">
             <Card>
@@ -139,6 +140,11 @@ const AdminPanel = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+          <TabsContent value="settings">
+            <div className="grid grid-cols-1 gap-6">
+              <EmailSettings />
+            </div>
           </TabsContent>
         </Tabs>
       )}

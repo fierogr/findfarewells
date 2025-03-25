@@ -13,6 +13,24 @@ interface EmailContent {
   body: string;
 }
 
+// Local storage key for admin email
+const ADMIN_EMAIL_STORAGE_KEY = 'riprice_admin_email';
+
+/**
+ * Get the admin email from localStorage or return the default
+ */
+export const getAdminEmail = (): string => {
+  const storedEmail = localStorage.getItem(ADMIN_EMAIL_STORAGE_KEY);
+  return storedEmail || 'admin@riprice.com';
+};
+
+/**
+ * Set the admin email in localStorage
+ */
+export const setAdminEmail = (email: string): void => {
+  localStorage.setItem(ADMIN_EMAIL_STORAGE_KEY, email);
+};
+
 /**
  * Sends an email notification
  * NOTE: This is a mock implementation and doesn't actually send emails.
@@ -33,7 +51,7 @@ export const sendEmail = async (content: EmailContent): Promise<boolean> => {
  * Sends a partner registration notification to the admin
  */
 export const sendPartnerRegistrationNotification = async (partnerData: any): Promise<boolean> => {
-  const adminEmail = 'admin@riprice.com'; // Replace with your actual admin email
+  const adminEmail = getAdminEmail();
   
   const subject = `Νέα αίτηση συνεργάτη: ${partnerData.businessName}`;
   

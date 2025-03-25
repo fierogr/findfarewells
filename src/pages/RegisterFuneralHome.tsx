@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { crypto } from "crypto";
 import { 
   Form,
   FormControl,
@@ -78,7 +77,7 @@ const RegisterFuneralHome = () => {
     
     try {
       const newFuneralHome = {
-        id: crypto.randomUUID(),
+        id: crypto.randomUUID(), // Using browser's native crypto API
         name: data.businessName,
         address: data.address,
         city: data.city,
@@ -95,7 +94,10 @@ const RegisterFuneralHome = () => {
         reviewCount: 0,
         services: data.services ? data.services.split(',').map(s => s.trim()) : [],
         basicPrice: 0,
-        featured: false
+        featured: false,
+        amenities: [],
+        packages: [],
+        additionalServices: []
       };
       
       await addFuneralHome(newFuneralHome);

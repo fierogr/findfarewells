@@ -19,8 +19,8 @@ const RegionsTab = ({ editedHome, onRegionsChange }: RegionsTabProps) => {
     if (editedHome) {
       // Ensure we have an array, even if regions is undefined or null
       const regions = Array.isArray(editedHome.regions) ? [...editedHome.regions] : [];
+      console.log("RegionsTab: Initializing with regions:", regions);
       setSelectedRegions(regions);
-      console.log("RegionsTab: Current edited home:", editedHome.id, "with regions:", regions);
     }
   }, [editedHome]);
 
@@ -34,13 +34,19 @@ const RegionsTab = ({ editedHome, onRegionsChange }: RegionsTabProps) => {
   ];
 
   const handleRegionToggle = (region: string) => {
-    const updatedRegions = selectedRegions.includes(region)
-      ? selectedRegions.filter(r => r !== region)
-      : [...selectedRegions, region];
+    let updatedRegions: string[];
+    
+    if (selectedRegions.includes(region)) {
+      updatedRegions = selectedRegions.filter(r => r !== region);
+    } else {
+      updatedRegions = [...selectedRegions, region];
+    }
+    
+    console.log("RegionsTab: Region toggled:", region);
+    console.log("RegionsTab: New regions after toggle:", updatedRegions);
     
     setSelectedRegions(updatedRegions);
     onRegionsChange(updatedRegions);
-    console.log("Region toggled:", region, "New regions:", updatedRegions);
   };
 
   return (

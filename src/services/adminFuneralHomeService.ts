@@ -1,4 +1,3 @@
-
 import { FuneralHome } from '@/types/funeralHome';
 import { mockFuneralHomes } from '@/data/mockFuneralHomes';
 
@@ -10,6 +9,7 @@ export const updateFuneralHome = (id: string, updates: Partial<FuneralHome>): Pr
     
     if (index === -1) {
       // Funeral home not found
+      console.error("Funeral home not found with ID:", id);
       resolve(null);
       return;
     }
@@ -17,21 +17,19 @@ export const updateFuneralHome = (id: string, updates: Partial<FuneralHome>): Pr
     console.log("Updating funeral home with ID:", id);
     console.log("Updates to be applied:", updates);
     
-    // Ensure regions is always an array
-    if (updates.regions === undefined) {
-      updates.regions = mockFuneralHomes[index].regions || [];
-    }
-    
-    // Update the funeral home
+    // Critical fix: Ensure regions is properly handled during updates
+    // We want to replace the regions array completely with what was passed
     const updatedHome = {
       ...mockFuneralHomes[index],
-      ...updates
+      ...updates,
+      // Make sure regions is always an array
+      regions: Array.isArray(updates.regions) ? [...updates.regions] : (mockFuneralHomes[index].regions || [])
     };
     
     // Replace the old funeral home with the updated one
     mockFuneralHomes[index] = updatedHome;
     
-    console.log("Updated funeral home:", updatedHome);
+    console.log("Updated funeral home with regions:", updatedHome.regions);
     
     // Simulate API call delay
     setTimeout(() => {

@@ -8,7 +8,13 @@ interface RegionsDisplayProps {
 }
 
 export const RegionsDisplay = ({ regions }: RegionsDisplayProps) => {
-  if (!regions || regions.length === 0) {
+  // Enhanced null check - make sure we don't render with empty regions
+  const hasRegions = Array.isArray(regions) && regions.length > 0;
+  
+  console.log("RegionsDisplay: Received regions:", regions);
+  
+  if (!hasRegions) {
+    console.log("RegionsDisplay: No regions to display");
     return null;
   }
 

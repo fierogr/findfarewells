@@ -32,29 +32,44 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
   useEffect(() => {
     if (funeralHome) {
       console.log("PartnerDetails: Loaded funeral home:", funeralHome.id);
-      console.log("PartnerDetails: Loaded regions:", funeralHome.regions);
+      // Critical logging to ensure regions data is available
+      console.log("PartnerDetails: Loaded regions data:", funeralHome.regions);
       
-      // Make a deep copy to ensure we don't have reference issues
-      setEditedHome({
+      // Create a completely new object to avoid reference issues
+      const homeWithCheckedRegions = {
         ...funeralHome,
+        // Make sure regions is always a new array instance
         regions: Array.isArray(funeralHome.regions) ? [...funeralHome.regions] : []
-      });
+      };
+      
+      console.log("PartnerDetails: Setting edited home with regions:", homeWithCheckedRegions.regions);
+      setEditedHome(homeWithCheckedRegions);
     }
   }, [funeralHome]);
 
   const handleSave = async () => {
     if (editedHome) {
       try {
+        // Log the regions before saving to track the data
         console.log("PartnerDetails: Saving partner with regions:", editedHome.regions);
-        const updatedHome = await updateFuneralHome(editedHome.id, editedHome);
+        
+        // Make sure we send a complete copy of the edited home
+        const homeToUpdate = { ...editedHome };
+        
+        const updatedHome = await updateFuneralHome(homeToUpdate.id, homeToUpdate);
         if (updatedHome) {
+          // Invalidate all related queries to ensure fresh data
           queryClient.invalidateQueries({ queryKey: ["funeralHomes"] });
           queryClient.invalidateQueries({ queryKey: ["funeralHome", partnerId] });
           
+          // Show success message
           toast({
             title: "Αποθήκευση επιτυχής",
             description: "Οι αλλαγές αποθηκεύτηκαν με επιτυχία.",
           });
+          
+          // Update local state with the response data
+          setEditedHome(updatedHome);
         }
       } catch (err) {
         toast({
@@ -150,13 +165,14 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
 
         <TabsContent value="regions">
           <RegionsTab 
-            editedHome={editedHome} 
+            editedHome={editedHome!} 
             onRegionsChange={(regions) => {
               if (editedHome) {
                 console.log("PartnerDetails: Updating regions to:", regions);
+                // Create a completely new object with updated regions
                 setEditedHome({
                   ...editedHome,
-                  regions
+                  regions: [...regions] // Create a new array to ensure proper state update
                 });
               }
             }}

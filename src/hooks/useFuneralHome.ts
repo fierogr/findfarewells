@@ -7,14 +7,14 @@ export const useFuneralHome = (id: string) => {
     queryKey: ["funeralHome", id],
     queryFn: async () => {
       const home = await getFuneralHomeById(id);
-      // Ensure regions is always an array
-      if (home && !home.regions) {
-        home.regions = [];
-      }
-      console.log("Fetched funeral home:", home);
-      if (home && home.regions) {
+      
+      // Ensure regions is always an array with proper initialization
+      if (home) {
+        home.regions = Array.isArray(home.regions) ? home.regions : [];
+        console.log("Fetched funeral home:", home);
         console.log("Regions from API:", home.regions);
       }
+      
       return home;
     },
     enabled: !!id,

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useFuneralHome } from "@/hooks/useFuneralHome";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +12,18 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog";
+import { deleteFuneralHome, updateFuneralHome } from "@/services/adminFuneralHomeService";
 
 interface PartnerDetailsProps {
   partnerId: string;
@@ -23,23 +34,67 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
   const { data: funeralHome, isLoading, error } = useFuneralHome(partnerId);
   const [editedHome, setEditedHome] = useState<FuneralHome | null>(null);
   const [newService, setNewService] = useState("");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Once data is loaded, initialize the editedHome state
   React.useEffect(() => {
     if (funeralHome) {
       setEditedHome(funeralHome);
     }
   }, [funeralHome]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (editedHome) {
-      // Here would go the API call to save the changes
-      console.log("Saving changes:", editedHome);
+      try {
+        const updatedHome = await updateFuneralHome(editedHome.id, editedHome);
+        if (updatedHome) {
+          queryClient.invalidateQueries({ queryKey: ["funeralHomes"] });
+          queryClient.invalidateQueries({ queryKey: ["funeralHome", partnerId] });
+          
+          toast({
+            title: "Αποθήκευση επιτυχής",
+            description: "Οι αλλαγές αποθηκεύτηκαν με επιτυχία.",
+          });
+        }
+      } catch (err) {
+        toast({
+          title: "Σφάλμα",
+          description: "Υπήρξε πρόβλημα κατά την αποθήκευση των αλλαγών.",
+          variant: "destructive",
+        });
+        console.error("Error saving partner:", err);
+      }
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const success = await deleteFuneralHome(partnerId);
+      if (success) {
+        queryClient.invalidateQueries({ queryKey: ["funeralHomes"] });
+        
+        toast({
+          title: "Διαγραφή επιτυχής",
+          description: "Ο συνεργάτης διαγράφηκε με επιτυχία.",
+        });
+        
+        onBack();
+      } else {
+        throw new Error("Failed to delete partner");
+      }
+    } catch (err) {
       toast({
-        title: "Αποθήκευση επιτυχής",
-        description: "Οι αλλαγές αποθηκεύτηκαν με επιτυχία.",
+        title: "Σφάλμα",
+        description: "Υπήρξε πρόβλημα κατά τη διαγραφή του συνεργάτη.",
+        variant: "destructive",
       });
+      console.error("Error deleting partner:", err);
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteDialogOpen(false);
     }
   };
 
@@ -102,7 +157,11 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
           <ArrowLeft className="mr-2 h-4 w-4" /> Επιστροφή στη λίστα
         </Button>
         <div className="flex space-x-2">
-          <Button variant="destructive">
+          <Button 
+            variant="destructive" 
+            onClick={() => setIsDeleteDialogOpen(true)}
+            disabled={isDeleting}
+          >
             <Trash2 className="mr-2 h-4 w-4" /> Διαγραφή
           </Button>
           <Button onClick={handleSave}>
@@ -297,7 +356,6 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
                     </div>
                     <Separator className="my-2" />
                     <h4 className="font-medium mb-2">Συμπεριλαμβανόμενες Υπηρεσίες</h4>
-                    {/* Here would go the included services management */}
                   </div>
                 ))}
                 <Button className="w-full">
@@ -430,7 +488,6 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
                   <h4 className="font-medium">Πρόσθετες Φωτογραφίες</h4>
                   <div className="border rounded-md p-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      {/* Here would go additional images */}
                       <div className="flex flex-col items-center justify-center h-40 bg-muted rounded-md">
                         <Upload className="h-8 w-8 text-muted-foreground mb-2" />
                         <p className="text-sm text-muted-foreground">Προσθήκη φωτογραφίας</p>
@@ -443,8 +500,6 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
-  );
-};
 
-export default PartnerDetails;
+
+

@@ -49,16 +49,25 @@ const Navbar = () => {
             </Link>
           </Button>
           {isAuthenticated ? (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="flex items-center"
-              onClick={logout}
-            >
-              <LogOut className="mr-1.5 h-4 w-4" />
-              <span className="hidden sm:inline">Αποσύνδεση</span>
-              <span className="sm:hidden">Έξοδος</span>
-            </Button>
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/admin" className="flex items-center">
+                  <Shield className="mr-1.5 h-4 w-4" />
+                  <span className="hidden sm:inline">Διαχείριση</span>
+                  <span className="sm:hidden">Admin</span>
+                </Link>
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="flex items-center"
+                onClick={logout}
+              >
+                <LogOut className="mr-1.5 h-4 w-4" />
+                <span className="hidden sm:inline">Αποσύνδεση</span>
+                <span className="sm:hidden">Έξοδος</span>
+              </Button>
+            </>
           ) : (
             <Button variant="ghost" size="sm" asChild>
               <Link to="/admin-login" className="flex items-center">

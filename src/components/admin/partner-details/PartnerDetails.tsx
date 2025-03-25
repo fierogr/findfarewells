@@ -1,5 +1,4 @@
-
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useFuneralHome } from "@/hooks/useFuneralHome";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -24,8 +23,8 @@ interface PartnerDetailsProps {
 
 const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
   const { data: funeralHome, isLoading, error } = useFuneralHome(partnerId);
-  const [editedHome, setEditedHome] = React.useState<FuneralHome | null>(null);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [editedHome, setEditedHome] = useState<FuneralHome | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -33,12 +32,10 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
     if (funeralHome) {
       console.log("Loaded funeral home with regions:", funeralHome.regions);
       
-      // Βεβαιωνόμαστε ότι το regions είναι πάντα ένας πίνακας
-      const safeRegions = funeralHome.regions || [];
-      
+      // Make a deep copy to ensure we don't have reference issues
       setEditedHome({
         ...funeralHome,
-        regions: safeRegions
+        regions: Array.isArray(funeralHome.regions) ? [...funeralHome.regions] : []
       });
     }
   }, [funeralHome]);
@@ -155,7 +152,10 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
             onRegionsChange={(regions) => {
               if (editedHome) {
                 console.log("Updating regions in PartnerDetails:", regions);
-                setEditedHome({ ...editedHome, regions });
+                setEditedHome({ 
+                  ...editedHome, 
+                  regions 
+                });
               }
             }}
           />

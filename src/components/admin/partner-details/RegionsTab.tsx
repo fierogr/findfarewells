@@ -15,11 +15,13 @@ interface RegionsTabProps {
 const RegionsTab = ({ editedHome, onRegionsChange }: RegionsTabProps) => {
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   
+  // Use a more robust useEffect to initialize regions
   useEffect(() => {
-    // Ενημέρωση των επιλεγμένων περιοχών όταν αλλάζει το editedHome
-    if (editedHome && editedHome.regions) {
-      setSelectedRegions(editedHome.regions);
-      console.log("RegionsTab initialized with regions:", editedHome.regions);
+    if (editedHome) {
+      // Ensure we have an array, even if regions is undefined or null
+      const regions = Array.isArray(editedHome.regions) ? [...editedHome.regions] : [];
+      setSelectedRegions(regions);
+      console.log("RegionsTab initialized with regions:", regions, "from editedHome:", editedHome);
     }
   }, [editedHome]);
 

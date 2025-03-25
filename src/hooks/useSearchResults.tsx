@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { getFuneralHomes } from "@/services/funeralHomeService";
+import { isWithinDistance, geocodeLocation } from "@/services/geocodingService";
 import { FuneralHome } from "@/types/funeralHome";
 
 export const useSearchResults = (initialLocation: string) => {
@@ -53,7 +54,7 @@ export const useSearchResults = (initialLocation: string) => {
           throw new Error("No funeral homes returned from service");
         }
         
-        const filteredByRegion = filterHomesByRegion(homes, searchLocation);
+        const filteredByRegion = await filterHomesByRegion(homes, searchLocation);
         console.log("Filtered by region:", filteredByRegion);
         
         setFuneralHomes(homes);
@@ -80,7 +81,7 @@ export const useSearchResults = (initialLocation: string) => {
     attempt();
   };
 
-  const filterHomesByRegion = (homes: FuneralHome[], searchLocation: string): FuneralHome[] => {
+  const filterHomesByRegion = async (homes: FuneralHome[], searchLocation: string): Promise<FuneralHome[]> => {
     const normalizedLocation = searchLocation.toLowerCase().trim();
     console.log("Searching for location:", normalizedLocation);
     
@@ -103,27 +104,27 @@ export const useSearchResults = (initialLocation: string) => {
       }
     }
     
-    if (matchedRegionVariants.length > 0) {
-      return homes.filter(home => {
-        const homeRegions = Array.isArray(home.regions) ? home.regions : [];
-        
+    // First, filter based on exact region matches
+    const exactMatches = homes.filter(home => {
+      const homeRegions = Array.isArray(home.regions) ? home.regions : [];
+      
+      if (matchedRegionVariants.length > 0) {
+        // Check if any of the home's regions match the search location
         const regionMatch = homeRegions.some(region => 
           matchedRegionVariants.some(variant => 
             region.toLowerCase().includes(variant.toLowerCase())
           )
         );
         
+        // Check if the state matches the search location
         const stateMatch = matchedRegionVariants.some(variant => 
           home.state.toLowerCase().includes(variant.toLowerCase())
         );
         
         return regionMatch || stateMatch;
-      });
-    }
-    
-    return homes.filter(home => {
-      const homeRegions = Array.isArray(home.regions) ? home.regions : [];
+      }
       
+      // If no matched region variants, check for other matches
       return (
         home.city.toLowerCase().includes(normalizedLocation) || 
         home.state.toLowerCase().includes(normalizedLocation) || 
@@ -133,6 +134,34 @@ export const useSearchResults = (initialLocation: string) => {
         )
       );
     });
+    
+    // If we have exact matches, no need to check distance
+    if (exactMatches.length > 0) {
+      return exactMatches;
+    }
+    
+    // Otherwise, check for homes within 50km of the search location
+    console.log("No exact matches found, checking for homes within 50km...");
+    
+    const proximityMatches = await Promise.all(
+      homes.map(async home => {
+        const homeRegions = Array.isArray(home.regions) ? home.regions : [];
+        
+        // Skip homes with no regions
+        if (homeRegions.length === 0) {
+          return { home, withinDistance: false };
+        }
+        
+        // Check if any of the home's regions are within 50km of the search location
+        const withinDistance = await isWithinDistance(searchLocation, homeRegions, 50);
+        
+        return { home, withinDistance };
+      })
+    );
+    
+    return proximityMatches
+      .filter(result => result.withinDistance)
+      .map(result => result.home);
   };
 
   const toggleSortOrder = () => {

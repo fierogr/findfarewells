@@ -10,6 +10,7 @@ import LoadingState from "@/components/search/LoadingState";
 import EmptyResults from "@/components/search/EmptyResults";
 import FuneralHomeCard from "@/components/search/FuneralHomeCard";
 import SelectedFiltersDisplay from "@/components/search/SelectedFiltersDisplay";
+import { MapPin } from "lucide-react";
 
 const SearchResults = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -44,6 +45,11 @@ const SearchResults = () => {
         <h1 className="text-3xl md:text-4xl font-semibold mb-6 animate-fadeIn">
           Γραφεία Τελετών στην περιοχή {location}
         </h1>
+        
+        <div className="mb-6 text-sm text-muted-foreground flex items-center">
+          <MapPin className="h-4 w-4 mr-1" />
+          <span>Περιλαμβάνονται αποτελέσματα σε ακτίνα έως 50χλμ από την αναζήτησή σας</span>
+        </div>
         
         <SearchForm 
           location={newLocation}

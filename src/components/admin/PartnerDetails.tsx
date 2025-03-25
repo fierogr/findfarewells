@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useFuneralHome } from "@/hooks/useFuneralHome";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -540,21 +541,24 @@ const PartnerDetails = ({ partnerId, onBack }: PartnerDetailsProps) => {
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {greekRegions.map((region) => (
-                    <div key={region} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`region-${region}`}
-                        checked={(editedHome.regions || []).includes(region)}
-                        onCheckedChange={() => handleRegionToggle(region)}
-                      />
-                      <label
-                        htmlFor={`region-${region}`}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {region}
-                      </label>
-                    </div>
-                  ))}
+                  {greekRegions.map((region) => {
+                    const isChecked = (editedHome.regions || []).includes(region);
+                    return (
+                      <div key={region} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`region-${region}`}
+                          checked={isChecked}
+                          onCheckedChange={() => handleRegionToggle(region)}
+                        />
+                        <label
+                          htmlFor={`region-${region}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {region}
+                        </label>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {(editedHome.regions || []).length > 0 && (

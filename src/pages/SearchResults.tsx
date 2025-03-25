@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { MapPin, Phone, Clock, ChevronDown, ChevronUp, Loader2, Filter } from "lucide-react";
@@ -20,8 +19,13 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 
-// Common services for filtering
+// Common services for filtering - updated with Greek options
 const commonServices = [
+  "Βασικό πακέτο",
+  "Αποτέφρωση",
+  "Έξτρα στολισμός", 
+  "Φαγητό",
+  "Μουσική",
   "Traditional Funeral Services",
   "Cremation Services",
   "Memorial Services",
@@ -195,21 +199,47 @@ const SearchResults = () => {
                 </SheetHeader>
                 <Separator className="my-4" />
                 <div className="grid grid-cols-1 gap-4 my-4">
-                  {commonServices.map((service) => (
-                    <div key={service} className="flex items-start space-x-2">
-                      <Checkbox 
-                        id={`service-${service}`}
-                        checked={selectedServices.includes(service)}
-                        onCheckedChange={() => toggleServiceSelection(service)}
-                      />
-                      <label
-                        htmlFor={`service-${service}`}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                      >
-                        {service}
-                      </label>
-                    </div>
-                  ))}
+                  {/* Featured Greek services first */}
+                  <div className="space-y-4">
+                    <h3 className="font-medium">Δημοφιλείς Υπηρεσίες</h3>
+                    {commonServices.slice(0, 5).map((service) => (
+                      <div key={service} className="flex items-start space-x-2">
+                        <Checkbox 
+                          id={`service-${service}`}
+                          checked={selectedServices.includes(service)}
+                          onCheckedChange={() => toggleServiceSelection(service)}
+                        />
+                        <label
+                          htmlFor={`service-${service}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {service}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+
+                  <Separator className="my-2" />
+                  
+                  {/* Other services */}
+                  <div className="space-y-4">
+                    <h3 className="font-medium">Άλλες Υπηρεσίες</h3>
+                    {commonServices.slice(5).map((service) => (
+                      <div key={service} className="flex items-start space-x-2">
+                        <Checkbox 
+                          id={`service-${service}`}
+                          checked={selectedServices.includes(service)}
+                          onCheckedChange={() => toggleServiceSelection(service)}
+                        />
+                        <label
+                          htmlFor={`service-${service}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {service}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <div className="flex justify-between mt-6">
                   <Button variant="outline" onClick={clearFilters}>

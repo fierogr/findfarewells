@@ -8,7 +8,7 @@ const Footer = () => {
       <div className="container py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-lg font-semibold mb-4">ΑνεύρεσηΚηδειών</h3>
+            <h3 className="text-lg font-semibold mb-4">Riprice</h3>
             <p className="text-muted-foreground">
               Σας βοηθάμε να βρείτε συμπονετικές υπηρεσίες κηδείας με διαφανείς τιμές.
             </p>
@@ -41,14 +41,14 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Επικοινωνία</h3>
             <ul className="space-y-2 text-muted-foreground">
-              <li>Email: info@aneuresikhdeion.gr</li>
+              <li>Email: info@riprice.gr</li>
               <li>Τηλέφωνο: (555) 123-4567</li>
             </ul>
           </div>
         </div>
         <div className="mt-8 pt-6 border-t border-border/40">
           <p className="text-center text-muted-foreground text-sm">
-            © {new Date().getFullYear()} ΑνεύρεσηΚηδειών. Με επιφύλαξη παντός δικαιώματος.
+            © {new Date().getFullYear()} Riprice. Με επιφύλαξη παντός δικαιώματος.
           </p>
         </div>
       </div>

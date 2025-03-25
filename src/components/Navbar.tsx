@@ -7,7 +7,7 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <Link to="/" className="mr-6 flex items-center space-x-2">
-          <span className="font-semibold text-xl">ΑνεύρεσηΚηδειών</span>
+          <span className="font-semibold text-xl">Riprice</span>
         </Link>
         <nav className="flex items-center space-x-6 text-sm font-medium">
           <Link

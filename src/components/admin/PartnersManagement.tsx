@@ -3,12 +3,13 @@ import React, { useState } from "react";
 import { useFuneralHomes } from "@/hooks/useFuneralHomes";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, FileDown } from "lucide-react";
+import { Search, Plus, FileDown, FileUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FuneralHome } from "@/types/funeralHome";
 import { addFuneralHome } from "@/services/funeralHomeService";
 import PartnerForm from "./PartnerForm";
+import ImportPartnersModal from "./ImportPartnersModal";
 import { exportToCSV } from "@/utils/exportUtils";
 import { toast } from "@/hooks/use-toast";
 
@@ -20,6 +21,7 @@ const PartnersManagement = ({ onPartnerSelect }: PartnersManagementProps) => {
   const { data: funeralHomes, isLoading, error, refetch } = useFuneralHomes();
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddPartnerOpen, setIsAddPartnerOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const filteredHomes = funeralHomes?.filter(
     (home) =>
@@ -49,6 +51,10 @@ const PartnersManagement = ({ onPartnerSelect }: PartnersManagementProps) => {
     }
   };
 
+  const handleImportComplete = () => {
+    refetch();
+  };
+
   if (isLoading) {
     return <div className="text-center py-4">Φόρτωση συνεργατών...</div>;
   }
@@ -72,6 +78,9 @@ const PartnersManagement = ({ onPartnerSelect }: PartnersManagementProps) => {
         </div>
         <Button variant="outline" onClick={handleExport}>
           <FileDown className="mr-2 h-4 w-4" /> Εξαγωγή
+        </Button>
+        <Button variant="outline" onClick={() => setIsImportModalOpen(true)}>
+          <FileUp className="mr-2 h-4 w-4" /> Εισαγωγή
         </Button>
         <Button onClick={() => setIsAddPartnerOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Προσθήκη Συνεργάτη
@@ -136,6 +145,12 @@ const PartnersManagement = ({ onPartnerSelect }: PartnersManagementProps) => {
         open={isAddPartnerOpen}
         onClose={() => setIsAddPartnerOpen(false)}
         onSave={handleAddPartner}
+      />
+
+      <ImportPartnersModal
+        open={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImportComplete={handleImportComplete}
       />
     </div>
   );

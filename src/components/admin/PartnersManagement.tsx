@@ -3,12 +3,14 @@ import React, { useState } from "react";
 import { useFuneralHomes } from "@/hooks/useFuneralHomes";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, FileExport } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FuneralHome } from "@/types/funeralHome";
 import { addFuneralHome } from "@/services/funeralHomeService";
 import PartnerForm from "./PartnerForm";
+import { exportToCSV } from "@/utils/exportUtils";
+import { toast } from "@/hooks/use-toast";
 
 interface PartnersManagementProps {
   onPartnerSelect: (partnerId: string) => void;
@@ -29,6 +31,22 @@ const PartnersManagement = ({ onPartnerSelect }: PartnersManagementProps) => {
   const handleAddPartner = async (partnerData: FuneralHome) => {
     await addFuneralHome(partnerData);
     refetch();
+  };
+
+  const handleExport = () => {
+    if (funeralHomes && funeralHomes.length > 0) {
+      exportToCSV(funeralHomes, "partners-list");
+      toast({
+        title: "Εξαγωγή Λίστας",
+        description: "Η λίστα των συνεργατών εξήχθη επιτυχώς",
+      });
+    } else {
+      toast({
+        title: "Προσοχή",
+        description: "Δεν υπάρχουν συνεργάτες για εξαγωγή",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isLoading) {
@@ -52,6 +70,9 @@ const PartnersManagement = ({ onPartnerSelect }: PartnersManagementProps) => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        <Button variant="outline" onClick={handleExport}>
+          <FileExport className="mr-2 h-4 w-4" /> Εξαγωγή
+        </Button>
         <Button onClick={() => setIsAddPartnerOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Προσθήκη Συνεργάτη
         </Button>

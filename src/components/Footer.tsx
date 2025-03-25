@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -10,7 +9,7 @@ const Footer = () => {
           <div>
             <div className="mb-4">
               <img 
-                src="/lovable-uploads/cf99ce96-ddda-41a2-aae6-1dad8d00e818.png" 
+                src="/lovable-uploads/4bccf2b8-8094-4207-a737-8b3cb7f4fd5a.png" 
                 alt="Restinprice Logo" 
                 className="h-10" 
               />

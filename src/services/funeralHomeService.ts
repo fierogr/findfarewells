@@ -28,10 +28,18 @@ export const getFuneralHomes = async (location?: string): Promise<FuneralHome[]>
 // Function to fetch a single funeral home by ID
 export const getFuneralHomeById = async (id: string): Promise<FuneralHome | null> => {
   try {
+    // Convert string ID to number if the ID is numeric
+    const numericId = parseInt(id, 10);
+    
+    if (isNaN(numericId)) {
+      console.error('Invalid ID format:', id);
+      return null;
+    }
+    
     const { data, error } = await supabase
       .from('partners')
       .select('*')
-      .eq('id', id)
+      .eq('id', numericId)
       .single();
     
     if (error) {
@@ -52,8 +60,10 @@ export const addFuneralHome = async (funeralHome: FuneralHome): Promise<FuneralH
     // Create a complete funeral home object with default values for missing properties
     const completeHome = createDefaultFuneralHome(funeralHome);
     
-    // Transform to partner DB structure
+    // Transform to partner DB structure, but without the id field
+    // Let Supabase generate a numeric ID
     const partnerData = transformFuneralHomeToPartner(completeHome);
+    delete partnerData.id; // Remove string ID to let Supabase generate a numeric ID
     
     const { data, error } = await supabase
       .from('partners')
@@ -77,12 +87,20 @@ export const addFuneralHome = async (funeralHome: FuneralHome): Promise<FuneralH
 // Function to update an existing funeral home
 export const updateFuneralHome = async (id: string, updatedFuneralHome: FuneralHome): Promise<FuneralHome> => {
   try {
+    // Convert string ID to number
+    const numericId = parseInt(id, 10);
+    
+    if (isNaN(numericId)) {
+      throw new Error(`Invalid ID format: ${id}`);
+    }
+    
     const partnerData = transformFuneralHomeToPartner(updatedFuneralHome);
+    delete partnerData.id; // Remove ID from update data
     
     const { data, error } = await supabase
       .from('partners')
       .update(partnerData)
-      .eq('id', id)
+      .eq('id', numericId)
       .select()
       .single();
     
@@ -102,10 +120,17 @@ export const updateFuneralHome = async (id: string, updatedFuneralHome: FuneralH
 // Function to delete a funeral home
 export const deleteFuneralHome = async (id: string): Promise<boolean> => {
   try {
+    // Convert string ID to number
+    const numericId = parseInt(id, 10);
+    
+    if (isNaN(numericId)) {
+      throw new Error(`Invalid ID format: ${id}`);
+    }
+    
     const { error } = await supabase
       .from('partners')
       .delete()
-      .eq('id', id);
+      .eq('id', numericId);
     
     if (error) {
       console.error('Error deleting funeral home:', error);
@@ -123,7 +148,7 @@ export const deleteFuneralHome = async (id: string): Promise<boolean> => {
 // Helper function to transform a Supabase partner record to a FuneralHome object
 const transformPartnerToFuneralHome = (partner: any): FuneralHome => {
   return {
-    id: partner.id,
+    id: partner.id.toString(), // Convert numeric ID to string
     name: partner.name || '',
     address: partner.address || '',
     city: partner.city || '',
@@ -152,8 +177,9 @@ const transformPartnerToFuneralHome = (partner: any): FuneralHome => {
 
 // Helper function to transform a FuneralHome object to a Supabase partner record
 const transformFuneralHomeToPartner = (home: FuneralHome): any => {
+  // Don't try to convert the ID to number here, handle it separately in each function
   return {
-    id: home.id,
+    id: home.id, // This will be handled in add/update functions
     name: home.name,
     address: home.address,
     city: home.city,

@@ -66,8 +66,10 @@ const PartnerRequests = () => {
     setProcessingAction(true);
     try {
       // 1. Create partner in the partners table
+      // Generate a random numeric ID instead of using UUID
       const newPartner = createDefaultFuneralHome({
-        id: request.id,
+        // Don't use request.id which is a UUID
+        // Let Supabase generate a numeric ID for us
         name: request.business_name,
         address: request.address,
         city: request.city,

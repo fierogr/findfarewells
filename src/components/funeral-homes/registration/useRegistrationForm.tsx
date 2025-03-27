@@ -51,19 +51,21 @@ export function useRegistrationForm() {
     setIsSubmitting(true);
     
     try {
-      // Save partner data to Supabase
-      const { error } = await supabase.from('partners').insert({
-        name: data.businessName,
+      // Save partner data to Supabase's new_partners table
+      const { error } = await supabase.from('new_partners').insert({
+        business_name: data.businessName,
         owner_name: data.ownerName,
         email: data.email,
         phone: data.phone,
         address: data.address,
         city: data.city,
-        zip: data.postalCode,
-        website: data.website || '',
+        postal_code: data.postalCode,
+        website: data.website || null,
         description: data.description,
-        services: data.services ? data.services.split(',').map(s => s.trim()) : [],
-        regions: selectedRegions
+        services: data.services || null,
+        regions: selectedRegions,
+        terms_accepted: data.termsAccepted,
+        status: 'pending'
       });
       
       if (error) {
@@ -74,7 +76,7 @@ export function useRegistrationForm() {
       const emailSent = await sendPartnerRegistrationNotification(data);
       
       if (!emailSent) {
-        console.warn("Failed to send email notification, but partner was saved");
+        console.warn("Failed to send email notification, but partner registration was saved");
       }
 
       // Display success message to user

@@ -10,6 +10,7 @@ import PartnersManagement from "@/components/admin/PartnersManagement";
 import UserRequests from "@/components/admin/UserRequests";
 import PartnerDetails from "@/components/admin/PartnerDetails";
 import EmailSettings from "@/components/admin/EmailSettings";
+import PartnerRequests from "@/components/admin/PartnerRequests";
 import { useFuneralHomes } from "@/hooks/useFuneralHomes";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -62,7 +63,8 @@ const AdminPanel = () => {
         <Tabs defaultValue="partners" className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="partners">Συνεργάτες</TabsTrigger>
-            <TabsTrigger value="requests">Αιτήματα Χρηστών</TabsTrigger>
+            <TabsTrigger value="requests">Νέες Αιτήσεις</TabsTrigger>
+            <TabsTrigger value="user-requests">Αιτήματα Χρηστών</TabsTrigger>
             <TabsTrigger value="stats">Στατιστικά</TabsTrigger>
             <TabsTrigger value="settings">Ρυθμίσεις</TabsTrigger>
           </TabsList>
@@ -82,6 +84,21 @@ const AdminPanel = () => {
             </Card>
           </TabsContent>
           <TabsContent value="requests">
+            <Card>
+              <CardHeader>
+                <CardTitle>Αιτήσεις Εγγραφής</CardTitle>
+                <CardDescription>
+                  Διαχείριση αιτήσεων εγγραφής από γραφεία τελετών.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[calc(100vh-300px)]">
+                  <PartnerRequests />
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="user-requests">
             <Card>
               <CardHeader>
                 <CardTitle>Αιτήματα Χρηστών</CardTitle>

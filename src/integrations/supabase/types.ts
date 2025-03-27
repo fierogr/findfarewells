@@ -11,25 +11,67 @@ export type Database = {
     Tables: {
       partners: {
         Row: {
+          address: string | null
           business_name: string | null
+          city: string | null
           created_at: string
+          description: string | null
           email: string | null
+          featured: boolean | null
           id: number
-          telephone: number | null
+          image_url: string | null
+          name: string | null
+          owner_name: string | null
+          packages: Json[] | null
+          phone: string | null
+          regions: string[] | null
+          services: string[] | null
+          state: string | null
+          telephone: string | null
+          website: string | null
+          zip: string | null
         }
         Insert: {
+          address?: string | null
           business_name?: string | null
+          city?: string | null
           created_at?: string
+          description?: string | null
           email?: string | null
+          featured?: boolean | null
           id?: number
-          telephone?: number | null
+          image_url?: string | null
+          name?: string | null
+          owner_name?: string | null
+          packages?: Json[] | null
+          phone?: string | null
+          regions?: string[] | null
+          services?: string[] | null
+          state?: string | null
+          telephone?: string | null
+          website?: string | null
+          zip?: string | null
         }
         Update: {
+          address?: string | null
           business_name?: string | null
+          city?: string | null
           created_at?: string
+          description?: string | null
           email?: string | null
+          featured?: boolean | null
           id?: number
-          telephone?: number | null
+          image_url?: string | null
+          name?: string | null
+          owner_name?: string | null
+          packages?: Json[] | null
+          phone?: string | null
+          regions?: string[] | null
+          services?: string[] | null
+          state?: string | null
+          telephone?: string | null
+          website?: string | null
+          zip?: string | null
         }
         Relationships: []
       }

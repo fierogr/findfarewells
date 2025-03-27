@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { registrationFormSchema, type RegistrationFormValues } from "@/schemas/registrationFormSchema";
 import { sendPartnerRegistrationNotification } from "@/services/emailService";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useRegistrationForm() {
   const navigate = useNavigate();
@@ -50,11 +51,30 @@ export function useRegistrationForm() {
     setIsSubmitting(true);
     
     try {
+      // Save partner data to Supabase
+      const { error } = await supabase.from('partners').insert({
+        name: data.businessName,
+        owner_name: data.ownerName,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        city: data.city,
+        zip: data.postalCode,
+        website: data.website || '',
+        description: data.description,
+        services: data.services ? data.services.split(',').map(s => s.trim()) : [],
+        regions: selectedRegions
+      });
+      
+      if (error) {
+        throw new Error(`Failed to save partner: ${error.message}`);
+      }
+
       // Send email notification with partner data
       const emailSent = await sendPartnerRegistrationNotification(data);
       
       if (!emailSent) {
-        throw new Error("Failed to send email notification");
+        console.warn("Failed to send email notification, but partner was saved");
       }
 
       // Display success message to user

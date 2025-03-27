@@ -1,91 +1,174 @@
 
 import { FuneralHome } from '@/types/funeralHome';
 import { createDefaultFuneralHome } from './funeralHomeUtils';
-import { initializeData, saveData } from './storageService';
-
-// Create a reference to our funeral homes that persists between renders
-let persistentFuneralHomes = initializeData();
+import { supabase } from '@/integrations/supabase/client';
 
 // Function to simulate fetching funeral homes by location
-export const getFuneralHomes = (location?: string): Promise<FuneralHome[]> => {
-  return new Promise((resolve) => {
-    // Simulate API call delay
-    setTimeout(() => {
-      // In a real app, this would filter based on the location from the backend
-      // Here we return all data since filtering will be done in the useSearchResults hook
-      resolve(persistentFuneralHomes);
-    }, 1000);
-  });
+export const getFuneralHomes = async (location?: string): Promise<FuneralHome[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('partners')
+      .select('*');
+    
+    if (error) {
+      console.error('Error fetching funeral homes:', error);
+      throw error;
+    }
+    
+    // Transform database records to FuneralHome objects
+    const homes = data.map(transformPartnerToFuneralHome);
+    console.log(`Fetched ${homes.length} funeral homes from Supabase`);
+    return homes;
+  } catch (error) {
+    console.error('Error in getFuneralHomes:', error);
+    return [];
+  }
 };
 
-// Function to simulate fetching a single funeral home by ID
-export const getFuneralHomeById = (id: string): Promise<FuneralHome | null> => {
-  return new Promise((resolve) => {
-    // Simulate API call delay
-    setTimeout(() => {
-      const home = persistentFuneralHomes.find(home => home.id === id) || null;
-      resolve(home);
-    }, 800);
-  });
+// Function to fetch a single funeral home by ID
+export const getFuneralHomeById = async (id: string): Promise<FuneralHome | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('partners')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching funeral home by ID:', error);
+      return null;
+    }
+    
+    return transformPartnerToFuneralHome(data);
+  } catch (error) {
+    console.error('Error in getFuneralHomeById:', error);
+    return null;
+  }
 };
 
-// Function to add a new funeral home to the list
-export const addFuneralHome = (funeralHome: FuneralHome): Promise<FuneralHome> => {
-  return new Promise((resolve) => {
+// Function to add a new funeral home
+export const addFuneralHome = async (funeralHome: FuneralHome): Promise<FuneralHome> => {
+  try {
     // Create a complete funeral home object with default values for missing properties
     const completeHome = createDefaultFuneralHome(funeralHome);
     
-    // Add the new funeral home to the array
-    persistentFuneralHomes.push(completeHome);
+    // Transform to partner DB structure
+    const partnerData = transformFuneralHomeToPartner(completeHome);
     
-    // Save to localStorage
-    saveData(persistentFuneralHomes);
+    const { data, error } = await supabase
+      .from('partners')
+      .insert(partnerData)
+      .select()
+      .single();
     
-    // Simulate API call delay
-    setTimeout(() => {
-      resolve(completeHome);
-    }, 500);
-  });
+    if (error) {
+      console.error('Error adding funeral home:', error);
+      throw error;
+    }
+    
+    console.log('Successfully added funeral home to Supabase:', data.id);
+    return transformPartnerToFuneralHome(data);
+  } catch (error) {
+    console.error('Error in addFuneralHome:', error);
+    throw error;
+  }
 };
 
 // Function to update an existing funeral home
-export const updateFuneralHome = (id: string, updatedFuneralHome: FuneralHome): Promise<FuneralHome> => {
-  return new Promise((resolve, reject) => {
-    // Find the index of the funeral home to update
-    const index = persistentFuneralHomes.findIndex(home => home.id === id);
+export const updateFuneralHome = async (id: string, updatedFuneralHome: FuneralHome): Promise<FuneralHome> => {
+  try {
+    const partnerData = transformFuneralHomeToPartner(updatedFuneralHome);
     
-    if (index === -1) {
-      reject(new Error(`Funeral home with ID ${id} not found`));
-      return;
+    const { data, error } = await supabase
+      .from('partners')
+      .update(partnerData)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error updating funeral home:', error);
+      throw error;
     }
     
-    // Update the funeral home
-    persistentFuneralHomes[index] = updatedFuneralHome;
-    
-    // Save to localStorage
-    saveData(persistentFuneralHomes);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      resolve(updatedFuneralHome);
-    }, 500);
-  });
+    console.log('Successfully updated funeral home in Supabase:', data.id);
+    return transformPartnerToFuneralHome(data);
+  } catch (error) {
+    console.error('Error in updateFuneralHome:', error);
+    throw error;
+  }
 };
 
 // Function to delete a funeral home
-export const deleteFuneralHome = (id: string): Promise<boolean> => {
-  return new Promise((resolve) => {
-    // Filter out the funeral home to delete
-    persistentFuneralHomes = persistentFuneralHomes.filter(home => home.id !== id);
+export const deleteFuneralHome = async (id: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('partners')
+      .delete()
+      .eq('id', id);
     
-    // Save to localStorage
-    saveData(persistentFuneralHomes);
+    if (error) {
+      console.error('Error deleting funeral home:', error);
+      throw error;
+    }
     
-    // Simulate API call delay
-    setTimeout(() => {
-      resolve(true);
-    }, 500);
-  });
+    console.log('Successfully deleted funeral home from Supabase:', id);
+    return true;
+  } catch (error) {
+    console.error('Error in deleteFuneralHome:', error);
+    return false;
+  }
+};
+
+// Helper function to transform a Supabase partner record to a FuneralHome object
+const transformPartnerToFuneralHome = (partner: any): FuneralHome => {
+  return {
+    id: partner.id,
+    name: partner.name || '',
+    address: partner.address || '',
+    city: partner.city || '',
+    state: partner.state || '',
+    zip: partner.zip || '',
+    phone: partner.phone || partner.telephone || '',
+    email: partner.email || '',
+    website: partner.website || '',
+    hours: "Mon-Fri: 9am-5pm, Sat: 10am-2pm, Sun: Closed", // Default value
+    description: partner.description || '',
+    about: partner.description || '',
+    imageUrl: partner.image_url || "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80",
+    coverImageUrl: "https://images.unsplash.com/photo-1468779065891-103dac4a7c48",
+    rating: 0,
+    reviewCount: 0,
+    services: Array.isArray(partner.services) ? partner.services : [],
+    amenities: [],
+    basicPrice: 0,
+    featured: partner.featured || false,
+    packages: Array.isArray(partner.packages) ? partner.packages : [],
+    additionalServices: [],
+    reviews: [],
+    regions: Array.isArray(partner.regions) ? partner.regions : []
+  };
+};
+
+// Helper function to transform a FuneralHome object to a Supabase partner record
+const transformFuneralHomeToPartner = (home: FuneralHome): any => {
+  return {
+    id: home.id,
+    name: home.name,
+    address: home.address,
+    city: home.city,
+    state: home.state,
+    zip: home.zip,
+    phone: home.phone,
+    email: home.email,
+    website: home.website,
+    description: home.description,
+    services: home.services,
+    image_url: home.imageUrl,
+    featured: home.featured,
+    regions: home.regions,
+    packages: home.packages
+  };
 };
 
 // Export distance calculation for backward compatibility

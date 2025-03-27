@@ -1,34 +1,23 @@
-
 import { FuneralHome } from '@/types/funeralHome';
-import { mockFuneralHomes } from '@/data/mockFuneralHomes';
+import { getFuneralHomes, addFuneralHome } from './funeralHomeService';
 
 const STORAGE_KEY = 'funeralHomes';
 
-// Initialize the funeral home data from localStorage if available
-export const initializeData = (): FuneralHome[] => {
+// Initialize the funeral home data from Supabase
+export const initializeData = async (): Promise<FuneralHome[]> => {
   try {
-    const storedHomes = localStorage.getItem(STORAGE_KEY);
-    if (storedHomes) {
-      console.log("Found stored funeral homes in localStorage:", JSON.parse(storedHomes).length);
-      return JSON.parse(storedHomes);
-    }
+    // Get data from Supabase
+    const homes = await getFuneralHomes();
+    console.log("Initialized with data from Supabase:", homes.length);
+    return homes;
   } catch (error) {
-    console.error("Error loading funeral homes from localStorage:", error);
+    console.error("Error loading funeral homes from Supabase:", error);
+    return [];
   }
-  
-  // If no data in localStorage or error, use mock data and save it
-  console.log("No stored homes found, initializing with mock data");
-  const initialData = [...mockFuneralHomes];
-  saveData(initialData);
-  return initialData;
 };
 
-// Helper function to save funeral homes to localStorage
-export const saveData = (data: FuneralHome[]): void => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    console.log("Saved funeral homes to localStorage:", data.length);
-  } catch (error) {
-    console.error("Error saving funeral homes to localStorage:", error);
-  }
+// This function is now essentially a pass-through to keep backward compatibility
+export const saveData = async (data: FuneralHome[]): Promise<void> => {
+  console.log("Note: Data is now saved to Supabase directly, not localStorage");
+  // This function is kept for backward compatibility
 };

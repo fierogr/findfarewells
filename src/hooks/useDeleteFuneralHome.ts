@@ -1,6 +1,6 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteFuneralHome } from "@/services/adminFuneralHomeService";
+import { deleteFuneralHome } from "@/services/funeralHomeService";
 
 export const useDeleteFuneralHome = () => {
   const queryClient = useQueryClient();

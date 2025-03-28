@@ -3,7 +3,7 @@ import { FuneralHome } from '@/types/funeralHome';
 import { createDefaultFuneralHome } from './funeralHomeUtils';
 import { supabase } from '@/integrations/supabase/client';
 
-// Function to simulate fetching funeral homes by location
+// Function to fetch funeral homes
 export const getFuneralHomes = async (location?: string): Promise<FuneralHome[]> => {
   try {
     const { data, error } = await supabase

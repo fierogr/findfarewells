@@ -16,18 +16,31 @@ export const useFuneralHomeFetch = () => {
 
     const attempt = async () => {
       try {
+        console.log(`Fetching funeral homes for location: "${searchLocation}"`);
         const homes = await getFuneralHomes();
-        console.log("Fetched homes:", homes);
         
         if (!homes || homes.length === 0) {
-          throw new Error("No funeral homes returned from service");
+          console.log("No funeral homes returned from service");
+          setFuneralHomes([]);
+          setLoading(false);
+          return;
         }
         
+        console.log(`Retrieved ${homes.length} homes from database`);
+        
         const filteredByRegion = await filterHomesByRegion(homes, searchLocation);
-        console.log("Filtered by region:", filteredByRegion);
+        console.log(`Filtered results: ${filteredByRegion.length} homes match location "${searchLocation}"`);
         
         setFuneralHomes(filteredByRegion);
         setLoading(false);
+        
+        if (filteredByRegion.length === 0) {
+          toast({
+            title: "Κανένα αποτέλεσμα",
+            description: `Δεν βρέθηκαν γραφεία τελετών στην περιοχή: ${searchLocation}`,
+            variant: "default",
+          });
+        }
       } catch (error) {
         console.error("Error fetching funeral homes:", error);
         
@@ -37,6 +50,7 @@ export const useFuneralHomeFetch = () => {
           setTimeout(attempt, 1000);
         } else {
           setLoading(false);
+          setFuneralHomes([]);
           toast({
             title: "Σφάλμα",
             description: "Αποτυχία φόρτωσης γραφείων τελετών. Παρακαλώ δοκιμάστε ξανά.",

@@ -10,26 +10,34 @@ export const filterHomesByRegion = async (
   homes: FuneralHome[],
   location: string
 ): Promise<FuneralHome[]> => {
-  console.log("Filtering homes for region:", location);
+  console.log("Filtering homes for location:", location);
   
-  // For the demo, we'll use a simple filtering approach based on city or region match
+  if (!location || location.trim() === '') {
+    console.log("No location provided, returning all homes");
+    return homes;
+  }
+  
+  const normalizedLocation = location.toLowerCase().trim();
+  
   return homes.filter(home => {
-    // Check for direct match in city or state
-    if (
-      home.city.toLowerCase().includes(location.toLowerCase()) ||
-      home.state.toLowerCase().includes(location.toLowerCase())
-    ) {
-      return true;
-    }
+    // Direct match check for city, state, or address
+    const cityMatch = home.city?.toLowerCase().includes(normalizedLocation);
+    const stateMatch = home.state?.toLowerCase().includes(normalizedLocation);
+    const addressMatch = home.address?.toLowerCase().includes(normalizedLocation);
     
-    // Check if the home has regions list and the location is in one of them
+    // Check regions array
+    let regionMatch = false;
     if (home.regions && Array.isArray(home.regions)) {
-      return home.regions.some(region => 
-        region.toLowerCase().includes(location.toLowerCase())
+      regionMatch = home.regions.some(region => 
+        region.toLowerCase().includes(normalizedLocation)
       );
     }
     
-    return false;
+    const isMatch = cityMatch || stateMatch || addressMatch || regionMatch;
+    if (isMatch) {
+      console.log(`Match found for "${location}" in home: ${home.name}`);
+    }
+    
+    return isMatch;
   });
 };
-

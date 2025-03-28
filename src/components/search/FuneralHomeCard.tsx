@@ -89,7 +89,7 @@ const FuneralHomeCard = ({ home, selectedServices }: FuneralHomeCardProps) => {
           
           <p className="text-sm line-clamp-2 text-muted-foreground mb-3">{home.description}</p>
           
-          {/* Reviews section - moved from right column to middle column */}
+          {/* Reviews section - in middle column */}
           <div className="mb-3">
             <div className="flex items-center space-x-1 mb-1">
               {Array(5).fill(0).map((_, i) => (
@@ -131,14 +131,12 @@ const FuneralHomeCard = ({ home, selectedServices }: FuneralHomeCardProps) => {
         
         <div className="md:col-span-3 p-4 md:p-6 bg-gray-50 flex flex-col justify-between">
           <div>
-            {/* Price section - moved back to right column */}
-            {basePrice > 0 && (
-              <div className="mb-4">
-                <p className="text-sm text-muted-foreground">Από</p>
-                <p className="text-2xl font-bold">{basePrice}€</p>
-                <p className="text-xs text-muted-foreground">Βασικό πακέτο</p>
-              </div>
-            )}
+            {/* Price section - in right column with better visibility */}
+            <div className="mb-4">
+              <p className="text-sm text-muted-foreground">Από</p>
+              <p className="text-2xl font-bold">{basePrice > 0 ? `${basePrice}€` : "Επικοινωνήστε"}</p>
+              <p className="text-xs text-muted-foreground">Βασικό πακέτο</p>
+            </div>
           </div>
           
           <div className="flex flex-col space-y-2 mt-2">

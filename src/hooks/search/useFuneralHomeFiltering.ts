@@ -6,23 +6,37 @@ export const useFuneralHomeFiltering = (funeralHomes: FuneralHome[]) => {
   const [filteredHomes, setFilteredHomes] = useState<FuneralHome[]>([]);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Update filtered homes when selection changes
   useEffect(() => {
-    if (selectedServices.length === 0) {
-      setFilteredHomes(funeralHomes);
-    } else {
-      const filtered = funeralHomes.filter(home => 
+    let filtered = [...funeralHomes];
+    
+    // Filter by services if any are selected
+    if (selectedServices.length > 0) {
+      filtered = filtered.filter(home => 
         selectedServices.every(service => 
           home.services.some(homeService => 
             homeService.toLowerCase().includes(service.toLowerCase())
           )
         )
       );
-      setFilteredHomes(filtered);
     }
-  }, [selectedServices, funeralHomes]);
+    
+    // Filter by regions if any are selected
+    if (selectedRegions.length > 0) {
+      filtered = filtered.filter(home => 
+        home.regions && selectedRegions.some(region => 
+          home.regions?.some(homeRegion => 
+            homeRegion.toLowerCase().includes(region.toLowerCase())
+          )
+        )
+      );
+    }
+    
+    setFilteredHomes(filtered);
+  }, [selectedServices, selectedRegions, funeralHomes]);
 
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -36,8 +50,17 @@ export const useFuneralHomeFiltering = (funeralHomes: FuneralHome[]) => {
     );
   };
 
+  const toggleRegionSelection = (region: string) => {
+    setSelectedRegions(prev => 
+      prev.includes(region)
+        ? prev.filter(r => r !== region)
+        : [...prev, region]
+    );
+  };
+
   const clearFilters = () => {
     setSelectedServices([]);
+    setSelectedRegions([]);
   };
 
   const getDisplayPrice = (home: FuneralHome) => {
@@ -60,10 +83,12 @@ export const useFuneralHomeFiltering = (funeralHomes: FuneralHome[]) => {
     sortedHomes: getSortedHomes(),
     sortOrder,
     selectedServices,
+    selectedRegions,
     isFilterOpen,
     setIsFilterOpen,
     toggleSortOrder,
     toggleServiceSelection,
+    toggleRegionSelection,
     clearFilters
   };
 };

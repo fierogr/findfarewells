@@ -5,6 +5,7 @@ import { useSearchResults } from "@/hooks/useSearchResults";
 import { useIsMobile } from "@/hooks/use-mobile";
 import SearchForm from "@/components/search/SearchForm";
 import FilterSidebar from "@/components/search/FilterSidebar";
+import FilterSheet from "@/components/search/FilterSheet";
 import SortButton from "@/components/search/SortButton";
 import LoadingState from "@/components/search/LoadingState";
 import EmptyResults from "@/components/search/EmptyResults";
@@ -25,10 +26,12 @@ const SearchResults = () => {
     loading,
     sortOrder,
     selectedServices,
+    selectedRegions,
     isFilterOpen,
     setIsFilterOpen,
     toggleSortOrder,
     toggleServiceSelection,
+    toggleRegionSelection,
     clearFilters
   } = useSearchResults(location);
 
@@ -38,6 +41,9 @@ const SearchResults = () => {
       setSearchParams({ location: newLocation });
     }
   };
+
+  // Calculate total active filters
+  const totalActiveFilters = selectedServices.length + selectedRegions.length;
 
   return (
     <div className="container py-8 md:py-12">
@@ -63,7 +69,9 @@ const SearchResults = () => {
         <div className="hidden md:block w-64 shrink-0">
           <FilterSidebar
             selectedServices={selectedServices}
+            selectedRegions={selectedRegions}
             onServiceToggle={toggleServiceSelection}
+            onRegionToggle={toggleRegionSelection}
             onClearFilters={clearFilters}
           />
         </div>
@@ -77,7 +85,7 @@ const SearchResults = () => {
                   : `${filteredHomes.length} γραφεία τελετών εντός 50χλμ`}
               </p>
               <SelectedFiltersDisplay 
-                selectedFiltersCount={selectedServices.length}
+                selectedFiltersCount={totalActiveFilters}
                 onClearFilters={clearFilters}
               />
             </div>
@@ -87,7 +95,9 @@ const SearchResults = () => {
               {isMobile && (
                 <FilterSheet 
                   selectedServices={selectedServices}
+                  selectedRegions={selectedRegions}
                   onServiceToggle={toggleServiceSelection}
+                  onRegionToggle={toggleRegionSelection}
                   onClearFilters={clearFilters}
                   isOpen={isFilterOpen}
                   onOpenChange={setIsFilterOpen}

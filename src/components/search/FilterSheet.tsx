@@ -11,7 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Filter } from "lucide-react";
+import { Filter, MapPin } from "lucide-react";
 
 // Greek services for filtering
 const commonServices = [
@@ -22,9 +22,21 @@ const commonServices = [
   "Μουσική"
 ];
 
+// Greek regions for filtering
+const commonRegions = [
+  "Νομός Θεσσαλονίκης",
+  "Νομός Σερρών",
+  "Νομός Κιλκίς",
+  "Νομός Πέλλας",
+  "Νομός Ημαθίας",
+  "Νομός Χαλκιδικής"
+];
+
 interface FilterSheetProps {
   selectedServices: string[];
+  selectedRegions: string[];
   onServiceToggle: (service: string) => void;
+  onRegionToggle: (region: string) => void;
   onClearFilters: () => void;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -32,32 +44,38 @@ interface FilterSheetProps {
 
 const FilterSheet = ({ 
   selectedServices, 
+  selectedRegions,
   onServiceToggle, 
+  onRegionToggle,
   onClearFilters, 
   isOpen,
   onOpenChange
 }: FilterSheetProps) => {
+  const totalActiveFilters = selectedServices.length + selectedRegions.length;
+  
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>
         <Button variant="outline" size="sm" className="flex items-center gap-2">
           <Filter className="h-4 w-4" />
           Φίλτρα
-          {selectedServices.length > 0 && (
+          {totalActiveFilters > 0 && (
             <span className="ml-1 text-xs bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center">
-              {selectedServices.length}
+              {totalActiveFilters}
             </span>
           )}
         </Button>
       </SheetTrigger>
       <SheetContent className="w-[300px] sm:w-[450px]">
         <SheetHeader>
-          <SheetTitle>Φίλτρα Υπηρεσιών</SheetTitle>
+          <SheetTitle>Φίλτρα</SheetTitle>
           <SheetDescription>
-            Επιλέξτε τις υπηρεσίες που σας ενδιαφέρουν
+            Επιλέξτε τις υπηρεσίες και περιοχές που σας ενδιαφέρουν
           </SheetDescription>
         </SheetHeader>
         <Separator className="my-4" />
+        
+        {/* Services Section */}
         <div className="grid grid-cols-1 gap-4 my-4">
           <div className="space-y-4">
             <h3 className="font-medium">Υπηρεσίες</h3>
@@ -78,6 +96,34 @@ const FilterSheet = ({
             ))}
           </div>
         </div>
+        
+        <Separator className="my-4" />
+        
+        {/* Regions Section */}
+        <div className="grid grid-cols-1 gap-4 my-4">
+          <div className="space-y-4">
+            <h3 className="font-medium flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Περιοχές
+            </h3>
+            {commonRegions.map((region) => (
+              <div key={region} className="flex items-start space-x-2">
+                <Checkbox 
+                  id={`region-${region}`}
+                  checked={selectedRegions.includes(region)}
+                  onCheckedChange={() => onRegionToggle(region)}
+                />
+                <label
+                  htmlFor={`region-${region}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {region}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+        
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={onClearFilters}>
             Καθαρισμός

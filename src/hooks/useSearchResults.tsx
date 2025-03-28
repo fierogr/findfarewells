@@ -11,10 +11,12 @@ export const useSearchResults = (initialLocation: string) => {
     sortedHomes,
     sortOrder,
     selectedServices,
+    selectedRegions,
     isFilterOpen,
     setIsFilterOpen,
     toggleSortOrder,
     toggleServiceSelection,
+    toggleRegionSelection,
     clearFilters
   } = useFuneralHomeFiltering(funeralHomes);
 
@@ -32,11 +34,13 @@ export const useSearchResults = (initialLocation: string) => {
     loading,
     sortOrder,
     selectedServices,
+    selectedRegions,
     isFilterOpen,
     setIsFilterOpen,
     fetchFuneralHomes,
     toggleSortOrder,
     toggleServiceSelection,
+    toggleRegionSelection,
     clearFilters
   };
 };

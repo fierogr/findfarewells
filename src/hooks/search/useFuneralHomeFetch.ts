@@ -40,19 +40,25 @@ export const useFuneralHomeFetch = () => {
         
         let filteredHomes: FuneralHome[];
         
+        // Make sure any home with a null regions field gets an empty array
+        const homesWithValidRegions = homes.map(home => ({
+          ...home,
+          regions: home.regions || []
+        }));
+        
         if (prefecture) {
           // If prefecture is provided, filter by prefecture directly
-          filteredHomes = filterHomesByPrefecture(homes, prefecture);
+          filteredHomes = filterHomesByPrefecture(homesWithValidRegions, prefecture);
           console.log(`Filtered by prefecture ${prefecture}: ${filteredHomes.length} homes match`);
           
           if (filteredHomes.length === 0) {
             // If no homes with the prefecture, try location filtering as fallback
-            filteredHomes = await filterHomesByRegion(homes, searchLocation);
+            filteredHomes = await filterHomesByRegion(homesWithValidRegions, searchLocation);
             console.log(`Fallback filtering by location: ${filteredHomes.length} homes match location "${searchLocation}"`);
           }
         } else {
           // If no prefecture, filter by location as before
-          filteredHomes = await filterHomesByRegion(homes, searchLocation);
+          filteredHomes = await filterHomesByRegion(homesWithValidRegions, searchLocation);
           console.log(`Filtered by location: ${filteredHomes.length} homes match location "${searchLocation}"`);
         }
         

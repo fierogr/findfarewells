@@ -50,6 +50,7 @@ const SearchResults = () => {
         // If prefecture is not provided in URL params, try to find it
         if (!prefectureParam) {
           try {
+            console.log(`Looking up prefecture for location: ${location}`);
             const foundPrefecture = await findPrefectureForLocation(location);
             setPrefecture(foundPrefecture);
             
@@ -68,6 +69,8 @@ const SearchResults = () => {
                 description: `Η περιοχή "${location}" ανήκει στον ${foundPrefecture}`,
                 variant: "default"
               });
+            } else {
+              console.log(`Could not determine prefecture for location: ${location}`);
             }
           } catch (error) {
             console.error("Error finding prefecture:", error);
@@ -82,7 +85,7 @@ const SearchResults = () => {
     };
     
     getPrefectureAndFetch();
-  }, [location, prefectureParam, fetchFuneralHomes, setSearchParams]);
+  }, [location, prefectureParam, fetchFuneralHomes, setSearchParams, prefecture]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();

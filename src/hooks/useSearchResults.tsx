@@ -13,7 +13,7 @@ export const useSearchResults = (initialLocation: string, prefecture: string | n
       console.log(`Fetching funeral homes for location: "${location}", prefecture: "${prefecture}"`);
       
       // First get all funeral homes for the location
-      await originalFetchFuneralHomes(location);
+      await originalFetchFuneralHomes(location, prefecture);
     },
     [originalFetchFuneralHomes]
   );

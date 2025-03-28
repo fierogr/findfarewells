@@ -46,6 +46,18 @@ const LOCATION_TO_PREFECTURE: Record<string, string> = {
   "σταυρούπολη": "Νομός Θεσσαλονίκης",
   "stavroupoli": "Νομός Θεσσαλονίκης",
   "σταυρουπολη": "Νομός Θεσσαλονίκης",
+  "νεαπολη": "Νομός Θεσσαλονίκης",
+  "neapoli": "Νομός Θεσσαλονίκης",
+  "νεάπολη": "Νομός Θεσσαλονίκης",
+  "αμπελοκηποι": "Νομός Θεσσαλονίκης",
+  "ampelokipoi": "Νομός Θεσσαλονίκης",
+  "αμπελόκηποι": "Νομός Θεσσαλονίκης",
+  "πολιχνη": "Νομός Θεσσαλονίκης",
+  "polichni": "Νομός Θεσσαλονίκης",
+  "πολίχνη": "Νομός Θεσσαλονίκης",
+  "θερμη": "Νομός Θεσσαλονίκης",
+  "thermi": "Νομός Θεσσαλονίκης",
+  "θέρμη": "Νομός Θεσσαλονίκης",
   
   // Serres areas
   "σέρρες": "Νομός Σερρών",
@@ -107,6 +119,46 @@ const LOCATION_TO_PREFECTURE: Record<string, string> = {
   "μουδανιά": "Νομός Χαλκιδικής",
   "moudania": "Νομός Χαλκιδικής",
   "μουδανια": "Νομός Χαλκιδικής",
+  
+  // Pieria areas
+  "κατερίνη": "Νομός Πιερίας",
+  "katerini": "Νομός Πιερίας",
+  "κατερινη": "Νομός Πιερίας",
+  "λιτόχωρο": "Νομός Πιερίας",
+  "litochoro": "Νομός Πιερίας",
+  "λιτοχωρο": "Νομός Πιερίας",
+  
+  // Attiki areas
+  "αθήνα": "Νομός Αττικής",
+  "athens": "Νομός Αττικής",
+  "αθηνα": "Νομός Αττικής",
+  "πειραιάς": "Νομός Αττικής",
+  "piraeus": "Νομός Αττικής",
+  "πειραιας": "Νομός Αττικής",
+  "γλυφάδα": "Νομός Αττικής",
+  "glyfada": "Νομός Αττικής",
+  "γλυφαδα": "Νομός Αττικής",
+  
+  // Evoia areas
+  "χαλκίδα": "Νομός Ευβοίας",
+  "chalkida": "Νομός Ευβοίας",
+  "χαλκιδα": "Νομός Ευβοίας",
+  "εύβοια": "Νομός Ευβοίας",
+  "evoia": "Νομός Ευβοίας",
+  "ευβοια": "Νομός Ευβοίας",
+  
+  // Viotia areas
+  "λιβαδειά": "Νομός Βοιωτίας",
+  "livadeia": "Νομός Βοιωτίας",
+  "λιβαδεια": "Νομός Βοιωτίας",
+  "θήβα": "Νομός Βοιωτίας",
+  "thiva": "Νομός Βοιωτίας",
+  "θηβα": "Νομός Βοιωτίας",
+  
+  // Fthiotida areas
+  "λαμία": "Νομός Φθιώτιδας",
+  "lamia": "Νομός Φθιώτιδας",
+  "λαμια": "Νομός Φθιώτιδας"
 };
 
 /**
@@ -128,6 +180,14 @@ export const findPrefectureForLocation = async (location: string): Promise<strin
   for (const [key, value] of Object.entries(LOCATION_TO_PREFECTURE)) {
     if (normalizedLocation.includes(key)) {
       console.log(`Found prefecture ${value} for ${location} in local mapping`);
+      return value;
+    }
+  }
+  
+  // If we couldn't find an exact match, try to match partially
+  for (const [key, value] of Object.entries(LOCATION_TO_PREFECTURE)) {
+    if (key.includes(normalizedLocation) || normalizedLocation.includes(key.substring(0, 3))) {
+      console.log(`Found partial match: prefecture ${value} for ${location}`);
       return value;
     }
   }
@@ -156,9 +216,10 @@ export const filterHomesByPrefecture = (homes: any[], prefecture: string | null)
   }
   
   return homes.filter(home => {
+    // If home.regions is null, convert it to an empty array
+    const regions = home.regions || [];
+    
     // Check if the home has regions and if the prefecture is included
-    return home.regions && 
-           Array.isArray(home.regions) && 
-           home.regions.includes(prefecture);
+    return Array.isArray(regions) && regions.includes(prefecture);
   });
 };

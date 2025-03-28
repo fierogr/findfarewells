@@ -4,7 +4,7 @@ import {
   getFuneralHomeById, 
   updateFuneralHome as updateHome, 
   deleteFuneralHome as deleteHome 
-} from "./funeralHomeService";
+} from "./funeralHome";
 
 // Export the functions from funeralHomeService with admin-specific names for clarity
 export const getFuneralHomeForAdmin = getFuneralHomeById;

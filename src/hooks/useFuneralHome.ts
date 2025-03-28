@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { getFuneralHomeById } from "@/services/funeralHomeService";
+import { getFuneralHomeById } from "@/services/funeralHome";
 
 export const useFuneralHome = (id: string) => {
   return useQuery({

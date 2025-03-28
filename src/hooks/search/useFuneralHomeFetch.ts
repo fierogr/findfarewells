@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from "react";
 import { toast } from "@/components/ui/use-toast";
-import { getFuneralHomes } from "@/services/funeralHomeService";
+import { getFuneralHomes } from "@/services/funeralHome";
 import { FuneralHome } from "@/types/funeralHome";
 import { filterHomesByRegion } from "./useLocationFilter";
 import { filterHomesByPrefecture } from "@/utils/searchUtils";

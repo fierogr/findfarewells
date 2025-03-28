@@ -10,7 +10,6 @@ export const registrationFormSchema = z.object({
   city: z.string().min(2, { message: "Η πόλη είναι απαραίτητη" }),
   postalCode: z.string().min(5, { message: "Ο ταχυδρομικός κώδικας είναι απαραίτητος" }),
   website: z.string().url({ message: "Παρακαλώ εισάγετε ένα έγκυρο URL" }).optional().or(z.literal("")),
-  description: z.string().min(20, { message: "Η περιγραφή πρέπει να έχει τουλάχιστον 20 χαρακτήρες" }),
   services: z.string().optional(),
   regions: z.array(z.string()).optional(),
 });

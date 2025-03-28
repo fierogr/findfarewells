@@ -25,7 +25,6 @@ export function useRegistrationForm() {
       city: "",
       postalCode: "",
       website: "",
-      description: "",
       services: ""
     }
   });
@@ -60,7 +59,7 @@ export function useRegistrationForm() {
         city: data.city,
         postal_code: data.postalCode,
         website: data.website || null,
-        description: data.description,
+        description: "", // Setting an empty string instead of removing it completely to maintain table structure
         services: data.services || null,
         regions: selectedRegions,
         status: 'pending'

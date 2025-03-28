@@ -4,13 +4,14 @@ import { toast } from "@/components/ui/use-toast";
 import { getFuneralHomes } from "@/services/funeralHomeService";
 import { FuneralHome } from "@/types/funeralHome";
 import { filterHomesByRegion } from "./useLocationFilter";
+import { filterHomesByPrefecture } from "@/utils/searchUtils";
 
 export const useFuneralHomeFetch = () => {
   const [funeralHomes, setFuneralHomes] = useState<FuneralHome[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchFuneralHomes = useCallback(async (searchLocation: string) => {
+  const fetchFuneralHomes = useCallback(async (searchLocation: string, prefecture: string | null = null) => {
     if (!searchLocation || searchLocation.trim() === '') {
       setLoading(false);
       setFuneralHomes([]);
@@ -25,7 +26,7 @@ export const useFuneralHomeFetch = () => {
 
     const attempt = async () => {
       try {
-        console.log(`Fetching funeral homes for location: "${searchLocation}"`);
+        console.log(`Fetching funeral homes for location: "${searchLocation}", prefecture: "${prefecture}"`);
         const homes = await getFuneralHomes();
         
         if (!homes || homes.length === 0) {
@@ -37,16 +38,35 @@ export const useFuneralHomeFetch = () => {
         
         console.log(`Retrieved ${homes.length} homes from database`);
         
-        const filteredByRegion = await filterHomesByRegion(homes, searchLocation);
-        console.log(`Filtered results: ${filteredByRegion.length} homes match location "${searchLocation}"`);
+        let filteredHomes: FuneralHome[];
         
-        setFuneralHomes(filteredByRegion);
+        if (prefecture) {
+          // If prefecture is provided, filter by prefecture directly
+          filteredHomes = filterHomesByPrefecture(homes, prefecture);
+          console.log(`Filtered by prefecture ${prefecture}: ${filteredHomes.length} homes match`);
+          
+          if (filteredHomes.length === 0) {
+            // If no homes with the prefecture, try location filtering as fallback
+            filteredHomes = await filterHomesByRegion(homes, searchLocation);
+            console.log(`Fallback filtering by location: ${filteredHomes.length} homes match location "${searchLocation}"`);
+          }
+        } else {
+          // If no prefecture, filter by location as before
+          filteredHomes = await filterHomesByRegion(homes, searchLocation);
+          console.log(`Filtered by location: ${filteredHomes.length} homes match location "${searchLocation}"`);
+        }
+        
+        setFuneralHomes(filteredHomes);
         setLoading(false);
         
-        if (filteredByRegion.length === 0) {
+        if (filteredHomes.length === 0) {
+          const message = prefecture 
+            ? `Δεν βρέθηκαν γραφεία τελετών στον ${prefecture}`
+            : `Δεν βρέθηκαν γραφεία τελετών στην περιοχή: ${searchLocation}`;
+            
           toast({
             title: "Κανένα αποτέλεσμα",
-            description: `Δεν βρέθηκαν γραφεία τελετών στην περιοχή: ${searchLocation}`,
+            description: message,
             variant: "default",
           });
         }

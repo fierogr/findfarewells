@@ -1,23 +1,52 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { findPrefectureForLocation } from "@/utils/searchUtils";
+import { toast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const [location, setLocation] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (location.trim()) {
+    
+    if (!location.trim()) {
+      return;
+    }
+    
+    setIsSearching(true);
+    
+    try {
+      // Find the prefecture for the location
+      const prefecture = await findPrefectureForLocation(location);
+      
+      if (prefecture) {
+        // If prefecture found, include it in the search params
+        navigate(`/search?location=${encodeURIComponent(location)}&prefecture=${encodeURIComponent(prefecture)}`);
+        
+        toast({
+          title: "Αναζήτηση",
+          description: `Αναζήτηση γραφείων τελετών στο ${prefecture}`,
+          variant: "default"
+        });
+      } else {
+        // If no prefecture found, just search by location
+        navigate(`/search?location=${encodeURIComponent(location)}`);
+      }
+    } catch (error) {
+      console.error("Error during search:", error);
       navigate(`/search?location=${encodeURIComponent(location)}`);
+    } finally {
+      setIsSearching(false);
     }
   };
 
   const handleSampleSearch = () => {
-    setLocation("Portland, OR 97205");
+    setLocation("Περαία");
   };
 
   return (
@@ -62,7 +91,7 @@ const Index = () => {
                   onClick={handleSampleSearch}
                   className="text-primary text-sm hover:underline focus:outline-none"
                 >
-                  Δοκιμάστε με παράδειγμα: Portland, OR 97205
+                  Δοκιμάστε με παράδειγμα: Περαία
                 </button>
               </div>
             </form>
@@ -87,7 +116,7 @@ const Index = () => {
             <div className="bg-background rounded-xl p-6 shadow-sm text-center animate-fadeIn delay-200">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               <h3 className="text-xl font-medium mb-3">Συγκρίνετε Επιλογές</h3>

@@ -12,11 +12,15 @@ import EmptyResults from "@/components/search/EmptyResults";
 import FuneralHomeCard from "@/components/search/FuneralHomeCard";
 import SelectedFiltersDisplay from "@/components/search/SelectedFiltersDisplay";
 import { MapPin } from "lucide-react";
+import { findPrefectureForLocation, filterHomesByPrefecture } from "@/utils/searchUtils";
+import { toast } from "@/components/ui/use-toast";
 
 const SearchResults = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = searchParams.get("location") || "";
+  const prefectureParam = searchParams.get("prefecture");
   const [newLocation, setNewLocation] = useState(location);
+  const [prefecture, setPrefecture] = useState<string | null>(prefectureParam);
   const isMobile = useIsMobile();
   
   const {
@@ -35,26 +39,70 @@ const SearchResults = () => {
     toggleServiceSelection,
     toggleRegionSelection,
     clearFilters
-  } = useSearchResults(location);
+  } = useSearchResults(location, prefecture);
 
-  // Re-fetch when location changes
+  // Determine prefecture if not provided and re-fetch when location changes
   useEffect(() => {
-    if (location) {
-      setNewLocation(location);
-      fetchFuneralHomes(location);
-    }
-  }, [location, fetchFuneralHomes]);
+    const getPrefectureAndFetch = async () => {
+      if (location) {
+        setNewLocation(location);
+        
+        // If prefecture is not provided in URL params, try to find it
+        if (!prefectureParam) {
+          try {
+            const foundPrefecture = await findPrefectureForLocation(location);
+            setPrefecture(foundPrefecture);
+            
+            if (foundPrefecture) {
+              console.log(`Found prefecture: ${foundPrefecture} for location: ${location}`);
+              
+              // Update URL with the found prefecture
+              setSearchParams(prev => {
+                const newParams = new URLSearchParams(prev);
+                newParams.set("prefecture", foundPrefecture);
+                return newParams;
+              });
+              
+              toast({
+                title: "Βρέθηκε νομός",
+                description: `Η περιοχή "${location}" ανήκει στον ${foundPrefecture}`,
+                variant: "default"
+              });
+            }
+          } catch (error) {
+            console.error("Error finding prefecture:", error);
+          }
+        } else {
+          setPrefecture(prefectureParam);
+        }
+        
+        // Fetch funeral homes with the determined prefecture
+        fetchFuneralHomes(location, prefecture || prefectureParam);
+      }
+    };
+    
+    getPrefectureAndFetch();
+  }, [location, prefectureParam, fetchFuneralHomes, setSearchParams]);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newLocation.trim()) {
-      setSearchParams({ location: newLocation });
+      // First try to find the prefecture
+      const foundPrefecture = await findPrefectureForLocation(newLocation);
+      
+      // Update search params with location and prefecture if found
+      const params: Record<string, string> = { location: newLocation };
+      if (foundPrefecture) {
+        params.prefecture = foundPrefecture;
+      }
+      
+      setSearchParams(params);
     }
   };
 
   const handleRetry = () => {
     if (location) {
-      fetchFuneralHomes(location);
+      fetchFuneralHomes(location, prefecture);
     }
   };
 
@@ -66,11 +114,20 @@ const SearchResults = () => {
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-semibold mb-6 animate-fadeIn">
           Γραφεία Τελετών στην περιοχή {location}
+          {prefecture && (
+            <span className="block text-lg font-medium text-muted-foreground mt-2">
+              {prefecture}
+            </span>
+          )}
         </h1>
         
         <div className="mb-6 text-sm text-muted-foreground flex items-center">
           <MapPin className="h-4 w-4 mr-1" />
-          <span>Εμφανίζονται μόνο αποτελέσματα σε ακτίνα έως 50χλμ από την αναζήτησή σας</span>
+          <span>
+            {prefecture 
+              ? `Εμφανίζονται αποτελέσματα γραφείων που εξυπηρετούν τον ${prefecture}` 
+              : "Εμφανίζονται μόνο αποτελέσματα σε ακτίνα έως 50χλμ από την αναζήτησή σας"}
+          </span>
         </div>
         
         <SearchForm 
@@ -98,7 +155,9 @@ const SearchResults = () => {
               <p className="text-muted-foreground">
                 {loading 
                   ? "Αναζήτηση..." 
-                  : `${filteredHomes.length} γραφεία τελετών εντός 50χλμ`}
+                  : prefecture
+                    ? `${filteredHomes.length} γραφεία τελετών στον ${prefecture}`
+                    : `${filteredHomes.length} γραφεία τελετών εντός 50χλμ`}
               </p>
               <SelectedFiltersDisplay 
                 selectedFiltersCount={totalActiveFilters}

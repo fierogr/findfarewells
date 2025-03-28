@@ -89,6 +89,23 @@ const FuneralHomeCard = ({ home, selectedServices }: FuneralHomeCardProps) => {
           
           <p className="text-sm line-clamp-2 text-muted-foreground mb-3">{home.description}</p>
           
+          {/* Reviews section - moved from right column to middle column */}
+          <div className="mb-3">
+            <div className="flex items-center space-x-1 mb-1">
+              {Array(5).fill(0).map((_, i) => (
+                <Star
+                  key={i}
+                  className={`h-4 w-4 ${i < home.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+                />
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {home.reviewCount > 0 
+                ? `${home.reviewCount} κριτικές` 
+                : "Δεν υπάρχουν κριτικές ακόμα"}
+            </p>
+          </div>
+          
           {home.services && home.services.length > 0 && (
             <div className="mt-4">
               <p className="text-sm font-medium mb-1">Παρεχόμενες Υπηρεσίες:</p>
@@ -114,20 +131,7 @@ const FuneralHomeCard = ({ home, selectedServices }: FuneralHomeCardProps) => {
         
         <div className="md:col-span-3 p-4 md:p-6 bg-gray-50 flex flex-col justify-between">
           <div>
-            <div className="flex items-center space-x-1 mb-1">
-              {Array(5).fill(0).map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-4 w-4 ${i < home.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
-                />
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground mb-3">
-              {home.reviewCount > 0 
-                ? `${home.reviewCount} κριτικές` 
-                : "Δεν υπάρχουν κριτικές ακόμα"}
-            </p>
-            
+            {/* Price section - moved back to right column */}
             {basePrice > 0 && (
               <div className="mb-4">
                 <p className="text-sm text-muted-foreground">Από</p>

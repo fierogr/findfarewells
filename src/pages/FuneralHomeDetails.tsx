@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { ChevronLeft, Star, MapPin, Phone, Globe, Mail, Clock } from "lucide-react";
@@ -127,7 +126,6 @@ const FuneralHomeDetails = () => {
             <CardContent>
               <p className="text-muted-foreground mb-4">{funeralHome.description}</p>
 
-              {/* Added RegionsDisplay component */}
               <RegionsDisplay regions={funeralHome.regions} />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">

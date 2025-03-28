@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SearchResults from "./pages/SearchResults";
@@ -28,6 +28,8 @@ const App = () => (
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
               <Route path="/search" element={<SearchResults />} />
+              {/* Add a redirect from /search-results to /search for backwards compatibility */}
+              <Route path="/search-results" element={<Navigate replace to="/search" />} />
               <Route path="/funeral-home/:id" element={<FuneralHomeDetails />} />
               <Route path="/register-funeral-home" element={<RegisterFuneralHome />} />
               <Route path="/admin-login" element={<AdminLogin />} />

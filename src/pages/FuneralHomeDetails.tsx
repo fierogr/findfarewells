@@ -19,7 +19,7 @@ const FuneralHomeDetails = () => {
     return (
       <div className="container py-8 space-y-8">
         <div className="flex items-center">
-          <Link to="/search-results">
+          <Link to="/search">
             <Button variant="outline" size="sm" className="gap-1">
               <ChevronLeft className="h-4 w-4" />
               <span>Πίσω στα αποτελέσματα</span>
@@ -40,7 +40,7 @@ const FuneralHomeDetails = () => {
     return (
       <div className="container py-8">
         <div className="flex items-center mb-8">
-          <Link to="/search-results">
+          <Link to="/search">
             <Button variant="outline" size="sm" className="gap-1">
               <ChevronLeft className="h-4 w-4" />
               <span>Πίσω στα αποτελέσματα</span>
@@ -77,7 +77,7 @@ const FuneralHomeDetails = () => {
   return (
     <div className="container py-8 space-y-6">
       <div className="flex items-center">
-        <Link to="/search-results">
+        <Link to="/search">
           <Button variant="outline" size="sm" className="gap-1">
             <ChevronLeft className="h-4 w-4" />
             <span>Πίσω στα αποτελέσματα</span>

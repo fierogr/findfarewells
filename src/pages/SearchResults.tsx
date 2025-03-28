@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { useSearchResults } from "@/hooks/useSearchResults";
 import { useIsMobile } from "@/hooks/use-mobile";
 import SearchForm from "@/components/search/SearchForm";
-import FilterSheet from "@/components/search/FilterSheet";
+import FilterSidebar from "@/components/search/FilterSidebar";
 import SortButton from "@/components/search/SortButton";
 import LoadingState from "@/components/search/LoadingState";
 import EmptyResults from "@/components/search/EmptyResults";
@@ -56,55 +56,70 @@ const SearchResults = () => {
           onLocationChange={setNewLocation}
           onSubmit={handleSearch}
         />
-        
-        <div className="flex justify-between items-center mb-4 animate-fadeIn delay-200">
-          <div className="flex items-center gap-2">
-            <p className="text-muted-foreground">
-              {loading 
-                ? "Αναζήτηση..." 
-                : `${filteredHomes.length} γραφεία τελετών εντός 50χλμ`}
-            </p>
-            <SelectedFiltersDisplay 
-              selectedFiltersCount={selectedServices.length}
-              onClearFilters={clearFilters}
-            />
-          </div>
+      </div>
 
-          <div className="flex gap-2">
-            <FilterSheet 
-              selectedServices={selectedServices}
-              onServiceToggle={toggleServiceSelection}
-              onClearFilters={clearFilters}
-              isOpen={isFilterOpen}
-              onOpenChange={setIsFilterOpen}
-            />
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Filter Sidebar - Hidden on mobile, shown on desktop */}
+        <div className="hidden md:block w-64 shrink-0">
+          <FilterSidebar
+            selectedServices={selectedServices}
+            onServiceToggle={toggleServiceSelection}
+            onClearFilters={clearFilters}
+          />
+        </div>
 
-            <SortButton 
-              sortOrder={sortOrder}
-              onToggle={toggleSortOrder}
-            />
+        <div className="flex-1">
+          <div className="flex justify-between items-center mb-4 animate-fadeIn delay-200">
+            <div className="flex items-center gap-2">
+              <p className="text-muted-foreground">
+                {loading 
+                  ? "Αναζήτηση..." 
+                  : `${filteredHomes.length} γραφεία τελετών εντός 50χλμ`}
+              </p>
+              <SelectedFiltersDisplay 
+                selectedFiltersCount={selectedServices.length}
+                onClearFilters={clearFilters}
+              />
+            </div>
+
+            <div className="flex gap-2">
+              {/* Only show sheet on mobile */}
+              {isMobile && (
+                <FilterSheet 
+                  selectedServices={selectedServices}
+                  onServiceToggle={toggleServiceSelection}
+                  onClearFilters={clearFilters}
+                  isOpen={isFilterOpen}
+                  onOpenChange={setIsFilterOpen}
+                />
+              )}
+
+              <SortButton 
+                sortOrder={sortOrder}
+                onToggle={toggleSortOrder}
+              />
+            </div>
           </div>
+          
+          {loading ? (
+            <LoadingState />
+          ) : filteredHomes.length === 0 ? (
+            <EmptyResults onClearFilters={clearFilters} />
+          ) : (
+            <div className="grid grid-cols-1 gap-6 animate-fadeIn delay-300">
+              {sortedHomes.map((home) => (
+                <FuneralHomeCard 
+                  key={home.id} 
+                  home={home} 
+                  selectedServices={selectedServices}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      
-      {loading ? (
-        <LoadingState />
-      ) : filteredHomes.length === 0 ? (
-        <EmptyResults onClearFilters={clearFilters} />
-      ) : (
-        <div className="grid grid-cols-1 gap-6 animate-fadeIn delay-300">
-          {sortedHomes.map((home) => (
-            <FuneralHomeCard 
-              key={home.id} 
-              home={home} 
-              selectedServices={selectedServices}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 };
 
 export default SearchResults;
-

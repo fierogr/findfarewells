@@ -23,7 +23,7 @@ export const useSearchResults = (initialLocation: string) => {
     if (initialLocation) {
       fetchFuneralHomes(initialLocation);
     }
-  }, [initialLocation]);
+  }, [initialLocation, fetchFuneralHomes]);
 
   return {
     funeralHomes,

@@ -1,5 +1,6 @@
+
 import React from "react";
-import { useParams, Link, useLocation } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { ChevronLeft, Star, MapPin, Phone, Globe, Mail, Clock } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -12,17 +13,13 @@ import { RegionsDisplay } from "@/components/funeral-homes/RegionsDisplay";
 
 const FuneralHomeDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const location = useLocation();
   const { data: funeralHome, isLoading, error } = useFuneralHome(id as string);
-  
-  const searchLocation = location.state?.location || new URLSearchParams(location.search).get("from");
-  const backUrl = searchLocation ? `/search?location=${encodeURIComponent(searchLocation)}` : "/search";
 
   if (isLoading) {
     return (
       <div className="container py-8 space-y-8">
         <div className="flex items-center">
-          <Link to={backUrl}>
+          <Link to="/search">
             <Button variant="outline" size="sm" className="gap-1">
               <ChevronLeft className="h-4 w-4" />
               <span>Πίσω στα αποτελέσματα</span>
@@ -43,7 +40,7 @@ const FuneralHomeDetails = () => {
     return (
       <div className="container py-8">
         <div className="flex items-center mb-8">
-          <Link to={backUrl}>
+          <Link to="/search">
             <Button variant="outline" size="sm" className="gap-1">
               <ChevronLeft className="h-4 w-4" />
               <span>Πίσω στα αποτελέσματα</span>
@@ -80,7 +77,7 @@ const FuneralHomeDetails = () => {
   return (
     <div className="container py-8 space-y-6">
       <div className="flex items-center">
-        <Link to={backUrl}>
+        <Link to="/search">
           <Button variant="outline" size="sm" className="gap-1">
             <ChevronLeft className="h-4 w-4" />
             <span>Πίσω στα αποτελέσματα</span>
@@ -130,6 +127,7 @@ const FuneralHomeDetails = () => {
             <CardContent>
               <p className="text-muted-foreground mb-4">{funeralHome.description}</p>
 
+              {/* Added RegionsDisplay component */}
               <RegionsDisplay regions={funeralHome.regions} />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">

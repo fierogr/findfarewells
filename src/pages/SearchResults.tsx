@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSearchResults } from "@/hooks/useSearchResults";
@@ -36,6 +37,7 @@ const SearchResults = () => {
     clearFilters
   } = useSearchResults(location);
 
+  // Re-fetch when location changes
   useEffect(() => {
     if (location) {
       setNewLocation(location);
@@ -56,6 +58,7 @@ const SearchResults = () => {
     }
   };
 
+  // Calculate total active filters
   const totalActiveFilters = selectedServices.length + selectedRegions.length;
 
   return (
@@ -78,6 +81,7 @@ const SearchResults = () => {
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
+        {/* Filter Sidebar - Hidden on mobile, shown on desktop */}
         <div className="hidden md:block w-64 shrink-0">
           <FilterSidebar
             selectedServices={selectedServices}
@@ -103,6 +107,7 @@ const SearchResults = () => {
             </div>
 
             <div className="flex gap-2">
+              {/* Only show sheet on mobile */}
               {isMobile && (
                 <FilterSheet 
                   selectedServices={selectedServices}

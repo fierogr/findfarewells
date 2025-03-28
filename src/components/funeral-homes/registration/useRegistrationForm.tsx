@@ -79,9 +79,9 @@ export function useRegistrationForm() {
         console.warn("Failed to send email notification, but partner registration was saved");
       }
 
-      // Display success message to user
-      toast.success("Η αίτηση σας υποβλήθηκε με επιτυχία", {
-        description: "Θα επικοινωνήσουμε μαζί σας σύντομα για να ολοκληρώσουμε τη διαδικασία εγγραφής."
+      // Display success message to user in Greek
+      toast.success("Ευχαριστούμε για την εγγραφή σας!", {
+        description: "Η αίτησή σας υποβλήθηκε με επιτυχία. Θα επικοινωνήσουμε μαζί σας σύντομα για τις λεπτομέρειες της συνεργασίας μας."
       });
       
       form.reset();
@@ -90,7 +90,7 @@ export function useRegistrationForm() {
       // Redirect user to home page after submission
       setTimeout(() => {
         navigate('/');
-      }, 2000);
+      }, 3000);
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Σφάλμα κατά την υποβολή", {

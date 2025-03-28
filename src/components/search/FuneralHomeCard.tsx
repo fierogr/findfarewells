@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { MapPin, Clock, ArrowRight, Star } from "lucide-react";
+import { MapPin, Clock, ArrowRight, Star, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -137,16 +137,23 @@ const FuneralHomeCard = ({ home, selectedServices }: FuneralHomeCardProps) => {
             )}
           </div>
           
-          <Link 
-            to={`/funeral-home/${home.id}${searchQuery}`} 
-            state={linkState}
-            className="mt-2"
-          >
-            <Button className="w-full">
-              <span>Περισσότερα</span>
-              <ArrowRight className="h-4 w-4 ml-2" />
+          <div className="flex flex-col space-y-2 mt-2">
+            <Button variant="outline" className="w-full">
+              <Phone className="h-4 w-4 mr-2" />
+              <span>Επικοινωνία</span>
             </Button>
-          </Link>
+            
+            <Link 
+              to={`/funeral-home/${home.id}${searchQuery}`} 
+              state={linkState}
+              className="w-full"
+            >
+              <Button className="w-full">
+                <span>Περισσότερα</span>
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </Card>

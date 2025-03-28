@@ -1,38 +1,25 @@
-
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 type AuthContextType = {
   isAuthenticated: boolean;
-  login: (username: string, password: string) => boolean;
+  login: () => boolean;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Always authenticated by default
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
-  useEffect(() => {
-    // Check if user is authenticated from localStorage
-    const authStatus = localStorage.getItem("isAuthenticated");
-    if (authStatus === "true") {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  const login = (username: string, password: string) => {
-    // Simple authentication - hardcoded credentials
-    if (username === "admin" && password === "admin") {
-      setIsAuthenticated(true);
-      localStorage.setItem("isAuthenticated", "true");
-      return true;
-    }
-    return false;
+  const login = () => {
+    setIsAuthenticated(true);
+    return true;
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem("isAuthenticated");
+    // We still keep the logout functionality for future use if needed
+    setIsAuthenticated(true); // But we immediately set it back to true
   };
 
   return (

@@ -1,13 +1,10 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { MapPin, UserPlus, Shield, LogOut } from "lucide-react";
+import { MapPin, UserPlus, Shield } from "lucide-react";
 import { Button } from "./ui/button";
-import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
-  const { isAuthenticated, logout } = useAuth();
-
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
@@ -49,35 +46,13 @@ const Navbar = () => {
             </Link>
           </Button>
           
-          {isAuthenticated ? (
-            <>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/admin" className="flex items-center">
-                  <Shield className="mr-1.5 h-4 w-4" />
-                  <span className="hidden sm:inline">Διαχείριση</span>
-                  <span className="sm:hidden">Admin</span>
-                </Link>
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="flex items-center"
-                onClick={logout}
-              >
-                <LogOut className="mr-1.5 h-4 w-4" />
-                <span className="hidden sm:inline">Αποσύνδεση</span>
-                <span className="sm:hidden">Έξοδος</span>
-              </Button>
-            </>
-          ) : (
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/admin-login" className="flex items-center">
-                <Shield className="mr-1.5 h-4 w-4" />
-                <span className="hidden sm:inline">Διαχείριση</span>
-                <span className="sm:hidden">Admin</span>
-              </Link>
-            </Button>
-          )}
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/admin" className="flex items-center">
+              <Shield className="mr-1.5 h-4 w-4" />
+              <span className="hidden sm:inline">Διαχείριση</span>
+              <span className="sm:hidden">Admin</span>
+            </Link>
+          </Button>
         </div>
       </div>
     </header>

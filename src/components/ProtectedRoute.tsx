@@ -1,14 +1,8 @@
 
-import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const { isAuthenticated } = useAuth();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/admin-login" replace />;
-  }
-
+  // No authentication check needed, all users can access admin routes
   return <Outlet />;
 };
 

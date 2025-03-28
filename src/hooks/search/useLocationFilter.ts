@@ -18,8 +18,10 @@ export const filterHomesByRegion = async (
   }
   
   const normalizedLocation = location.toLowerCase().trim();
+  const filteredHomes: FuneralHome[] = [];
   
-  return homes.filter(home => {
+  // Check each home for a match
+  for (const home of homes) {
     // Direct match check for city, state, or address
     const cityMatch = home.city?.toLowerCase().includes(normalizedLocation);
     const stateMatch = home.state?.toLowerCase().includes(normalizedLocation);
@@ -33,11 +35,17 @@ export const filterHomesByRegion = async (
       );
     }
     
-    const isMatch = cityMatch || stateMatch || addressMatch || regionMatch;
+    // Also check if the location appears in the name
+    const nameMatch = home.name.toLowerCase().includes(normalizedLocation);
+    
+    const isMatch = cityMatch || stateMatch || addressMatch || regionMatch || nameMatch;
+    
     if (isMatch) {
       console.log(`Match found for "${location}" in home: ${home.name}`);
+      filteredHomes.push(home);
     }
-    
-    return isMatch;
-  });
+  }
+  
+  console.log(`Found ${filteredHomes.length} matching homes for location: "${location}"`);
+  return filteredHomes;
 };

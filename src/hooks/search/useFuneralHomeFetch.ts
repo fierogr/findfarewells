@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { getFuneralHomes } from "@/services/funeralHomeService";
 import { FuneralHome } from "@/types/funeralHome";
@@ -7,10 +7,19 @@ import { filterHomesByRegion } from "./useLocationFilter";
 
 export const useFuneralHomeFetch = () => {
   const [funeralHomes, setFuneralHomes] = useState<FuneralHome[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchFuneralHomes = async (searchLocation: string) => {
+  const fetchFuneralHomes = useCallback(async (searchLocation: string) => {
+    if (!searchLocation || searchLocation.trim() === '') {
+      setLoading(false);
+      setFuneralHomes([]);
+      return;
+    }
+    
     setLoading(true);
+    setError(null);
+    
     let retries = 0;
     const maxRetries = 2;
 
@@ -51,6 +60,7 @@ export const useFuneralHomeFetch = () => {
         } else {
           setLoading(false);
           setFuneralHomes([]);
+          setError("Αποτυχία φόρτωσης γραφείων τελετών");
           toast({
             title: "Σφάλμα",
             description: "Αποτυχία φόρτωσης γραφείων τελετών. Παρακαλώ δοκιμάστε ξανά.",
@@ -61,11 +71,12 @@ export const useFuneralHomeFetch = () => {
     };
 
     attempt();
-  };
+  }, []);
 
   return {
     funeralHomes,
     loading,
+    error,
     fetchFuneralHomes
   };
 };

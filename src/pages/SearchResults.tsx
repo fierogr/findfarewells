@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSearchResults } from "@/hooks/useSearchResults";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -24,21 +24,37 @@ const SearchResults = () => {
     filteredHomes,
     sortedHomes,
     loading,
+    error,
     sortOrder,
     selectedServices,
     selectedRegions,
     isFilterOpen,
     setIsFilterOpen,
+    fetchFuneralHomes,
     toggleSortOrder,
     toggleServiceSelection,
     toggleRegionSelection,
     clearFilters
   } = useSearchResults(location);
 
+  // Re-fetch when location changes
+  useEffect(() => {
+    if (location) {
+      setNewLocation(location);
+      fetchFuneralHomes(location);
+    }
+  }, [location, fetchFuneralHomes]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (newLocation.trim()) {
       setSearchParams({ location: newLocation });
+    }
+  };
+
+  const handleRetry = () => {
+    if (location) {
+      fetchFuneralHomes(location);
     }
   };
 
@@ -113,8 +129,18 @@ const SearchResults = () => {
           
           {loading ? (
             <LoadingState />
+          ) : error ? (
+            <EmptyResults 
+              onClearFilters={clearFilters} 
+              location={location}
+              onRetry={handleRetry}
+            />
           ) : filteredHomes.length === 0 ? (
-            <EmptyResults onClearFilters={clearFilters} />
+            <EmptyResults 
+              onClearFilters={clearFilters}
+              location={location}
+              onRetry={handleRetry}
+            />
           ) : (
             <div className="grid grid-cols-1 gap-6 animate-fadeIn delay-300">
               {sortedHomes.map((home) => (

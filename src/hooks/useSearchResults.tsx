@@ -1,10 +1,10 @@
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useFuneralHomeFetch } from "./search/useFuneralHomeFetch";
 import { useFuneralHomeFiltering } from "./search/useFuneralHomeFiltering";
 
 export const useSearchResults = (initialLocation: string) => {
-  const { funeralHomes, loading, fetchFuneralHomes } = useFuneralHomeFetch();
+  const { funeralHomes, loading, error, fetchFuneralHomes } = useFuneralHomeFetch();
   
   const {
     filteredHomes,
@@ -20,7 +20,7 @@ export const useSearchResults = (initialLocation: string) => {
     clearFilters
   } = useFuneralHomeFiltering(funeralHomes);
 
-  // Initial fetch on component mount
+  // Initial fetch on component mount or location change
   useEffect(() => {
     if (initialLocation) {
       fetchFuneralHomes(initialLocation);
@@ -32,6 +32,7 @@ export const useSearchResults = (initialLocation: string) => {
     filteredHomes,
     sortedHomes,
     loading,
+    error,
     sortOrder,
     selectedServices,
     selectedRegions,

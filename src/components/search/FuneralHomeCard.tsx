@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Clock } from "lucide-react";
@@ -34,10 +35,18 @@ const FuneralHomeCard = ({
             <h3 className="text-xl font-semibold mb-2">{home.name}</h3>
             <div className="flex items-start gap-2 mb-2 text-sm text-muted-foreground">
               <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-              <span>{home.address}</span>
+              <span>{home.address}, {home.city}</span>
             </div>
             
-            
+            {/* Service Areas */}
+            {home.regions && home.regions.length > 0 && (
+              <div className="flex items-start gap-2 mb-2 text-sm text-muted-foreground">
+                <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <span>Εξυπηρετεί: {home.regions.slice(0, 3).join(', ')}
+                  {home.regions.length > 3 && ` + ${home.regions.length - 3} ακόμη`}
+                </span>
+              </div>
+            )}
             
             <div className="flex items-center mb-2">
               <div className="text-yellow-400 flex mr-2">
@@ -50,8 +59,9 @@ const FuneralHomeCard = ({
             
             <p className="line-clamp-2 text-sm text-muted-foreground mb-4">{home.description}</p>
             
-            {/* Service tags */}
-            <div className="mt-auto mb-4">
+            {/* Services offered */}
+            <div className="mb-4">
+              <h4 className="text-sm font-medium mb-2">Παρεχόμενες Υπηρεσίες:</h4>
               <div className="flex flex-wrap gap-1">
                 {home.services.slice(0, 3).map((service, idx) => <span key={idx} className={`text-xs px-2 py-1 rounded-full ${selectedServices.includes(service) ? 'bg-primary/20 text-primary' : 'bg-secondary text-secondary-foreground'}`}>
                     {service}
@@ -61,8 +71,6 @@ const FuneralHomeCard = ({
                   </span>}
               </div>
             </div>
-            
-            {/* Removed the middle "Προβολή Λεπτομερειών" button that was here */}
           </div>
           
           <div className="p-4 md:p-6 bg-secondary flex flex-col">

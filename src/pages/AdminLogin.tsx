@@ -27,12 +27,19 @@ const AdminLogin = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    const { error } = await login(email, password);
-    
-    setIsLoading(false);
-    
-    if (!error) {
-      // Login successful, the auth state change will handle redirection
+    try {
+      const { error } = await login(email, password);
+      
+      if (!error) {
+        // Check if user is admin immediately after login
+        // The auth state change will handle redirection via the useEffect above
+        toast.success("Επιτυχής σύνδεση");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      toast.error("Σφάλμα κατά τη σύνδεση");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -46,14 +53,19 @@ const AdminLogin = () => {
     
     setIsLoading(true);
     
-    const { error } = await signup(email, password);
-    
-    setIsLoading(false);
-    
-    if (!error) {
-      toast.success("Η εγγραφή ολοκληρώθηκε", {
-        description: "Ο λογαριασμός σας δημιουργήθηκε. Θα πρέπει να σας ανατεθεί ρόλος διαχειριστή για να αποκτήσετε πρόσβαση.",
-      });
+    try {
+      const { error } = await signup(email, password);
+      
+      if (!error) {
+        toast.success("Η εγγραφή ολοκληρώθηκε", {
+          description: "Ο λογαριασμός σας δημιουργήθηκε. Θα πρέπει να σας ανατεθεί ρόλος διαχειριστή για να αποκτήσετε πρόσβαση.",
+        });
+      }
+    } catch (err) {
+      console.error("Signup error:", err);
+      toast.error("Σφάλμα κατά την εγγραφή");
+    } finally {
+      setIsLoading(false);
     }
   };
 

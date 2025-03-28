@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 
 const AdminPanel = () => {
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
-  const { data: funeralHomes } = useFuneralHomes();
+  const { data: funeralHomes, error: dataError } = useFuneralHomes();
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -29,9 +29,9 @@ const AdminPanel = () => {
     setSelectedPartnerId(null);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
+  const handleLogout = async () => {
+    await logout();
+    navigate("/admin-login");
   };
 
   // Calculate some basic statistics
@@ -56,6 +56,14 @@ const AdminPanel = () => {
           Αποσύνδεση
         </Button>
       </div>
+
+      {dataError && (
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <p className="text-destructive">Σφάλμα κατά τη φόρτωση δεδομένων. Παρακαλώ προσπαθήστε ξανά αργότερα.</p>
+          </CardContent>
+        </Card>
+      )}
 
       {selectedPartnerId ? (
         <PartnerDetails partnerId={selectedPartnerId} onBack={handleBackToList} />

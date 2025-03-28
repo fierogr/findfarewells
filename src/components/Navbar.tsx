@@ -1,10 +1,13 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { MapPin, UserPlus, Shield } from "lucide-react";
+import { MapPin, UserPlus, Shield, LogIn, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
+  const { isAuthenticated, isAdmin, logout } = useAuth();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
@@ -46,13 +49,31 @@ const Navbar = () => {
             </Link>
           </Button>
           
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/admin" className="flex items-center">
-              <Shield className="mr-1.5 h-4 w-4" />
-              <span className="hidden sm:inline">Διαχείριση</span>
-              <span className="sm:hidden">Admin</span>
-            </Link>
-          </Button>
+          {isAdmin && (
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/admin" className="flex items-center">
+                <Shield className="mr-1.5 h-4 w-4" />
+                <span className="hidden sm:inline">Διαχείριση</span>
+                <span className="sm:hidden">Admin</span>
+              </Link>
+            </Button>
+          )}
+          
+          {isAuthenticated ? (
+            <Button variant="outline" size="sm" onClick={() => logout()} className="flex items-center">
+              <LogOut className="mr-1.5 h-4 w-4" />
+              <span className="hidden sm:inline">Αποσύνδεση</span>
+              <span className="sm:hidden">Έξοδος</span>
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/admin-login" className="flex items-center">
+                <LogIn className="mr-1.5 h-4 w-4" />
+                <span className="hidden sm:inline">Σύνδεση</span>
+                <span className="sm:hidden">Είσοδος</span>
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>

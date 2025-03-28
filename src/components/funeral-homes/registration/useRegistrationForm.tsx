@@ -26,8 +26,7 @@ export function useRegistrationForm() {
       postalCode: "",
       website: "",
       description: "",
-      services: "",
-      termsAccepted: false
+      services: ""
     }
   });
 
@@ -64,7 +63,6 @@ export function useRegistrationForm() {
         description: data.description,
         services: data.services || null,
         regions: selectedRegions,
-        terms_accepted: data.termsAccepted,
         status: 'pending'
       });
       

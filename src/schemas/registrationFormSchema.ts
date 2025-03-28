@@ -12,9 +12,6 @@ export const registrationFormSchema = z.object({
   website: z.string().url({ message: "Παρακαλώ εισάγετε ένα έγκυρο URL" }).optional().or(z.literal("")),
   description: z.string().min(20, { message: "Η περιγραφή πρέπει να έχει τουλάχιστον 20 χαρακτήρες" }),
   services: z.string().optional(),
-  termsAccepted: z.boolean().refine(val => val === true, {
-    message: "Πρέπει να αποδεχτείτε τους όρους και τις προϋποθέσεις"
-  }),
   regions: z.array(z.string()).optional(),
 });
 

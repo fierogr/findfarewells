@@ -7,7 +7,6 @@ import { ContactInfoFields } from "./registration/ContactInfoFields";
 import { AddressFields } from "./registration/AddressFields";
 import { DescriptionFields } from "./registration/DescriptionFields";
 import { RegionsFields } from "./registration/RegionsFields";
-import { TermsAndConditionsField } from "./registration/TermsAndConditionsField";
 import { SubmitButton } from "./registration/SubmitButton";
 import { useRegistrationForm } from "./registration/useRegistrationForm";
 
@@ -40,8 +39,6 @@ export const RegisterForm = () => {
             selectedRegions={selectedRegions} 
             setSelectedRegions={setSelectedRegions} 
           />
-          
-          <TermsAndConditionsField form={form} />
           
           <SubmitButton 
             isSubmitting={isSubmitting} 

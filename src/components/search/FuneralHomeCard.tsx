@@ -52,13 +52,16 @@ const FuneralHomeCard = ({
             </div>
             
             {/* Service Areas */}
-            {Array.isArray(home.regions) && home.regions.length > 0 && (
+            {home.regions && home.regions.length > 0 && (
               <div className="flex items-start gap-2 mb-3 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <span>
-                  <strong>Εξυπηρετεί:</strong> {home.regions.slice(0, 3).join(', ')}
-                  {home.regions.length > 3 && ` + ${home.regions.length - 3} ακόμη`}
-                </span>
+                <div>
+                  <strong>Εξυπηρετεί:</strong>{' '}
+                  {Array.isArray(home.regions) 
+                    ? home.regions.slice(0, 3).join(', ') + 
+                      (home.regions.length > 3 ? ` + ${home.regions.length - 3} ακόμη` : '')
+                    : 'Δεν υπάρχουν περιοχές'}
+                </div>
               </div>
             )}
             
@@ -78,11 +81,11 @@ const FuneralHomeCard = ({
             <p className="line-clamp-2 text-sm text-muted-foreground mb-4">{home.description}</p>
             
             {/* Services offered */}
-            {Array.isArray(home.services) && home.services.length > 0 && (
-              <div className="mb-4">
+            {home.services && home.services.length > 0 && (
+              <div className="mt-auto mb-4">
                 <h4 className="text-sm font-medium mb-2">Παρεχόμενες Υπηρεσίες:</h4>
                 <div className="flex flex-wrap gap-1">
-                  {home.services.slice(0, 3).map((service, idx) => (
+                  {Array.isArray(home.services) && home.services.slice(0, 3).map((service, idx) => (
                     <span 
                       key={idx} 
                       className={`text-xs px-2 py-1 rounded-full ${
@@ -94,7 +97,7 @@ const FuneralHomeCard = ({
                       {service}
                     </span>
                   ))}
-                  {home.services.length > 3 && (
+                  {Array.isArray(home.services) && home.services.length > 3 && (
                     <span className="text-xs px-2 py-1 rounded-full bg-secondary text-secondary-foreground">
                       +{home.services.length - 3}
                     </span>

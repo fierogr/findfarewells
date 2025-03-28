@@ -94,13 +94,7 @@ const FuneralHomeCard = ({ home, selectedServices }: FuneralHomeCardProps) => {
               </div>
             </div>
             
-            {!isMobile && (
-              <div className="mt-auto">
-                <Link to={`/funeral-home/${home.id}`}>
-                  <Button variant="outline" className="w-full">Προβολή Λεπτομερειών</Button>
-                </Link>
-              </div>
-            )}
+            {/* Removed the middle "Προβολή Λεπτομερειών" button that was here */}
           </div>
           
           <div className="p-4 md:p-6 bg-secondary flex flex-col">

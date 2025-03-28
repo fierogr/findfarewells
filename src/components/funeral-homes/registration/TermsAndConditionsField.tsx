@@ -17,7 +17,7 @@ export function TermsAndConditionsField({
       control={form.control} 
       name="termsAccepted" 
       render={({ field }) => (
-        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-4 border">
+        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
           <FormControl>
             <Checkbox
               checked={field.value}

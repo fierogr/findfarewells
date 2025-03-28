@@ -1,146 +1,154 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
-import { MapPin, Phone, Clock } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { MapPin, Clock, ArrowRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { FuneralHome } from "@/types/funeralHome";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface FuneralHomeCardProps {
   home: FuneralHome;
   selectedServices: string[];
 }
 
-const FuneralHomeCard = ({
-  home,
-  selectedServices
-}: FuneralHomeCardProps) => {
-  const isMobile = useIsMobile();
-  
-  const getDisplayPrice = (home: FuneralHome) => {
-    if (home.packages && home.packages.length > 0) {
-      return home.packages[0].price;
-    }
-    return home.basicPrice;
-  };
+const FuneralHomeCard = ({ home, selectedServices }: FuneralHomeCardProps) => {
+  const [searchParams] = useSearchParams();
+  const searchLocation = searchParams.get("location");
   
   console.log("Rendering FuneralHomeCard for:", home.name);
   console.log("Regions:", home.regions);
   console.log("Services:", home.services);
-  
+
+  // Get base price either from first package or basic price
+  const basePrice = home.packages && home.packages.length > 0 
+    ? home.packages[0].price 
+    : home.basicPrice;
+
+  // Set up the state to pass in the Link
+  const linkState = { location: searchLocation };
+  const searchQuery = searchLocation ? `?from=${encodeURIComponent(searchLocation)}` : "";
+
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
-      <CardContent className="p-0">
-        <div className="grid grid-cols-1 md:grid-cols-3 h-full">
-          <div className="relative aspect-video md:aspect-auto">
-            <img src={home.imageUrl} alt={home.name} className="w-full h-full object-cover" />
+    <Card className="overflow-hidden transition-all hover:shadow-md">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+        {home.imageUrl && (
+          <div className="md:col-span-3">
+            <AspectRatio ratio={4/3}>
+              <img 
+                src={home.imageUrl} 
+                alt={home.name} 
+                className="object-cover w-full h-full"
+              />
+            </AspectRatio>
+          </div>
+        )}
+        
+        <div className={`p-4 md:p-6 ${home.imageUrl ? 'md:col-span-6' : 'md:col-span-9'}`}>
+          <div className="mb-2 flex items-start justify-between">
+            <h3 className="text-xl font-semibold">{home.name}</h3>
             {home.featured && (
-              <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
-                Προτεινόμενο
-              </div>
+              <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Προτεινόμενο</Badge>
             )}
           </div>
           
-          <div className="p-4 md:p-6 flex flex-col">
-            <h3 className="text-xl font-semibold mb-2">{home.name}</h3>
-            
-            {/* Location */}
-            <div className="flex items-start gap-2 mb-2 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-              <span>{home.address}, {home.city}</span>
-            </div>
-            
-            {/* Service Areas */}
-            {home.regions && home.regions.length > 0 && (
-              <div className="flex items-start gap-2 mb-3 text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <div>
-                  <strong>Εξυπηρετεί:</strong>{' '}
-                  {Array.isArray(home.regions) 
-                    ? home.regions.slice(0, 3).join(', ') + 
-                      (home.regions.length > 3 ? ` + ${home.regions.length - 3} ακόμη` : '')
-                    : 'Δεν υπάρχουν περιοχές'}
-                </div>
-              </div>
-            )}
-            
-            {/* Ratings */}
-            <div className="flex items-center mb-3">
-              <div className="text-yellow-400 flex mr-2">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className={`w-4 h-4 ${i < Math.floor(home.rating) ? 'fill-current' : 'text-gray-300'}`} viewBox="0 0 24 24">
-                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
-                  </svg>
+          <div className="mb-4 flex items-center text-sm text-muted-foreground">
+            <MapPin className="h-4 w-4 mr-1" />
+            <span>{home.address}, {home.city}</span>
+          </div>
+          
+          {home.regions && home.regions.length > 0 ? (
+            <div className="mb-3">
+              <p className="text-sm font-medium mb-1">Περιοχές Εξυπηρέτησης:</p>
+              <div className="flex flex-wrap gap-1">
+                {home.regions.slice(0, 3).map((region, index) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {region}
+                  </Badge>
                 ))}
+                {home.regions.length > 3 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{home.regions.length - 3} ακόμα
+                  </Badge>
+                )}
               </div>
-              <span className="text-sm text-muted-foreground">({home.reviewCount} κριτικές)</span>
             </div>
+          ) : (
+            <div className="mb-3">
+              <p className="text-sm text-muted-foreground">Δεν έχουν οριστεί περιοχές εξυπηρέτησης</p>
+            </div>
+          )}
+          
+          {home.hours && (
+            <div className="mb-3 flex items-center text-sm text-muted-foreground">
+              <Clock className="h-4 w-4 mr-1" />
+              <span>{home.hours}</span>
+            </div>
+          )}
+          
+          <p className="text-sm line-clamp-2 text-muted-foreground mb-3">{home.description}</p>
+          
+          {home.services && home.services.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm font-medium mb-1">Παρεχόμενες Υπηρεσίες:</p>
+              <div className="flex flex-wrap gap-1">
+                {home.services.slice(0, 3).map((service, index) => (
+                  <Badge 
+                    key={index}
+                    variant={selectedServices.includes(service) ? "default" : "outline"}
+                    className="text-xs"
+                  >
+                    {service}
+                  </Badge>
+                ))}
+                {home.services.length > 3 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{home.services.length - 3} ακόμα
+                  </Badge>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <div className="md:col-span-3 p-4 md:p-6 bg-gray-50 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center space-x-1 mb-1">
+              {Array(5).fill(0).map((_, i) => (
+                <Star
+                  key={i}
+                  className={`h-4 w-4 ${i < home.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+                />
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">
+              {home.reviewCount > 0 
+                ? `${home.reviewCount} κριτικές` 
+                : "Δεν υπάρχουν κριτικές ακόμα"}
+            </p>
             
-            {/* Description */}
-            <p className="line-clamp-2 text-sm text-muted-foreground mb-4">{home.description}</p>
-            
-            {/* Services offered */}
-            {home.services && home.services.length > 0 && (
-              <div className="mt-auto mb-4">
-                <h4 className="text-sm font-medium mb-2">Παρεχόμενες Υπηρεσίες:</h4>
-                <div className="flex flex-wrap gap-1">
-                  {Array.isArray(home.services) && home.services.slice(0, 3).map((service, idx) => (
-                    <span 
-                      key={idx} 
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        selectedServices.includes(service) 
-                          ? 'bg-primary/20 text-primary' 
-                          : 'bg-secondary text-secondary-foreground'
-                      }`}
-                    >
-                      {service}
-                    </span>
-                  ))}
-                  {Array.isArray(home.services) && home.services.length > 3 && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-secondary text-secondary-foreground">
-                      +{home.services.length - 3}
-                    </span>
-                  )}
-                </div>
+            {basePrice > 0 && (
+              <div className="mb-4">
+                <p className="text-sm text-muted-foreground">Από</p>
+                <p className="text-2xl font-bold">{basePrice}€</p>
+                <p className="text-xs text-muted-foreground">Βασικό πακέτο</p>
               </div>
             )}
           </div>
           
-          <div className="p-4 md:p-6 bg-secondary flex flex-col">
-            <div className="text-center mb-4">
-              <p className="text-sm text-muted-foreground mb-1">
-                {home.packages && home.packages.length > 0 ? home.packages[0].name : "Βασική Υπηρεσία"} Από
-              </p>
-              <p className="text-3xl font-semibold text-primary">
-                ${getDisplayPrice(home).toLocaleString()}
-              </p>
-              <p className="text-xs text-muted-foreground">Συν ΦΠΑ</p>
-            </div>
-            
-            <div className="space-y-2 mb-4">
-              {Array.isArray(home.services) && home.services.slice(0, 3).map((service, i) => (
-                <div key={i} className="flex items-center text-sm">
-                  <svg className="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  {service}
-                </div>
-              ))}
-              {Array.isArray(home.services) && home.services.length > 3 && (
-                <p className="text-xs text-muted-foreground">+{home.services.length - 3} επιπλέον υπηρεσίες</p>
-              )}
-            </div>
-            
-            <div className="mt-auto space-y-2">
-              <Link to={`/funeral-home/${home.id}`}>
-                <Button className="w-full">Προβολή Λεπτομερειών</Button>
-              </Link>
-              <Button variant="outline" className="w-full">Επικοινωνία</Button>
-            </div>
-          </div>
+          <Link 
+            to={`/funeral-home/${home.id}${searchQuery}`} 
+            state={linkState}
+            className="mt-2"
+          >
+            <Button className="w-full">
+              <span>Περισσότερα</span>
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </Link>
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 };

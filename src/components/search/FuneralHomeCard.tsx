@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FuneralHome } from "@/types/funeralHome";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface FuneralHomeCardProps {
   home: FuneralHome;
@@ -25,16 +26,43 @@ const FuneralHomeCard = ({
     return home.basicPrice;
   };
   
+  // Δημιουργία fallback για την περίπτωση που το URL της εικόνας είναι άκυρο ή λείπει
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+  
   console.log("Rendering FuneralHomeCard for:", home.name);
   console.log("Regions:", home.regions);
   console.log("Services:", home.services);
+  console.log("Image URL:", home.imageUrl);
   
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
       <CardContent className="p-0">
         <div className="grid grid-cols-1 md:grid-cols-3 h-full">
           <div className="relative aspect-video md:aspect-auto">
-            <img src={home.imageUrl} alt={home.name} className="w-full h-full object-cover" />
+            {home.imageUrl ? (
+              <img 
+                src={home.imageUrl} 
+                alt={home.name} 
+                className="w-full h-full object-cover" 
+                onError={(e) => {
+                  // Σε περίπτωση σφάλματος φόρτωσης, αλλάζουμε σε εικόνα placeholder
+                  (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80";
+                }}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-secondary">
+                <Avatar className="h-20 w-20">
+                  <AvatarFallback className="text-xl">{getInitials(home.name)}</AvatarFallback>
+                </Avatar>
+              </div>
+            )}
             {home.featured && (
               <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
                 Προτεινόμενο

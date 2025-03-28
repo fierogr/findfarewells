@@ -62,15 +62,15 @@ const SearchResults = () => {
   const totalActiveFilters = selectedServices.length + selectedRegions.length;
 
   return (
-    <div className="container py-8 md:py-12 bg-[#f0f2f6]">
+    <div className="container py-8 md:py-12">
       <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-6 animate-fadeIn font-roboto text-[#1A3674]">
-          Διάλεξε το πακέτο που σου ταιριάζει στη καλύτερη τιμή της αγοράς
+        <h1 className="text-3xl md:text-4xl font-semibold mb-6 animate-fadeIn">
+          Γραφεία Τελετών στην περιοχή {location}
         </h1>
         
         <div className="mb-6 text-sm text-muted-foreground flex items-center">
           <MapPin className="h-4 w-4 mr-1" />
-          <span>Βρέθηκαν 16 προσφορές για Βασικό πακέτο 12μηνης διάρκειας</span>
+          <span>Εμφανίζονται μόνο αποτελέσματα σε ακτίνα έως 50χλμ από την αναζήτησή σας</span>
         </div>
         
         <SearchForm 
@@ -82,7 +82,7 @@ const SearchResults = () => {
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Filter Sidebar - Hidden on mobile, shown on desktop */}
-        <div className="hidden md:block w-72 shrink-0">
+        <div className="hidden md:block w-64 shrink-0">
           <FilterSidebar
             selectedServices={selectedServices}
             selectedRegions={selectedRegions}
@@ -95,7 +95,7 @@ const SearchResults = () => {
         <div className="flex-1">
           <div className="flex justify-between items-center mb-4 animate-fadeIn delay-200">
             <div className="flex items-center gap-2">
-              <p className="text-muted-foreground font-roboto">
+              <p className="text-muted-foreground">
                 {loading 
                   ? "Αναζήτηση..." 
                   : `${filteredHomes.length} γραφεία τελετών εντός 50χλμ`}
@@ -142,7 +142,7 @@ const SearchResults = () => {
               onRetry={handleRetry}
             />
           ) : (
-            <div className="space-y-6 animate-fadeIn delay-300">
+            <div className="grid grid-cols-1 gap-6 animate-fadeIn delay-300">
               {sortedHomes.map((home) => (
                 <FuneralHomeCard 
                   key={home.id} 

@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Filter, MapPin } from "lucide-react";
+import { Filter, MapPin, Check } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // Greek services for filtering - reusing the same list from FilterSheet
 const commonServices = [
@@ -43,42 +44,74 @@ const FilterSidebar = ({
   const hasActiveFilters = selectedServices.length > 0 || selectedRegions.length > 0;
   
   return (
-    <Card className="sticky top-24">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
+    <Card className="sticky top-24 border rounded-xl shadow-sm overflow-hidden">
+      <CardHeader className="pb-3 bg-white">
+        <CardTitle className="text-lg font-roboto font-bold flex items-center gap-2">
           <Filter className="h-4 w-4" />
-          Φίλτρα
+          Πακέτο (Βασική)
         </CardTitle>
       </CardHeader>
       <Separator />
-      <CardContent className="pt-4">
-        {/* Services Section */}
+      <CardContent className="pt-4 bg-white">
+        {/* Services Section - Now using radio buttons like in the image */}
         <div className="mb-6">
-          <h3 className="font-medium mb-3 text-sm">Υπηρεσίες</h3>
-          <div className="space-y-4">
-            {commonServices.map((service) => (
-              <div key={service} className="flex items-start space-x-2">
-                <Checkbox 
-                  id={`sidebar-service-${service}`}
-                  checked={selectedServices.includes(service)}
-                  onCheckedChange={() => onServiceToggle(service)}
-                />
-                <label
-                  htmlFor={`sidebar-service-${service}`}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                >
-                  {service}
-                </label>
-              </div>
-            ))}
-          </div>
+          <RadioGroup defaultValue="Βασική" className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="Βασική" id="option-basic" className="h-5 w-5" />
+              <label 
+                htmlFor="option-basic" 
+                className="text-base font-medium leading-none cursor-pointer flex items-center"
+              >
+                Βασική
+                <div className="ml-auto">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M7 10l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="Πυρός & κλοπής" id="option-fire" className="h-5 w-5" />
+              <label 
+                htmlFor="option-fire" 
+                className="text-base font-medium leading-none cursor-pointer flex items-center"
+              >
+                Πυρός & κλοπής
+                <div className="ml-auto">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M7 10l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="Μικτή" id="option-mixed" className="h-5 w-5" />
+              <label 
+                htmlFor="option-mixed" 
+                className="text-base font-medium leading-none cursor-pointer flex items-center"
+              >
+                Μικτή 
+                <div className="ml-auto">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M7 10l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </label>
+            </div>
+          </RadioGroup>
         </div>
         
         <Separator className="my-4" />
         
         {/* Regions Section */}
         <div className="mb-6">
-          <h3 className="font-medium mb-3 text-sm flex items-center gap-2">
+          <h3 className="font-medium mb-3 text-sm font-roboto flex items-center gap-2">
             <MapPin className="h-4 w-4" />
             Περιοχές
           </h3>

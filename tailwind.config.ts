@@ -21,6 +21,7 @@ export default {
     extend: {
       fontFamily: {
         inter: ["Inter", "sans-serif"],
+        roboto: ["Roboto", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -65,6 +66,9 @@ export default {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
+        },
+        price: {
+          DEFAULT: "hsl(var(--price))",
         },
       },
       borderRadius: {

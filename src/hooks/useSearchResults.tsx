@@ -2,6 +2,7 @@
 import { useEffect, useCallback } from "react";
 import { useFuneralHomeFetch } from "./search/useFuneralHomeFetch";
 import { useFuneralHomeFiltering } from "./search/useFuneralHomeFiltering";
+import { toast } from "sonner";
 
 export const useSearchResults = (initialLocation: string) => {
   const { funeralHomes, loading, error, fetchFuneralHomes } = useFuneralHomeFetch();
@@ -23,7 +24,11 @@ export const useSearchResults = (initialLocation: string) => {
   // Initial fetch on component mount or location change
   useEffect(() => {
     if (initialLocation) {
-      fetchFuneralHomes(initialLocation);
+      fetchFuneralHomes(initialLocation)
+        .catch(err => {
+          toast.error(`Σφάλμα αναζήτησης: ${err.message}`);
+          console.error("Error fetching funeral homes:", err);
+        });
     }
   }, [initialLocation, fetchFuneralHomes]);
 

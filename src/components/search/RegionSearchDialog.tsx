@@ -7,11 +7,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Phone } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { RegionPrefectureSelect } from "./RegionPrefectureSelect";
-import { ServicesCheckboxes } from "./ServicesCheckboxes";
+import RegionPrefectureSelect from "./RegionPrefectureSelect";
+import ServicesCheckboxes from "./ServicesCheckboxes";
 import { useRegionSearch } from "@/hooks/search/useRegionSearch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
+import { REGIONS_AND_PREFECTURES } from "@/constants/geographicData";
 
 interface RegionSearchDialogProps {
   open: boolean;
@@ -80,8 +81,9 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
             selectedRegion={selectedRegion}
             selectedPrefecture={selectedPrefecture}
             availablePrefectures={availablePrefectures}
-            setSelectedRegion={setSelectedRegion}
-            setSelectedPrefecture={setSelectedPrefecture}
+            onRegionChange={setSelectedRegion}
+            onPrefectureChange={setSelectedPrefecture}
+            regions={Object.keys(REGIONS_AND_PREFECTURES)}
           />
 
           <Separator />
@@ -109,8 +111,9 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
 
           {/* Services Checkboxes */}
           <ServicesCheckboxes 
+            services={["Πλήρεις Υπηρεσίες Κηδείας", "Αποτέφρωση", "Μεταφορά Σορού", "Μνημόσυνα", "Στολισμός", "Έκδοση Πιστοποιητικών"]}
             selectedServices={selectedServices}
-            handleServiceToggle={handleServiceToggle}
+            onServiceToggle={handleServiceToggle}
           />
 
           {/* Action Buttons */}

@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Phone } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -90,7 +90,7 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
 
           {/* Phone Number Field */}
           <div className="space-y-2">
-            <FormLabel htmlFor="phone-number">Τηλέφωνο Επικοινωνίας</FormLabel>
+            <Label htmlFor="phone-number">Τηλέφωνο Επικοινωνίας</Label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <Phone className="h-5 w-5 text-muted-foreground" />

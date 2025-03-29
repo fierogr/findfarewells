@@ -37,10 +37,10 @@ export const useRegionSearch = () => {
       setIsSaving(true);
       
       const { error } = await supabase.from('search_requests').insert({
-        location: selectedRegion,
-        prefecture: selectedPrefecture,
+        location: selectedRegion || null,
+        prefecture: selectedPrefecture || null,
         services: selectedServices.length > 0 ? selectedServices : null,
-        phone_number: phoneNumber
+        phone_number: phoneNumber || ""
       });
 
       if (error) throw error;
@@ -57,10 +57,19 @@ export const useRegionSearch = () => {
   };
 
   const handleSearch = async () => {
-    if (!selectedRegion || !selectedPrefecture) {
+    if (!selectedRegion && !selectedPrefecture) {
       toast({
         title: "Απαιτούνται πεδία",
         description: "Παρακαλώ επιλέξτε περιοχή και νομό για να συνεχίσετε.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!phoneNumber) {
+      toast({
+        title: "Απαιτούμενο πεδίο",
+        description: "Παρακαλώ εισάγετε ένα τηλέφωνο επικοινωνίας για να συνεχίσετε.",
         variant: "destructive",
       });
       return;
@@ -76,11 +85,15 @@ export const useRegionSearch = () => {
     });
 
     // Construct the search URL with parameters
+    const prefectureParam = selectedPrefecture ? `prefecture=${encodeURIComponent(selectedPrefecture)}` : '';
     const servicesParam = selectedServices.length > 0 
-      ? `&services=${encodeURIComponent(selectedServices.join(','))}` 
+      ? `services=${encodeURIComponent(selectedServices.join(','))}` 
       : '';
     
-    navigate(`/search?prefecture=${encodeURIComponent(selectedPrefecture)}${servicesParam}`);
+    const searchParams = [prefectureParam, servicesParam].filter(Boolean).join('&');
+    const searchUrl = `/search${searchParams ? `?${searchParams}` : ''}`;
+    
+    navigate(searchUrl);
   };
 
   const handleReset = () => {

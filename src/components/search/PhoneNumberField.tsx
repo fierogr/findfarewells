@@ -26,7 +26,7 @@ const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({
           id="phone-number"
           type="tel"
           placeholder="Εισάγετε το τηλέφωνό σας"
-          value={value}
+          value={value || ""}
           onChange={(e) => onChange(e.target.value)}
           className="pl-10"
           required

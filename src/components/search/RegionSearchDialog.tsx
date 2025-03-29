@@ -60,30 +60,30 @@ const RegionSearchDialog = ({
   }, [open, initialLocation, initialPrefecture, initialServices, setSelectedRegion, setSelectedPrefecture, setSelectedServices]);
 
   const handleSubmit = async () => {
-    if (!selectedPrefecture && !selectedRegion) {
-      toast({
-        title: "Απαιτούμενα πεδία",
-        description: "Παρακαλώ επιλέξτε τουλάχιστον μία περιοχή ή νομό για να συνεχίσετε.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!phoneNumber) {
-      toast({
-        title: "Απαιτούμενο πεδίο",
-        description: "Παρακαλώ εισάγετε ένα τηλέφωνο επικοινωνίας για να συνεχίσετε.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Save the search request to the database
     try {
-      // Insert the search request
+      // Validate form inputs
+      if (!phoneNumber) {
+        toast({
+          title: "Απαιτούμενο πεδίο",
+          description: "Παρακαλώ εισάγετε ένα τηλέφωνο επικοινωνίας για να συνεχίσετε.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!selectedRegion && !selectedPrefecture) {
+        toast({
+          title: "Απαιτούμενα πεδία",
+          description: "Παρακαλώ επιλέξτε τουλάχιστον μία περιοχή ή νομό για να συνεχίσετε.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Save the search request to the database
       const { data: insertedData, error } = await supabase.from('search_requests').insert({
-        location: selectedRegion,
-        prefecture: selectedPrefecture,
+        location: selectedRegion || null,
+        prefecture: selectedPrefecture || null,
         services: selectedServices.length > 0 ? selectedServices : null,
         phone_number: phoneNumber
       }).select('id').single();
@@ -138,7 +138,7 @@ const RegionSearchDialog = ({
           selectedPrefecture={selectedPrefecture}
           selectedServices={selectedServices}
           availablePrefectures={availablePrefectures}
-          phoneNumber={phoneNumber}
+          phoneNumber={phoneNumber || ""}
           isLoading={isLoading || isSaving}
           onRegionChange={setSelectedRegion}
           onPrefectureChange={setSelectedPrefecture}

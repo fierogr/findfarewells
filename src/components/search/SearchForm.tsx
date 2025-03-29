@@ -46,7 +46,7 @@ const SearchForm = ({
         </div>
         <Input
           type="text"
-          value={location}
+          value={location || ""}
           onChange={(e) => handleInputChange(onLocationChange, e.target.value)}
           className="pl-10"
           placeholder="Αναζήτηση ανά περιοχή εξυπηρέτησης"
@@ -59,7 +59,7 @@ const SearchForm = ({
         </div>
         <Input
           type="tel"
-          value={phoneNumber}
+          value={phoneNumber || ""}
           onChange={(e) => handleInputChange(onPhoneNumberChange, e.target.value)}
           className="pl-10"
           placeholder="Τηλέφωνο επικοινωνίας"

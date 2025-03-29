@@ -1,4 +1,3 @@
-
 export interface FuneralHome {
   id: string;
   name: string;
@@ -23,7 +22,8 @@ export interface FuneralHome {
   packages: ServicePackage[];
   additionalServices: AdditionalService[];
   reviews?: Review[];
-  regions?: string[]; // Added regions field
+  regions?: string[];
+  additionalImages?: string[];
 }
 
 export interface ServicePackage {

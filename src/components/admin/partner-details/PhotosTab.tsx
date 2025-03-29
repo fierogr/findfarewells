@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, Upload } from "lucide-react";
@@ -8,7 +8,7 @@ import ImageUpload from "../forms/ImageUpload";
 
 interface PhotosTabProps {
   editedHome: FuneralHome;
-  onPhotoChange: (field: keyof FuneralHome, value: string) => void;
+  onPhotoChange: (field: keyof FuneralHome, value: string | string[]) => void;
 }
 
 const PhotosTab = ({ editedHome, onPhotoChange }: PhotosTabProps) => {
@@ -16,18 +16,19 @@ const PhotosTab = ({ editedHome, onPhotoChange }: PhotosTabProps) => {
     editedHome.additionalImages || []
   );
 
+  // Update parent component when additionalImages change
+  useEffect(() => {
+    onPhotoChange("additionalImages", additionalImages);
+  }, [additionalImages, onPhotoChange]);
+
   const handleAdditionalImageUpload = (url: string) => {
     const newImages = [...additionalImages, url];
     setAdditionalImages(newImages);
-    // Update the parent component if needed
-    // onPhotoChange("additionalImages", newImages);
   };
 
   const handleRemoveAdditionalImage = (index: number) => {
     const newImages = additionalImages.filter((_, i) => i !== index);
     setAdditionalImages(newImages);
-    // Update the parent component if needed
-    // onPhotoChange("additionalImages", newImages);
   };
 
   return (

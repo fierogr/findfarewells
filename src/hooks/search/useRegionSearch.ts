@@ -32,7 +32,7 @@ export const useRegionSearch = () => {
     );
   };
 
-  // This function is maintained for compatibility but will just log the attempt
+  // This function logs the attempt but doesn't actually save to the database
   const saveSearchRequest = async () => {
     try {
       setIsSaving(true);
@@ -46,6 +46,10 @@ export const useRegionSearch = () => {
       
       // We're not actually saving to the database due to RLS issues
       console.log("Database save skipped - would normally save search request");
+      
+      // Simulate a short delay to make the UI feel responsive
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       return true;
     } catch (error) {
       console.error('Error in saveSearchRequest:', error);

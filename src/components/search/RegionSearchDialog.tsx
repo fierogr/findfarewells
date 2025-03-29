@@ -60,7 +60,7 @@ const RegionSearchDialog = ({
 
   const handleSubmit = async () => {
     try {
-      // Validate form inputs
+      // Validate form inputs - require at least location or phone
       if (!phoneNumber) {
         toast({
           title: "Απαιτούμενο πεδίο",
@@ -79,7 +79,7 @@ const RegionSearchDialog = ({
         return;
       }
 
-      // Skip DB storage and proceed with search
+      // Skip DB storage - this would log the search attempt in development
       console.log("Proceeding with search without saving to database");
       
       // Call the onSearch callback if provided

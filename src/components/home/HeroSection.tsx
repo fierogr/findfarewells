@@ -16,15 +16,26 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   onSearch 
 }) => {
   return (
-    <section className="relative py-20 md:py-32">
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517164850305-99a3e65bb47e')] bg-cover bg-center opacity-10 z-0"></div>
+    <section className="relative py-20 md:py-32 overflow-hidden">
+      {/* Video Background */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-black/50 z-10"></div>
+        <iframe 
+          className="w-full h-full absolute"
+          src="https://www.youtube.com/embed/k7V4uPri-Tk?autoplay=1&mute=1&loop=1&playlist=k7V4uPri-Tk&controls=0&showinfo=0"
+          title="Background Video"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        ></iframe>
+      </div>
       
-      <div className="container relative z-10">
+      <div className="container relative z-20">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 animate-fadeIn">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 animate-fadeIn text-white">
             Βρείτε Υπηρεσίες Κηδείας Κοντά Σας
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-10 animate-fadeIn delay-100">
+          <p className="text-xl md:text-2xl text-white/90 mb-10 animate-fadeIn delay-100">
             Συγκρίνετε γραφεία τελετών στην περιοχή σας και βρείτε τις καλύτερες επιλογές για τις ανάγκες και τον προϋπολογισμό σας.
           </p>
           

@@ -2,8 +2,9 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { FuneralHome } from "@/types/funeralHome";
+import ImageUpload from "../forms/ImageUpload";
 
 interface PhotosTabProps {
   editedHome: FuneralHome;
@@ -23,64 +24,18 @@ const PhotosTab = ({ editedHome, onPhotoChange }: PhotosTabProps) => {
         <div className="grid grid-cols-1 gap-6">
           <div className="space-y-4">
             <h4 className="font-medium">Κύρια Φωτογραφία</h4>
-            <div className="border rounded-md p-4 text-center">
-              {editedHome.imageUrl ? (
-                <div className="relative">
-                  <img
-                    src={editedHome.imageUrl}
-                    alt="Main image"
-                    className="h-60 w-full object-cover rounded-md"
-                  />
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="absolute top-2 right-2"
-                    onClick={() => onPhotoChange("imageUrl", "")}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-40 bg-muted rounded-md">
-                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">Δεν υπάρχει εικόνα</p>
-                </div>
-              )}
-              <Button variant="outline" className="mt-4">
-                <Upload className="mr-2 h-4 w-4" /> Μεταφόρτωση
-              </Button>
-            </div>
+            <ImageUpload 
+              imageUrl={editedHome.imageUrl} 
+              setImageUrl={(url) => onPhotoChange("imageUrl", url)} 
+            />
           </div>
 
           <div className="space-y-4">
             <h4 className="font-medium">Εικόνα Εξώφυλλου</h4>
-            <div className="border rounded-md p-4 text-center">
-              {editedHome.coverImageUrl ? (
-                <div className="relative">
-                  <img
-                    src={editedHome.coverImageUrl}
-                    alt="Cover image"
-                    className="h-40 w-full object-cover rounded-md"
-                  />
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="absolute top-2 right-2"
-                    onClick={() => onPhotoChange("coverImageUrl", "")}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-40 bg-muted rounded-md">
-                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">Δεν υπάρχει εικόνα εξώφυλου</p>
-                </div>
-              )}
-              <Button variant="outline" className="mt-4">
-                <Upload className="mr-2 h-4 w-4" /> Μεταφόρτωση
-              </Button>
-            </div>
+            <ImageUpload 
+              imageUrl={editedHome.coverImageUrl || ""} 
+              setImageUrl={(url) => onPhotoChange("coverImageUrl", url)} 
+            />
           </div>
 
           <div className="space-y-4">
@@ -88,8 +43,15 @@ const PhotosTab = ({ editedHome, onPhotoChange }: PhotosTabProps) => {
             <div className="border rounded-md p-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="flex flex-col items-center justify-center h-40 bg-muted rounded-md">
-                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">Προσθήκη φωτογραφίας</p>
+                  <Button variant="ghost" className="flex flex-col h-full w-full items-center justify-center">
+                    <ImageUpload 
+                      imageUrl="" 
+                      setImageUrl={(url) => {
+                        // In a real app, we would add this to an array of additional images
+                        console.log("Additional image uploaded:", url);
+                      }} 
+                    />
+                  </Button>
                 </div>
               </div>
             </div>

@@ -12,6 +12,7 @@ import ServicesCheckboxes from "./ServicesCheckboxes";
 import { useRegionSearch } from "@/hooks/search/useRegionSearch";
 import { toast } from "@/components/ui/use-toast";
 import { REGIONS_AND_PREFECTURES } from "@/constants/geographicData";
+import { supabase } from "@/integrations/supabase/client";
 
 interface RegionSearchDialogProps {
   open: boolean;

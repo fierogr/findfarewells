@@ -15,7 +15,7 @@ interface SearchFormProps {
 
 const SearchForm = ({ 
   location = "", 
-  phoneNumber = "",
+  phoneNumber = "", 
   onLocationChange, 
   onPhoneNumberChange,
   onSubmit,

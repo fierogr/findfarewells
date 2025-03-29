@@ -1,22 +1,23 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ArrowDownUp } from "lucide-react";
 
-interface SortButtonProps {
+export interface SortButtonProps {
   sortOrder: "asc" | "desc";
-  onToggle: () => void;
+  onClick: () => void;
 }
 
-const SortButton = ({ sortOrder, onToggle }: SortButtonProps) => {
+const SortButton = ({ sortOrder, onClick }: SortButtonProps) => {
   return (
     <Button 
       variant="outline" 
+      size="sm" 
       className="flex items-center gap-2"
-      onClick={onToggle}
+      onClick={onClick}
     >
-      Τιμή {sortOrder === "asc" ? "Χαμηλή προς Υψηλή" : "Υψηλή προς Χαμηλή"}
-      {sortOrder === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+      <ArrowDownUp className="h-4 w-4" />
+      Τιμή {sortOrder === "asc" ? "Αύξουσα" : "Φθίνουσα"}
     </Button>
   );
 };

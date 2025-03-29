@@ -69,8 +69,12 @@ export const useFuneralHomeFetch = () => {
         // 3. Filter by services if any are selected
         if (services.length > 0) {
           filteredHomes = filteredHomes.filter(home => {
+            // Handle nullish services array
+            const homeServices = home.services || [];
+            
+            // Check if the home offers each of the selected services
             return services.every(service => 
-              home.services && home.services.some(homeService => 
+              homeServices.some(homeService => 
                 homeService.toLowerCase().includes(service.toLowerCase())
               )
             );

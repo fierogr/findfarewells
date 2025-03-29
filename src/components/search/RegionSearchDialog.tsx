@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Search, Home, X } from "lucide-react";
+import { MapPin, Search, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -96,6 +96,11 @@ const RegionSearchDialog: React.FC<RegionSearchDialogProps> = ({
     const servicesParam = selectedServices.length > 0 
       ? `&services=${encodeURIComponent(selectedServices.join(','))}` 
       : '';
+    
+    console.log("Navigating to search with params:", {
+      prefecture: selectedPrefecture,
+      services: selectedServices
+    });
     
     navigate(`/search?prefecture=${encodeURIComponent(selectedPrefecture)}${servicesParam}`);
     onOpenChange(false);

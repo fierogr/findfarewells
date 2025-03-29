@@ -1,27 +1,25 @@
 
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import SearchForm from "@/components/search/SearchForm";
 import FuneralHomeCard from "@/components/search/FuneralHomeCard";
 import LoadingState from "@/components/search/LoadingState";
 import EmptyResults from "@/components/search/EmptyResults";
 import FilterSheet from "@/components/search/FilterSheet";
 import SortButton from "@/components/search/SortButton";
-import SelectedFiltersDisplay from "@/components/search/SelectedFiltersDisplay";
+import RegionSearchDialog from "@/components/search/RegionSearchDialog";
 import { useFuneralHomeFetch } from "@/hooks/search/useFuneralHomeFetch";
 import { useFuneralHomeFiltering } from "@/hooks/search/useFuneralHomeFiltering";
-import RegionSearchDialog from "@/components/search/RegionSearchDialog";
 
 const SearchResults = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const searchLocation = searchParams.get("location") || "";
   const searchPrefecture = searchParams.get("prefecture") || null;
   const searchServices = searchParams.get("services") ? searchParams.get("services")!.split(',') : [];
   
-  const [localLocation, setLocalLocation] = useState(searchLocation);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   const { funeralHomes, loading, error, fetchFuneralHomes } = useFuneralHomeFetch();
@@ -39,20 +37,32 @@ const SearchResults = () => {
   } = useFuneralHomeFiltering(funeralHomes);
 
   useEffect(() => {
-    // Set initial services from URL
-    if (searchServices.length > 0) {
-      for (const service of searchServices) {
-        toggleServiceSelection(service);
-      }
-    }
+    console.log("Search parameters changed:", {
+      prefecture: searchPrefecture,
+      services: searchServices
+    });
     
     // Initial fetch based on URL parameters
     fetchFuneralHomes(searchLocation, searchPrefecture, searchServices);
-  }, [fetchFuneralHomes, searchLocation, searchPrefecture, searchServices]);
+    
+    // Set initial services from URL to the filter state
+    if (searchServices.length > 0) {
+      // Reset services to avoid duplicating selections
+      clearFilters();
+      
+      // Then add each service from the URL
+      searchServices.forEach(service => {
+        toggleServiceSelection(service);
+      });
+    }
+  }, [fetchFuneralHomes, searchLocation, searchPrefecture, searchServices, toggleServiceSelection, clearFilters]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchFuneralHomes(localLocation, searchPrefecture);
+  const handleClearFilters = () => {
+    clearFilters();
+    // Reset URL parameters
+    navigate('/search');
+    // Fetch all funeral homes without filters
+    fetchFuneralHomes();
   };
 
   return (
@@ -126,7 +136,10 @@ const SearchResults = () => {
           <p className="text-destructive">{error}</p>
         </div>
       ) : sortedHomes.length === 0 ? (
-        <EmptyResults />
+        <EmptyResults 
+          onClearFilters={handleClearFilters}
+          location={searchLocation || searchPrefecture || undefined}
+        />
       ) : (
         <div className="grid grid-cols-1 gap-6">
           {sortedHomes.map((home) => (

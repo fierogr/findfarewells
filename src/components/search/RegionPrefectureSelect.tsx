@@ -15,6 +15,7 @@ interface RegionPrefectureSelectProps {
   onRegionChange: (value: string) => void;
   onPrefectureChange: (value: string) => void;
   regions: string[];
+  disabled?: boolean; // Add optional disabled property
 }
 
 const RegionPrefectureSelect: React.FC<RegionPrefectureSelectProps> = ({
@@ -24,6 +25,7 @@ const RegionPrefectureSelect: React.FC<RegionPrefectureSelectProps> = ({
   onRegionChange,
   onPrefectureChange,
   regions,
+  disabled,
 }) => {
   return (
     <>
@@ -34,6 +36,7 @@ const RegionPrefectureSelect: React.FC<RegionPrefectureSelectProps> = ({
         <Select
           value={selectedRegion}
           onValueChange={onRegionChange}
+          disabled={disabled}
         >
           <SelectTrigger id="region" className="w-full">
             <SelectValue placeholder="Επιλέξτε περιοχή" />
@@ -55,7 +58,7 @@ const RegionPrefectureSelect: React.FC<RegionPrefectureSelectProps> = ({
         <Select
           value={selectedPrefecture}
           onValueChange={onPrefectureChange}
-          disabled={!selectedRegion}
+          disabled={!selectedRegion || disabled}
         >
           <SelectTrigger id="prefecture" className="w-full">
             <SelectValue placeholder={selectedRegion ? "Επιλέξτε νομό" : "Πρώτα επιλέξτε περιοχή"} />

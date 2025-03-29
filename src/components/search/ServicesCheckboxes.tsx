@@ -6,12 +6,14 @@ interface ServicesCheckboxesProps {
   services: string[];
   selectedServices: string[];
   onServiceToggle: (service: string) => void;
+  disabled?: boolean; // Add optional disabled property
 }
 
 const ServicesCheckboxes: React.FC<ServicesCheckboxesProps> = ({
   services,
   selectedServices,
   onServiceToggle,
+  disabled,
 }) => {
   return (
     <div className="space-y-2">
@@ -25,6 +27,7 @@ const ServicesCheckboxes: React.FC<ServicesCheckboxesProps> = ({
               id={`service-${service}`}
               checked={selectedServices.includes(service)}
               onCheckedChange={() => onServiceToggle(service)}
+              disabled={disabled}
             />
             <label
               htmlFor={`service-${service}`}

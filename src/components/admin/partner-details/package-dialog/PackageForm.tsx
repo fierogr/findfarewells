@@ -19,16 +19,12 @@ import { PackageFormValues } from "./types";
 
 interface PackageFormProps {
   form: UseFormReturn<PackageFormValues>;
-  includedServices: string[];
-  setIncludedServices: (services: string[]) => void;
   onSubmit: (data: PackageFormValues) => void;
   resetForm: () => void;
 }
 
 const PackageForm = ({ 
   form, 
-  includedServices, 
-  setIncludedServices, 
   onSubmit, 
   resetForm 
 }: PackageFormProps) => {
@@ -81,10 +77,7 @@ const PackageForm = ({
           )}
         />
         
-        <IncludedServicesField
-          includedServices={includedServices}
-          onChange={setIncludedServices}
-        />
+        <IncludedServicesField form={form} />
         
         <DialogFooter>
           <DialogClose asChild>

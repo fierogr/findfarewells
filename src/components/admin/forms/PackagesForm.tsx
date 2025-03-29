@@ -3,9 +3,7 @@ import React, { useState } from "react";
 import { ServicePackage } from "@/types/funeralHome";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import PackageFormEditor from "./packages/PackageFormEditor";
-import PackagesList from "./packages/PackagesList";
-import EmptyPackageState from "./packages/EmptyPackageState";
+import { PackageFormEditor, PackagesList, EmptyPackageState } from "./packages";
 import { usePackageForm } from "./packages/usePackageForm";
 
 interface PackagesFormProps {

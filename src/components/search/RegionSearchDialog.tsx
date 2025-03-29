@@ -10,7 +10,6 @@ import { Separator } from "@/components/ui/separator";
 import RegionPrefectureSelect from "./RegionPrefectureSelect";
 import ServicesCheckboxes from "./ServicesCheckboxes";
 import { useRegionSearch } from "@/hooks/search/useRegionSearch";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { REGIONS_AND_PREFECTURES } from "@/constants/geographicData";
 
@@ -27,6 +26,7 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
     selectedServices,
     availablePrefectures,
     phoneNumber,
+    isSaving,
     setPhoneNumber,
     setSelectedRegion,
     setSelectedPrefecture,
@@ -34,7 +34,17 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
     handleReset
   } = useRegionSearch();
 
-  const saveSearchRequest = async () => {
+  const handleSubmit = async () => {
+    if (!selectedRegion || !selectedPrefecture || !phoneNumber) {
+      toast({
+        title: "Απαιτούνται πεδία",
+        description: "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία για να συνεχίσετε.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Save the search request to the database
     try {
       const { error } = await supabase.from('search_requests').insert({
         location: selectedRegion,
@@ -48,20 +58,6 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
       console.error('Error saving search request:', error);
       // Don't show error to user, just log it
     }
-  };
-
-  const handleSubmit = async () => {
-    if (!selectedRegion || !selectedPrefecture || !phoneNumber) {
-      toast({
-        title: "Απαιτούνται πεδία",
-        description: "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία για να συνεχίσετε.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Save the search request to the database
-    await saveSearchRequest();
     
     // Close the dialog and redirect to search results
     onOpenChange(false);
@@ -127,8 +123,12 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
             <Button variant="outline" onClick={handleReset} className="sm:flex-1">
               Επαναφορά
             </Button>
-            <Button onClick={handleSubmit} className="sm:flex-1">
-              Αναζήτηση
+            <Button 
+              onClick={handleSubmit} 
+              className="sm:flex-1"
+              disabled={isSaving}
+            >
+              {isSaving ? "Υποβολή..." : "Αναζήτηση"}
             </Button>
           </div>
         </div>

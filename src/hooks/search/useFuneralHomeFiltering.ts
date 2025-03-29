@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { FuneralHome } from "@/types/funeralHome";
+import { FuneralHome, ServicePackage } from "@/types/funeralHome";
 
 export const useFuneralHomeFiltering = (funeralHomes: FuneralHome[]) => {
   const [filteredHomes, setFilteredHomes] = useState<FuneralHome[]>([]);
@@ -19,7 +19,13 @@ export const useFuneralHomeFiltering = (funeralHomes: FuneralHome[]) => {
         selectedServices.every(service => 
           home.services.some(homeService => 
             homeService.toLowerCase().includes(service.toLowerCase())
-          )
+          ) || 
+          // Also check services in packages
+          (home.packages && home.packages.some(pkg => 
+            pkg.includedServices.some(includedService => 
+              includedService.toLowerCase().includes(service.toLowerCase())
+            )
+          ))
         )
       );
     }
@@ -71,6 +77,7 @@ export const useFuneralHomeFiltering = (funeralHomes: FuneralHome[]) => {
   };
 
   const getSortedHomes = () => {
+    // For home-based sorting (not package-based)
     return [...filteredHomes].sort((a, b) => {
       const priceA = getDisplayPrice(a);
       const priceB = getDisplayPrice(b);

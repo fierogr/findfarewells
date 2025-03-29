@@ -4,30 +4,35 @@ import { Link } from "react-router-dom";
 import { MapPin, Phone, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { FuneralHome } from "@/types/funeralHome";
+import { FuneralHome, ServicePackage } from "@/types/funeralHome";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 interface FuneralHomeCardProps {
   home: FuneralHome;
   selectedServices: string[];
+  packageToShow?: ServicePackage | null;
 }
 
 const FuneralHomeCard = ({
   home,
-  selectedServices
+  selectedServices,
+  packageToShow = null
 }: FuneralHomeCardProps) => {
   const isMobile = useIsMobile();
   
-  const getDisplayPrice = (home: FuneralHome) => {
-    if (home.packages && home.packages.length > 0) {
+  const getDisplayPrice = () => {
+    if (packageToShow) {
+      return packageToShow.price;
+    } else if (home.packages && home.packages.length > 0) {
       return home.packages[0].price;
     }
     return home.basicPrice;
   };
   
-  // Get the first package or an empty array if no packages
-  const mainPackage = home.packages && home.packages.length > 0 ? home.packages[0] : null;
+  // Get the package to display - either the provided one or the first one
+  const mainPackage = packageToShow || (home.packages && home.packages.length > 0 ? home.packages[0] : null);
   
   // Δημιουργία fallback για την περίπτωση που το URL της εικόνας είναι άκυρο ή λείπει
   const getInitials = (name: string) => {
@@ -38,11 +43,6 @@ const FuneralHomeCard = ({
       .toUpperCase()
       .substring(0, 2);
   };
-  
-  console.log("Rendering FuneralHomeCard for:", home.name);
-  console.log("Regions:", home.regions);
-  console.log("Services:", home.services);
-  console.log("Image URL:", home.imageUrl);
   
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
@@ -69,6 +69,11 @@ const FuneralHomeCard = ({
             {home.featured && (
               <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
                 Προτεινόμενο
+              </div>
+            )}
+            {packageToShow && (
+              <div className="absolute bottom-2 right-2 bg-secondary text-xs px-2 py-1 rounded">
+                {packageToShow.name}
               </div>
             )}
           </div>
@@ -118,7 +123,7 @@ const FuneralHomeCard = ({
                 {mainPackage ? mainPackage.name : "Βασική Υπηρεσία"} Από
               </p>
               <p className="text-3xl font-semibold text-primary">
-                ${getDisplayPrice(home).toLocaleString()}
+                ${getDisplayPrice().toLocaleString()}
               </p>
               <p className="text-xs text-muted-foreground">Συν ΦΠΑ</p>
             </div>

@@ -29,7 +29,6 @@ export const useFuneralHomeFetch = () => {
       if (!homes || homes.length === 0) {
         console.log("No funeral homes returned from service");
         setFuneralHomes([]);
-        setLoading(false);
         return;
       }
       
@@ -96,7 +95,10 @@ export const useFuneralHomeFetch = () => {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      // Always ensure loading state is finished, even on error
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
     }
   }, []);
 

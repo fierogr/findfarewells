@@ -6,7 +6,7 @@ import { filterHomesByPrefecture } from "@/utils/searchUtils";
 import { toast } from "@/components/ui/use-toast";
 
 export const useSearchResults = (initialLocation: string, prefecture: string | null = null) => {
-  const { funeralHomes, loading, error, fetchFuneralHomes: originalFetchFuneralHomes } = useFuneralHomeFetch();
+  const { funeralHomes, loading: fetchLoading, error, fetchFuneralHomes: originalFetchFuneralHomes } = useFuneralHomeFetch();
   const [isSearching, setIsSearching] = useState(false);
   
   // Wrap the original fetch function to include prefecture filtering and loading state
@@ -26,10 +26,10 @@ export const useSearchResults = (initialLocation: string, prefecture: string | n
           variant: "destructive",
         });
       } finally {
-        // Delay slightly to ensure UI has time to update
+        // Ensure loading state finishes even if there's an error
         setTimeout(() => {
           setIsSearching(false);
-        }, 300);
+        }, 800); // Match the progress interval from LoadingState
       }
     },
     [originalFetchFuneralHomes]
@@ -56,16 +56,19 @@ export const useSearchResults = (initialLocation: string, prefecture: string | n
 
   // Initial fetch on component mount or location/prefecture change
   useEffect(() => {
-    if (initialLocation) {
+    if (initialLocation || prefecture) {
       fetchFuneralHomes(initialLocation, prefecture);
     }
   }, [initialLocation, prefecture, fetchFuneralHomes]);
+
+  // Combined loading state
+  const loading = fetchLoading || isSearching;
 
   return {
     funeralHomes: prefectureFilteredHomes,
     filteredHomes,
     sortedHomes,
-    loading: loading || isSearching,
+    loading,
     error,
     sortOrder,
     selectedServices,

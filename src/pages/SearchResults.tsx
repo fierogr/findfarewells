@@ -9,8 +9,7 @@ import EmptyResults from "@/components/search/EmptyResults";
 import FilterSheet from "@/components/search/FilterSheet";
 import SortButton from "@/components/search/SortButton";
 import RegionSearchDialog from "@/components/search/RegionSearchDialog";
-import { useFuneralHomeFetch } from "@/hooks/search/useFuneralHomeFetch";
-import { useFuneralHomeFiltering } from "@/hooks/search/useFuneralHomeFiltering";
+import { useSearchResults } from "@/hooks/useSearchResults";
 
 const SearchResults = () => {
   const location = useLocation();
@@ -21,20 +20,22 @@ const SearchResults = () => {
   const searchServices = searchParams.get("services") ? searchParams.get("services")!.split(',') : [];
   
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  
-  const { funeralHomes, loading, error, fetchFuneralHomes } = useFuneralHomeFetch();
+
   const {
     sortedHomes,
+    loading,
+    error,
     sortOrder,
     selectedServices,
     selectedRegions,
     isFilterOpen,
     setIsFilterOpen,
+    fetchFuneralHomes,
     toggleSortOrder,
     toggleServiceSelection,
     toggleRegionSelection,
     clearFilters
-  } = useFuneralHomeFiltering(funeralHomes);
+  } = useSearchResults(searchLocation, searchPrefecture);
 
   useEffect(() => {
     console.log("Search parameters changed:", {
@@ -95,6 +96,41 @@ const SearchResults = () => {
     );
   };
 
+  const renderContent = () => {
+    if (loading) {
+      return <LoadingState />;
+    }
+    
+    if (error) {
+      return (
+        <div className="text-center py-10">
+          <p className="text-destructive">{error}</p>
+        </div>
+      );
+    }
+    
+    if (sortedHomes.length === 0) {
+      return (
+        <EmptyResults 
+          onClearFilters={handleClearFilters}
+          location={searchLocation || searchPrefecture || undefined}
+        />
+      );
+    }
+    
+    return (
+      <div className="grid grid-cols-1 gap-6">
+        {sortedHomes.map((home) => (
+          <FuneralHomeCard 
+            key={home.id} 
+            home={home}
+            selectedServices={selectedServices}
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="container py-8">
       <h1 className="text-3xl font-bold mb-6">Αποτελέσματα Αναζήτησης</h1>
@@ -136,7 +172,7 @@ const SearchResults = () => {
           </div>
         )}
         
-        {(searchPrefecture || searchServices.length > 0) && (
+        {(searchPrefecture || searchServices.length > 0) && !loading && (
           <div className="mt-1 text-xs text-muted-foreground">
             Βρέθηκαν {sortedHomes.length} γραφεία τελετών με βάση τα κριτήρια αναζήτησης
           </div>
@@ -166,28 +202,7 @@ const SearchResults = () => {
       />
 
       {/* Search results */}
-      {loading ? (
-        <LoadingState />
-      ) : error ? (
-        <div className="text-center py-10">
-          <p className="text-destructive">{error}</p>
-        </div>
-      ) : sortedHomes.length === 0 ? (
-        <EmptyResults 
-          onClearFilters={handleClearFilters}
-          location={searchLocation || searchPrefecture || undefined}
-        />
-      ) : (
-        <div className="grid grid-cols-1 gap-6">
-          {sortedHomes.map((home) => (
-            <FuneralHomeCard 
-              key={home.id} 
-              home={home}
-              selectedServices={selectedServices}
-            />
-          ))}
-        </div>
-      )}
+      {renderContent()}
     </div>
   );
 };

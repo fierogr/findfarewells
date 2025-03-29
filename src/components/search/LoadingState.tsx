@@ -3,19 +3,29 @@ import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
-const LoadingState = () => {
-  const [progress, setProgress] = useState(10);
+interface LoadingStateProps {
+  initialProgress?: number;
+  progressInterval?: number;
+  maxProgress?: number;
+}
+
+const LoadingState = ({
+  initialProgress = 10,
+  progressInterval = 800,
+  maxProgress = 90
+}: LoadingStateProps) => {
+  const [progress, setProgress] = useState(initialProgress);
   
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prev) => {
-        // Cap at 90% to show that we're still waiting for the final result
-        return prev >= 90 ? 90 : prev + 10;
+        // Cap at maxProgress to show that we're still waiting for the final result
+        return prev >= maxProgress ? maxProgress : prev + 10;
       });
-    }, 800);
+    }, progressInterval);
     
     return () => clearInterval(interval);
-  }, []);
+  }, [maxProgress, progressInterval]);
   
   return (
     <div className="flex flex-col justify-center items-center h-64 space-y-4">

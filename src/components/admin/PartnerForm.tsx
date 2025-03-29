@@ -65,6 +65,8 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
       // Calculate basicPrice from the first package if available
       const basicPrice = packages.length > 0 ? packages[0].price : 0;
       
+      console.log("Submitting form with regions:", selectedRegions);
+      
       const partnerData: FuneralHome = {
         id: initialData?.id || crypto.randomUUID(),
         name: data.name,

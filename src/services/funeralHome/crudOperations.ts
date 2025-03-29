@@ -68,6 +68,7 @@ export const addFuneralHome = async (funeralHome: FuneralHome): Promise<FuneralH
     
     // Log the data we're sending to the database
     console.log('Adding new partner with data:', partnerData);
+    console.log('Regions being saved:', partnerData.regions);
     
     const { data, error } = await supabase
       .from('partners')
@@ -103,6 +104,7 @@ export const updateFuneralHome = async (id: string, updatedFuneralHome: FuneralH
     
     // Log the data we're sending to the database
     console.log('Updating partner with data:', partnerData);
+    console.log('Regions being updated:', partnerData.regions);
     
     const { data, error } = await supabase
       .from('partners')

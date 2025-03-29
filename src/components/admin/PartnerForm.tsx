@@ -62,6 +62,9 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
     try {
       setIsSubmitting(true);
       
+      // Calculate basicPrice from the first package if available
+      const basicPrice = packages.length > 0 ? packages[0].price : 0;
+      
       const partnerData: FuneralHome = {
         id: initialData?.id || crypto.randomUUID(),
         name: data.name,
@@ -79,7 +82,7 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
         about: initialData?.about || "",
         rating: initialData?.rating || 0,
         reviewCount: initialData?.reviewCount || 0,
-        basicPrice: packages.length > 0 ? packages[0].price : (initialData?.basicPrice || 0),
+        basicPrice: basicPrice,
         featured: data.featured,
         amenities: initialData?.amenities || [],
         packages: packages,

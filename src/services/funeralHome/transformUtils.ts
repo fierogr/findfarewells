@@ -22,7 +22,8 @@ export const transformPartnerToFuneralHome = (partner: any): FuneralHome => {
     reviewCount: partner.review_count || 0,
     services: Array.isArray(partner.services) ? partner.services : [],
     amenities: [],
-    basicPrice: partner.basic_price || 0,
+    basicPrice: partner.packages && partner.packages.length > 0 ? 
+      partner.packages[0].price : 0, // Derive from packages instead of database field
     featured: partner.featured || false,
     packages: Array.isArray(partner.packages) ? partner.packages : [],
     additionalServices: [],
@@ -49,9 +50,9 @@ export const transformFuneralHomeToPartner = (home: FuneralHome): any => {
     image_url: home.imageUrl,
     rating: home.rating,
     review_count: home.reviewCount,
-    basic_price: home.basicPrice,
     featured: home.featured,
     regions: home.regions,
     packages: home.packages
+    // Removed basic_price field as it doesn't exist in the database
   };
 };

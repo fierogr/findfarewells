@@ -63,7 +63,7 @@ const SearchResults = () => {
     // Reset URL parameters
     navigate('/search');
     // Fetch all funeral homes without filters
-    fetchFuneralHomes();
+    fetchFuneralHomes(searchLocation);
   };
 
   const handleNewSearch = (formData: { location: string; prefecture: string | null; services: string[] }) => {

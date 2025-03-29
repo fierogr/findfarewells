@@ -1,11 +1,38 @@
+
 import React, { useState } from "react";
 import { Search, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RegionSearchDialog from "@/components/search/RegionSearchDialog";
 import { toast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSearch = (formData: { location: string; prefecture: string | null; services: string[] }) => {
+    console.log("Search initiated with data:", formData);
+    
+    // Construct URL parameters
+    const params = new URLSearchParams();
+    
+    if (formData.location) {
+      params.set("location", formData.location);
+    }
+    
+    if (formData.prefecture) {
+      params.set("prefecture", formData.prefecture);
+    }
+    
+    if (formData.services.length > 0) {
+      params.set("services", formData.services.join(','));
+    }
+    
+    // Navigate to search results with parameters
+    const searchUrl = `/search?${params.toString()}`;
+    console.log("Navigating to:", searchUrl);
+    navigate(searchUrl);
+  };
 
   return (
     <div className="relative overflow-hidden">
@@ -36,7 +63,8 @@ const Index = () => {
             {/* Search Dialog */}
             <RegionSearchDialog 
               open={isSearchOpen} 
-              onOpenChange={setIsSearchOpen} 
+              onOpenChange={setIsSearchOpen}
+              onSearch={handleSearch}
             />
           </div>
         </div>

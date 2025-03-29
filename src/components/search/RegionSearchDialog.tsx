@@ -107,22 +107,31 @@ const RegionSearchDialog = ({
           console.error('Error sending notification:', notifyError);
         }
       }
+
+      console.log("Search request saved successfully, calling onSearch callback");
+      
+      // Call the onSearch callback if provided
+      if (onSearch) {
+        onSearch({
+          location: selectedRegion,
+          prefecture: selectedPrefecture,
+          services: selectedServices
+        });
+      } else {
+        console.error("No onSearch callback provided to RegionSearchDialog");
+      }
+      
+      // Close the dialog
+      onOpenChange(false);
+      
     } catch (error) {
       console.error('Error saving search request:', error);
-      // Don't show error to user, just log it
-    }
-    
-    // Call the onSearch callback if provided
-    if (onSearch) {
-      onSearch({
-        location: selectedRegion,
-        prefecture: selectedPrefecture,
-        services: selectedServices
+      toast({
+        title: "Σφάλμα",
+        description: "Παρουσιάστηκε σφάλμα κατά την αποθήκευση του αιτήματος. Παρακαλώ δοκιμάστε ξανά.",
+        variant: "destructive",
       });
     }
-    
-    // Close the dialog
-    onOpenChange(false);
   };
 
   return (

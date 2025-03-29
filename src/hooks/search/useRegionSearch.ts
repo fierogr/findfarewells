@@ -46,9 +46,11 @@ export const useRegionSearch = () => {
       if (error) throw error;
       
       console.log("Search request saved successfully");
+      return true;
     } catch (error) {
       console.error('Error saving search request:', error);
       // Don't show error to user, just log it
+      return false;
     } finally {
       setIsSaving(false);
     }

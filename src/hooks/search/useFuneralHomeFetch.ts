@@ -11,13 +11,11 @@ export const useFuneralHomeFetch = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchFuneralHomes = useCallback(async (searchLocation: string, prefecture: string | null = null) => {
-    if (!searchLocation || searchLocation.trim() === '') {
-      setLoading(false);
-      setFuneralHomes([]);
-      return;
-    }
-    
+  const fetchFuneralHomes = useCallback(async (
+    searchLocation: string = "", 
+    prefecture: string | null = null,
+    services: string[] = []
+  ) => {
     setLoading(true);
     setError(null);
     
@@ -26,7 +24,11 @@ export const useFuneralHomeFetch = () => {
 
     const attempt = async () => {
       try {
-        console.log(`Fetching funeral homes for location: "${searchLocation}", prefecture: "${prefecture}"`);
+        console.log(`Fetching funeral homes with: 
+          location: "${searchLocation}", 
+          prefecture: "${prefecture}",
+          services: [${services.join(', ')}]`);
+          
         const homes = await getFuneralHomes();
         
         if (!homes || homes.length === 0) {
@@ -38,28 +40,42 @@ export const useFuneralHomeFetch = () => {
         
         console.log(`Retrieved ${homes.length} homes from database`);
         
-        let filteredHomes: FuneralHome[];
-        
         // Make sure any home with a null regions field gets an empty array
         const homesWithValidRegions = homes.map(home => ({
           ...home,
-          regions: home.regions || []
+          regions: home.regions || [],
+          services: home.services || []
         }));
         
+        let filteredHomes: FuneralHome[] = homesWithValidRegions;
+        
+        // 1. Filter by prefecture if provided
         if (prefecture) {
-          // If prefecture is provided, filter by prefecture directly
-          filteredHomes = filterHomesByPrefecture(homesWithValidRegions, prefecture);
+          filteredHomes = filterHomesByPrefecture(filteredHomes, prefecture);
           console.log(`Filtered by prefecture ${prefecture}: ${filteredHomes.length} homes match`);
           
-          if (filteredHomes.length === 0) {
-            // If no homes with the prefecture, try location filtering as fallback
+          // If no prefecture results, try filtering by location as a fallback
+          if (filteredHomes.length === 0 && searchLocation) {
             filteredHomes = await filterHomesByRegion(homesWithValidRegions, searchLocation);
             console.log(`Fallback filtering by location: ${filteredHomes.length} homes match location "${searchLocation}"`);
           }
-        } else {
-          // If no prefecture, filter by location as before
+        } 
+        // 2. Otherwise filter by location if provided
+        else if (searchLocation) {
           filteredHomes = await filterHomesByRegion(homesWithValidRegions, searchLocation);
           console.log(`Filtered by location: ${filteredHomes.length} homes match location "${searchLocation}"`);
+        }
+        
+        // 3. Filter by services if any are selected
+        if (services.length > 0) {
+          filteredHomes = filteredHomes.filter(home => {
+            return services.every(service => 
+              home.services && home.services.some(homeService => 
+                homeService.toLowerCase().includes(service.toLowerCase())
+              )
+            );
+          });
+          console.log(`Filtered by services: ${filteredHomes.length} homes match selected services`);
         }
         
         setFuneralHomes(filteredHomes);
@@ -68,7 +84,8 @@ export const useFuneralHomeFetch = () => {
         if (filteredHomes.length === 0) {
           const message = prefecture 
             ? `Δεν βρέθηκαν γραφεία τελετών στον ${prefecture}`
-            : `Δεν βρέθηκαν γραφεία τελετών στην περιοχή: ${searchLocation}`;
+            : (searchLocation ? `Δεν βρέθηκαν γραφεία τελετών στην περιοχή: ${searchLocation}` : 
+              "Δεν βρέθηκαν γραφεία τελετών με τα επιλεγμένα κριτήρια");
             
           toast({
             title: "Κανένα αποτέλεσμα",

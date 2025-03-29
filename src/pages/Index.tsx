@@ -1,53 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Search, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { findPrefectureForLocation } from "@/utils/searchUtils";
+import RegionSearchDialog from "@/components/search/RegionSearchDialog";
 import { toast } from "@/components/ui/use-toast";
 
 const Index = () => {
-  const [location, setLocation] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const navigate = useNavigate();
-
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!location.trim()) {
-      return;
-    }
-    
-    setIsSearching(true);
-    
-    try {
-      // Find the prefecture for the location
-      const prefecture = await findPrefectureForLocation(location);
-      
-      if (prefecture) {
-        // If prefecture found, include it in the search params
-        navigate(`/search?location=${encodeURIComponent(location)}&prefecture=${encodeURIComponent(prefecture)}`);
-        
-        toast({
-          title: "Αναζήτηση",
-          description: `Αναζήτηση γραφείων τελετών στο ${prefecture}`,
-          variant: "default"
-        });
-      } else {
-        // If no prefecture found, just search by location
-        navigate(`/search?location=${encodeURIComponent(location)}`);
-      }
-    } catch (error) {
-      console.error("Error during search:", error);
-      navigate(`/search?location=${encodeURIComponent(location)}`);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const handleSampleSearch = () => {
-    setLocation("Περαία");
-  };
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
     <div className="relative overflow-hidden">
@@ -64,37 +22,22 @@ const Index = () => {
               Συγκρίνετε γραφεία τελετών στην περιοχή σας και βρείτε τις καλύτερες επιλογές για τις ανάγκες και τον προϋπολογισμό σας.
             </p>
             
-            <form onSubmit={handleSearch} className="max-w-md mx-auto animate-fadeIn delay-200">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <MapPin className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <Input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="pl-10 pr-20 py-6 text-lg rounded-full border-2 focus:border-primary"
-                  placeholder="Εισάγετε πόλη ή ταχυδρομικό κώδικα"
-                  required
-                />
-                <Button 
-                  type="submit" 
-                  className="absolute right-1 top-1 bottom-1 px-4 rounded-full transition-all duration-300 hover:scale-105"
-                >
-                  <Search className="h-5 w-5 mr-2" />
-                  Αναζήτηση
-                </Button>
-              </div>
-              <div className="mt-3 text-center">
-                <button 
-                  type="button" 
-                  onClick={handleSampleSearch}
-                  className="text-primary text-sm hover:underline focus:outline-none"
-                >
-                  Δοκιμάστε με παράδειγμα: Περαία
-                </button>
-              </div>
-            </form>
+            <div className="flex justify-center animate-fadeIn delay-200">
+              <Button 
+                onClick={() => setIsSearchOpen(true)}
+                size="lg" 
+                className="px-8 py-6 text-lg rounded-full transition-all duration-300 hover:scale-105 shadow-md"
+              >
+                <Search className="mr-2 h-5 w-5" />
+                Αναζήτηση Γραφείων Τελετών
+              </Button>
+            </div>
+            
+            {/* Search Dialog */}
+            <RegionSearchDialog 
+              open={isSearchOpen} 
+              onOpenChange={setIsSearchOpen} 
+            />
           </div>
         </div>
       </section>
@@ -109,8 +52,8 @@ const Index = () => {
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <MapPin className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-medium mb-3">Εισάγετε την Τοποθεσία σας</h3>
-              <p className="text-muted-foreground">Εισάγετε την πόλη ή τον ταχυδρομικό σας κώδικα για να βρείτε γραφεία τελετών στην περιοχή σας.</p>
+              <h3 className="text-xl font-medium mb-3">Επιλέξτε την Περιοχή σας</h3>
+              <p className="text-muted-foreground">Επιλέξτε την γεωγραφική περιοχή και τον νομό σας για να ��ρείτε γραφεία τελετών που εξυπηρετούν την περιοχή σας.</p>
             </div>
             
             <div className="bg-background rounded-xl p-6 shadow-sm text-center animate-fadeIn delay-200">

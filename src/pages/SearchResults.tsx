@@ -1,221 +1,143 @@
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { useSearchResults } from "@/hooks/useSearchResults";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useLocation } from "react-router-dom";
+import { Filter } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import SearchForm from "@/components/search/SearchForm";
-import FilterSidebar from "@/components/search/FilterSidebar";
-import FilterSheet from "@/components/search/FilterSheet";
-import SortButton from "@/components/search/SortButton";
+import FuneralHomeCard from "@/components/search/FuneralHomeCard";
 import LoadingState from "@/components/search/LoadingState";
 import EmptyResults from "@/components/search/EmptyResults";
-import FuneralHomeCard from "@/components/search/FuneralHomeCard";
+import FilterSheet from "@/components/search/FilterSheet";
+import SortButton from "@/components/search/SortButton";
 import SelectedFiltersDisplay from "@/components/search/SelectedFiltersDisplay";
-import { MapPin } from "lucide-react";
-import { findPrefectureForLocation, filterHomesByPrefecture } from "@/utils/searchUtils";
-import { toast } from "@/components/ui/use-toast";
+import { useFuneralHomeFetch } from "@/hooks/search/useFuneralHomeFetch";
+import { useFuneralHomeFiltering } from "@/hooks/search/useFuneralHomeFiltering";
+import RegionSearchDialog from "@/components/search/RegionSearchDialog";
 
 const SearchResults = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const location = searchParams.get("location") || "";
-  const prefectureParam = searchParams.get("prefecture");
-  const [newLocation, setNewLocation] = useState(location);
-  const [prefecture, setPrefecture] = useState<string | null>(prefectureParam);
-  const isMobile = useIsMobile();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const searchLocation = searchParams.get("location") || "";
+  const searchPrefecture = searchParams.get("prefecture") || null;
+  const searchServices = searchParams.get("services") ? searchParams.get("services")!.split(',') : [];
   
+  const [localLocation, setLocalLocation] = useState(searchLocation);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  
+  const { funeralHomes, loading, error, fetchFuneralHomes } = useFuneralHomeFetch();
   const {
-    funeralHomes,
-    filteredHomes,
     sortedHomes,
-    loading,
-    error,
     sortOrder,
     selectedServices,
     selectedRegions,
     isFilterOpen,
     setIsFilterOpen,
-    fetchFuneralHomes,
     toggleSortOrder,
     toggleServiceSelection,
     toggleRegionSelection,
     clearFilters
-  } = useSearchResults(location, prefecture);
+  } = useFuneralHomeFiltering(funeralHomes);
 
-  // Determine prefecture if not provided and re-fetch when location changes
   useEffect(() => {
-    const getPrefectureAndFetch = async () => {
-      if (location) {
-        setNewLocation(location);
-        
-        // If prefecture is not provided in URL params, try to find it
-        if (!prefectureParam) {
-          try {
-            console.log(`Looking up prefecture for location: ${location}`);
-            const foundPrefecture = await findPrefectureForLocation(location);
-            setPrefecture(foundPrefecture);
-            
-            if (foundPrefecture) {
-              console.log(`Found prefecture: ${foundPrefecture} for location: ${location}`);
-              
-              // Update URL with the found prefecture
-              setSearchParams(prev => {
-                const newParams = new URLSearchParams(prev);
-                newParams.set("prefecture", foundPrefecture);
-                return newParams;
-              });
-              
-              toast({
-                title: "Βρέθηκε νομός",
-                description: `Η περιοχή "${location}" ανήκει στον ${foundPrefecture}`,
-                variant: "default"
-              });
-            } else {
-              console.log(`Could not determine prefecture for location: ${location}`);
-            }
-          } catch (error) {
-            console.error("Error finding prefecture:", error);
-          }
-        } else {
-          setPrefecture(prefectureParam);
-        }
-        
-        // Fetch funeral homes with the determined prefecture
-        fetchFuneralHomes(location, prefecture || prefectureParam);
+    // Set initial services from URL
+    if (searchServices.length > 0) {
+      for (const service of searchServices) {
+        toggleServiceSelection(service);
       }
-    };
+    }
     
-    getPrefectureAndFetch();
-  }, [location, prefectureParam, fetchFuneralHomes, setSearchParams, prefecture]);
+    // Initial fetch based on URL parameters
+    fetchFuneralHomes(searchLocation, searchPrefecture, searchServices);
+  }, [fetchFuneralHomes, searchLocation, searchPrefecture, searchServices]);
 
-  const handleSearch = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newLocation.trim()) {
-      // First try to find the prefecture
-      const foundPrefecture = await findPrefectureForLocation(newLocation);
-      
-      // Update search params with location and prefecture if found
-      const params: Record<string, string> = { location: newLocation };
-      if (foundPrefecture) {
-        params.prefecture = foundPrefecture;
-      }
-      
-      setSearchParams(params);
-    }
+    fetchFuneralHomes(localLocation, searchPrefecture);
   };
-
-  const handleRetry = () => {
-    if (location) {
-      fetchFuneralHomes(location, prefecture);
-    }
-  };
-
-  // Calculate total active filters
-  const totalActiveFilters = selectedServices.length + selectedRegions.length;
 
   return (
-    <div className="container py-8 md:py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-semibold mb-6 animate-fadeIn">
-          Γραφεία Τελετών στην περιοχή {location}
-          {prefecture && (
-            <span className="block text-lg font-medium text-muted-foreground mt-2">
-              {prefecture}
-            </span>
-          )}
-        </h1>
-        
-        <div className="mb-6 text-sm text-muted-foreground flex items-center">
-          <MapPin className="h-4 w-4 mr-1" />
-          <span>
-            {prefecture 
-              ? `Εμφανίζονται αποτελέσματα γραφείων που εξυπηρετούν τον ${prefecture}` 
-              : "Εμφανίζονται μόνο αποτελέσματα σε ακτίνα έως 50χλμ από την αναζήτησή σας"}
-          </span>
-        </div>
-        
-        <SearchForm 
-          location={newLocation}
-          onLocationChange={setNewLocation}
-          onSubmit={handleSearch}
-        />
-      </div>
-
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Filter Sidebar - Hidden on mobile, shown on desktop */}
-        <div className="hidden md:block w-64 shrink-0">
-          <FilterSidebar
-            selectedServices={selectedServices}
-            selectedRegions={selectedRegions}
-            onServiceToggle={toggleServiceSelection}
-            onRegionToggle={toggleRegionSelection}
-            onClearFilters={clearFilters}
+    <div className="container py-8">
+      <h1 className="text-3xl font-bold mb-6">Αποτελέσματα Αναζήτησης</h1>
+      
+      <div className="flex items-center justify-between flex-wrap gap-2 md:gap-0 mb-4">
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={() => setIsSearchOpen(true)}
+          >
+            <Filter className="h-4 w-4" />
+            Νέα Αναζήτηση
+          </Button>
+          
+          <SortButton 
+            sortOrder={sortOrder}
+            onClick={toggleSortOrder}
           />
         </div>
-
-        <div className="flex-1">
-          <div className="flex justify-between items-center mb-4 animate-fadeIn delay-200">
-            <div className="flex items-center gap-2">
-              <p className="text-muted-foreground">
-                {loading 
-                  ? "Αναζήτηση..." 
-                  : prefecture
-                    ? `${filteredHomes.length} γραφεία τελετών στον ${prefecture}`
-                    : `${filteredHomes.length} γραφεία τελετών εντός 50χλμ`}
-              </p>
-              <SelectedFiltersDisplay 
-                selectedFiltersCount={totalActiveFilters}
-                onClearFilters={clearFilters}
-              />
-            </div>
-
-            <div className="flex gap-2">
-              {/* Only show sheet on mobile */}
-              {isMobile && (
-                <FilterSheet 
-                  selectedServices={selectedServices}
-                  selectedRegions={selectedRegions}
-                  onServiceToggle={toggleServiceSelection}
-                  onRegionToggle={toggleRegionSelection}
-                  onClearFilters={clearFilters}
-                  isOpen={isFilterOpen}
-                  onOpenChange={setIsFilterOpen}
-                />
-              )}
-
-              <SortButton 
-                sortOrder={sortOrder}
-                onToggle={toggleSortOrder}
-              />
-            </div>
-          </div>
-          
-          {loading ? (
-            <LoadingState />
-          ) : error ? (
-            <EmptyResults 
-              onClearFilters={clearFilters} 
-              location={location}
-              onRetry={handleRetry}
-            />
-          ) : filteredHomes.length === 0 ? (
-            <EmptyResults 
-              onClearFilters={clearFilters}
-              location={location}
-              onRetry={handleRetry}
-            />
-          ) : (
-            <div className="grid grid-cols-1 gap-6 animate-fadeIn delay-300">
-              {sortedHomes.map((home) => (
-                <FuneralHomeCard 
-                  key={home.id} 
-                  home={home} 
-                  selectedServices={selectedServices}
-                />
-              ))}
-            </div>
-          )}
-        </div>
       </div>
+      
+      {/* Display selected search parameters */}
+      <div className="mb-6">
+        {searchPrefecture && (
+          <div className="inline-flex items-center bg-secondary rounded-full px-3 py-1 text-sm mr-2 mb-2">
+            <span className="text-foreground">Νομός: {searchPrefecture}</span>
+          </div>
+        )}
+        
+        {searchServices.length > 0 && (
+          <div className="inline-flex items-center bg-secondary rounded-full px-3 py-1 text-sm mr-2 mb-2">
+            <span className="text-foreground">
+              Υπηρεσίες: {searchServices.slice(0, 2).join(', ')}
+              {searchServices.length > 2 ? ` +${searchServices.length - 2} ακόμη` : ''}
+            </span>
+          </div>
+        )}
+        
+        {(searchPrefecture || searchServices.length > 0) && (
+          <div className="mt-1 text-xs text-muted-foreground">
+            Βρέθηκαν {sortedHomes.length} γραφεία τελετών με βάση τα κριτήρια αναζήτησης
+          </div>
+        )}
+      </div>
+
+      {/* Filter sheet */}
+      <FilterSheet
+        selectedServices={selectedServices}
+        selectedRegions={selectedRegions}
+        onServiceToggle={toggleServiceSelection}
+        onRegionToggle={toggleRegionSelection}
+        onClearFilters={clearFilters}
+        isOpen={isFilterOpen}
+        onOpenChange={setIsFilterOpen}
+      />
+      
+      {/* Search dialog */}
+      <RegionSearchDialog 
+        open={isSearchOpen} 
+        onOpenChange={setIsSearchOpen} 
+      />
+
+      {/* Search results */}
+      {loading ? (
+        <LoadingState />
+      ) : error ? (
+        <div className="text-center py-10">
+          <p className="text-destructive">{error}</p>
+        </div>
+      ) : sortedHomes.length === 0 ? (
+        <EmptyResults />
+      ) : (
+        <div className="grid grid-cols-1 gap-6">
+          {sortedHomes.map((home) => (
+            <FuneralHomeCard 
+              key={home.id} 
+              home={home}
+              selectedServices={selectedServices}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

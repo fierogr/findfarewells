@@ -21,12 +21,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-black/50 z-10"></div>
         <iframe 
-          className="w-full h-full absolute"
-          src="https://www.youtube.com/embed/k7V4uPri-Tk?autoplay=1&mute=1&loop=1&playlist=k7V4uPri-Tk&controls=0&showinfo=0"
+          className="w-full h-full absolute object-cover"
+          src="https://www.youtube.com/embed/k7V4uPri-Tk?autoplay=1&mute=1&loop=1&playlist=k7V4uPri-Tk&controls=0&showinfo=0&rel=0&modestbranding=1&enablejsapi=1"
           title="Background Video"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
+          style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }}
         ></iframe>
       </div>
       

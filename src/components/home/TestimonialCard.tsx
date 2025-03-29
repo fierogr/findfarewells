@@ -4,16 +4,12 @@ import React from "react";
 interface TestimonialCardProps {
   text: string;
   author: string;
-  delay?: number;
+  delay: number;
 }
 
-const TestimonialCard: React.FC<TestimonialCardProps> = ({ 
-  text, 
-  author, 
-  delay = 0 
-}) => {
+const TestimonialCard: React.FC<TestimonialCardProps> = ({ text, author, delay }) => {
   return (
-    <div className={`bg-background rounded-xl p-6 shadow-sm animate-fadeIn${delay ? ` delay-${delay}` : ''}`}>
+    <div className={`bg-background rounded-xl p-6 shadow-sm animate-fadeIn delay-${delay}`}>
       <div className="flex items-center mb-4">
         <div className="text-yellow-400 flex">
           {[...Array(5)].map((_, i) => (

@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { REGIONS_AND_PREFECTURES } from "@/constants/geographicData";
 
@@ -10,7 +9,6 @@ export const useRegionSearch = () => {
   const [availablePrefectures, setAvailablePrefectures] = useState<string[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const navigate = useNavigate();
 
   // Update available prefectures when region changes
   useEffect(() => {
@@ -40,16 +38,11 @@ export const useRegionSearch = () => {
       return;
     }
 
-    const servicesParam = selectedServices.length > 0 
-      ? `&services=${encodeURIComponent(selectedServices.join(','))}` 
-      : '';
-    
-    console.log("Navigating to search with params:", {
+    console.log("Search params:", {
+      region: selectedRegion,
       prefecture: selectedPrefecture,
       services: selectedServices
     });
-    
-    navigate(`/search?prefecture=${encodeURIComponent(selectedPrefecture)}${servicesParam}`);
   };
 
   const handleReset = () => {

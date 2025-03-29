@@ -14,7 +14,15 @@ export const filterHomesByPrefecture = (homes: any[], prefecture: string | null)
     const regions = home.regions || [];
     
     // Check if the home has regions and if the prefecture is included
-    return Array.isArray(regions) && regions.includes(prefecture);
+    return Array.isArray(regions) && regions.some(region => {
+      // Case-insensitive comparison
+      if (typeof region === 'string') {
+        return region.toLowerCase() === prefecture.toLowerCase() || 
+               region.toLowerCase().includes(prefecture.toLowerCase()) ||
+               prefecture.toLowerCase().includes(region.toLowerCase());
+      }
+      return false;
+    });
   });
 };
 

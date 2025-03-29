@@ -20,6 +20,7 @@ interface RegionSearchDialogProps {
 }
 
 const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => {
+  const navigate = useNavigate();
   const {
     selectedRegion,
     selectedPrefecture,
@@ -30,7 +31,6 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
     setSelectedRegion,
     setSelectedPrefecture,
     handleServiceToggle,
-    handleSearch,
     handleReset
   } = useRegionSearch();
 
@@ -65,7 +65,13 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
     
     // Close the dialog and redirect to search results
     onOpenChange(false);
-    handleSearch();
+    
+    // Construct the search URL with parameters
+    const servicesParam = selectedServices.length > 0 
+      ? `&services=${encodeURIComponent(selectedServices.join(','))}` 
+      : '';
+    
+    navigate(`/search?prefecture=${encodeURIComponent(selectedPrefecture)}${servicesParam}`);
   };
 
   return (

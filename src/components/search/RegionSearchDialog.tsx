@@ -1,17 +1,12 @@
 
 import React, { useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Phone, Loader2 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import RegionPrefectureSelect from "./RegionPrefectureSelect";
-import ServicesCheckboxes from "./ServicesCheckboxes";
-import { useRegionSearch } from "@/hooks/search/useRegionSearch";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
+import { useRegionSearch } from "@/hooks/search/useRegionSearch";
 import { REGIONS_AND_PREFECTURES } from "@/constants/geographicData";
 import { supabase } from "@/integrations/supabase/client";
+import DialogHeader from "./DialogHeader";
+import SearchFormContent from "./SearchFormContent";
 
 interface RegionSearchDialogProps {
   open: boolean;
@@ -45,7 +40,6 @@ const RegionSearchDialog = ({
     setSelectedServices,
     handleServiceToggle,
     handleReset,
-    saveSearchRequest
   } = useRegionSearch();
 
   // Initialize form with values from props when dialog opens
@@ -137,80 +131,23 @@ const RegionSearchDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">Αναζήτηση Γραφείων Τελετών</DialogTitle>
-        </DialogHeader>
-
-        <div className="py-4 space-y-6">
-          {/* Region and Prefecture Selection */}
-          <RegionPrefectureSelect 
-            selectedRegion={selectedRegion}
-            selectedPrefecture={selectedPrefecture}
-            availablePrefectures={availablePrefectures}
-            onRegionChange={setSelectedRegion}
-            onPrefectureChange={setSelectedPrefecture}
-            regions={Object.keys(REGIONS_AND_PREFECTURES)}
-            disabled={isLoading || isSaving}
-          />
-
-          <Separator />
-
-          {/* Phone Number Field */}
-          <div className="space-y-2">
-            <Label htmlFor="phone-number">Τηλέφωνο Επικοινωνίας</Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Phone className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <Input
-                id="phone-number"
-                type="tel"
-                placeholder="Εισάγετε το τηλέφωνό σας"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className="pl-10"
-                required
-                disabled={isLoading || isSaving}
-              />
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Services Checkboxes */}
-          <ServicesCheckboxes 
-            services={["Πλήρεις Υπηρεσίες Κηδείας", "Αποτέφρωση", "Μεταφορά Σορού", "Μνημόσυνα", "Στολισμός", "Έκδοση Πιστοποιητικών"]}
-            selectedServices={selectedServices}
-            onServiceToggle={handleServiceToggle}
-            disabled={isLoading || isSaving}
-          />
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2 pt-4">
-            <Button 
-              variant="outline" 
-              onClick={handleReset} 
-              className="sm:flex-1"
-              disabled={isLoading || isSaving}
-            >
-              Επαναφορά
-            </Button>
-            <Button 
-              onClick={handleSubmit} 
-              className="sm:flex-1"
-              disabled={isLoading || isSaving}
-            >
-              {isLoading || isSaving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Αναζήτηση...
-                </>
-              ) : (
-                "Αναζήτηση"
-              )}
-            </Button>
-          </div>
-        </div>
+        <DialogHeader title="Αναζήτηση Γραφείων Τελετών" />
+        
+        <SearchFormContent
+          selectedRegion={selectedRegion}
+          selectedPrefecture={selectedPrefecture}
+          selectedServices={selectedServices}
+          availablePrefectures={availablePrefectures}
+          phoneNumber={phoneNumber}
+          isLoading={isLoading || isSaving}
+          onRegionChange={setSelectedRegion}
+          onPrefectureChange={setSelectedPrefecture}
+          onServiceToggle={handleServiceToggle}
+          onPhoneNumberChange={setPhoneNumber}
+          onReset={handleReset}
+          onSubmit={handleSubmit}
+          regions={Object.keys(REGIONS_AND_PREFECTURES)}
+        />
       </DialogContent>
     </Dialog>
   );

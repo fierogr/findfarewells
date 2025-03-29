@@ -8,16 +8,32 @@ import { toast } from "@/components/ui/use-toast";
 export const useSearchResults = (initialLocation: string, prefecture: string | null = null) => {
   const { funeralHomes, loading: fetchLoading, error, fetchFuneralHomes: originalFetchFuneralHomes } = useFuneralHomeFetch();
   const [isSearching, setIsSearching] = useState(false);
+  const [lastSearchParams, setLastSearchParams] = useState<{
+    location: string;
+    prefecture: string | null;
+    services: string[];
+  } | null>(null);
   
   // Wrap the original fetch function to include prefecture filtering and loading state
   const fetchFuneralHomes = useCallback(
     async (location: string, prefecture: string | null = null, services: string[] = []) => {
+      // Avoid duplicate searches with the same parameters
+      const searchParamsString = JSON.stringify({ location, prefecture, services });
+      const lastParamsString = lastSearchParams ? JSON.stringify(lastSearchParams) : null;
+      
+      if (searchParamsString === lastParamsString && lastParamsString !== null) {
+        console.log("Skipping duplicate search with same parameters");
+        return;
+      }
+      
       setIsSearching(true);
       console.log(`Fetching funeral homes for location: "${location}", prefecture: "${prefecture}"`);
       
       try {
         // First get all funeral homes for the location
         await originalFetchFuneralHomes(location, prefecture, services);
+        // Update last search params to prevent duplicate searches
+        setLastSearchParams({ location, prefecture, services });
       } catch (error) {
         console.error("Error in search:", error);
         toast({
@@ -32,7 +48,7 @@ export const useSearchResults = (initialLocation: string, prefecture: string | n
         }, 800); // Match the progress interval from LoadingState
       }
     },
-    [originalFetchFuneralHomes]
+    [originalFetchFuneralHomes, lastSearchParams]
   );
   
   // Apply prefecture filter to funeral homes
@@ -53,13 +69,6 @@ export const useSearchResults = (initialLocation: string, prefecture: string | n
     toggleRegionSelection,
     clearFilters
   } = useFuneralHomeFiltering(prefectureFilteredHomes);
-
-  // Initial fetch on component mount or location/prefecture change
-  useEffect(() => {
-    if (initialLocation || prefecture) {
-      fetchFuneralHomes(initialLocation, prefecture);
-    }
-  }, [initialLocation, prefecture, fetchFuneralHomes]);
 
   // Combined loading state
   const loading = fetchLoading || isSearching;

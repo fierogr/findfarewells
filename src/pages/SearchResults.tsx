@@ -20,6 +20,7 @@ const SearchResults = () => {
   const searchServices = searchParams.get("services") ? searchParams.get("services")!.split(',') : [];
   
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [initialSearchDone, setInitialSearchDone] = useState(false);
 
   const {
     sortedHomes,
@@ -37,26 +38,47 @@ const SearchResults = () => {
     clearFilters
   } = useSearchResults(searchLocation, searchPrefecture);
 
+  // Initial fetch on component mount
   useEffect(() => {
-    console.log("Search parameters changed:", {
-      prefecture: searchPrefecture,
-      services: searchServices
-    });
-    
-    // Initial fetch based on URL parameters
-    fetchFuneralHomes(searchLocation, searchPrefecture, searchServices);
-    
-    // Set initial services from URL to the filter state
-    if (searchServices.length > 0) {
-      // Reset services to avoid duplicating selections
-      clearFilters();
+    if (!initialSearchDone) {
+      console.log("Initial search with parameters:", {
+        prefecture: searchPrefecture,
+        services: searchServices
+      });
       
-      // Then add each service from the URL
+      // Initial fetch based on URL parameters
+      fetchFuneralHomes(searchLocation, searchPrefecture, searchServices);
+      
+      // Set initial services from URL to the filter state
+      if (searchServices.length > 0) {
+        // Reset services to avoid duplicating selections
+        clearFilters();
+        
+        // Then add each service from the URL
+        searchServices.forEach(service => {
+          toggleServiceSelection(service);
+        });
+      }
+      
+      setInitialSearchDone(true);
+    }
+  }, [searchLocation, searchPrefecture, fetchFuneralHomes, clearFilters, toggleServiceSelection, searchServices, initialSearchDone]);
+
+  // Re-run search when the URL parameters change
+  useEffect(() => {
+    // Only run this effect if the initial search has already been done
+    // and when actual URL parameters change
+    if (initialSearchDone) {
+      console.log("URL parameters changed, running new search");
+      fetchFuneralHomes(searchLocation, searchPrefecture, searchServices);
+      
+      // Update selected services
+      clearFilters();
       searchServices.forEach(service => {
         toggleServiceSelection(service);
       });
     }
-  }, [fetchFuneralHomes, searchLocation, searchPrefecture, searchServices, toggleServiceSelection, clearFilters]);
+  }, [location.search, initialSearchDone]);
 
   const handleClearFilters = () => {
     clearFilters();

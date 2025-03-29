@@ -27,7 +27,15 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
-          style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }}
+          style={{ 
+            width: '100%', 
+            height: '150%', // Increased height to eliminate black bars
+            objectFit: 'cover', 
+            pointerEvents: 'none',
+            position: 'absolute',
+            top: '-25%', // Adjust vertical position to center the video
+            left: 0
+          }}
         ></iframe>
       </div>
       

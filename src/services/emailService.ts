@@ -2,10 +2,10 @@
 /**
  * Email Service
  * 
- * This is a placeholder for a real email service implementation.
- * In a production environment, this would connect to an email service provider
- * like SendGrid, Mailgun, or your own SMTP server through a backend API.
+ * This service manages email notifications and settings.
  */
+
+import { supabase } from "@/integrations/supabase/client";
 
 interface EmailContent {
   to: string;
@@ -13,45 +13,73 @@ interface EmailContent {
   body: string;
 }
 
-// Local storage key for admin email
-const ADMIN_EMAIL_STORAGE_KEY = 'riprice_admin_email';
+// Supabase table name for settings
+const SETTINGS_TABLE = 'settings';
 
 /**
- * Get the admin email from localStorage or return the default
+ * Get the admin email from database or return the default
  */
-export const getAdminEmail = (): string => {
-  const storedEmail = localStorage.getItem(ADMIN_EMAIL_STORAGE_KEY);
-  return storedEmail || 'admin@riprice.com';
+export const getAdminEmail = async (): Promise<string> => {
+  try {
+    const { data, error } = await supabase
+      .from(SETTINGS_TABLE)
+      .select('value')
+      .eq('key', 'admin_email')
+      .single();
+    
+    if (error || !data) {
+      console.error('Error fetching admin email:', error);
+      return 'admin@riprice.com';
+    }
+    
+    return data.value;
+  } catch (error) {
+    console.error('Error in getAdminEmail:', error);
+    return 'admin@riprice.com';
+  }
 };
 
 /**
- * Set the admin email in localStorage
+ * Set the admin email in the database
  */
-export const setAdminEmail = (email: string): void => {
-  localStorage.setItem(ADMIN_EMAIL_STORAGE_KEY, email);
-};
-
-/**
- * Sends an email notification
- * NOTE: This is a mock implementation and doesn't actually send emails.
- * In a real app, this would be connected to your email service provider API.
- */
-export const sendEmail = async (content: EmailContent): Promise<boolean> => {
-  // This is where you would call your email service provider API
-  console.log('Email would be sent with the following content:', content);
-  
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Return true to simulate successful email sending
-  return true;
+export const setAdminEmail = async (email: string): Promise<boolean> => {
+  try {
+    // Check if the admin_email setting already exists
+    const { data } = await supabase
+      .from(SETTINGS_TABLE)
+      .select('*')
+      .eq('key', 'admin_email')
+      .single();
+    
+    if (data) {
+      // Update existing record
+      const { error } = await supabase
+        .from(SETTINGS_TABLE)
+        .update({ value: email })
+        .eq('key', 'admin_email');
+      
+      if (error) throw error;
+    } else {
+      // Insert new record
+      const { error } = await supabase
+        .from(SETTINGS_TABLE)
+        .insert({ key: 'admin_email', value: email });
+      
+      if (error) throw error;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error saving admin email:', error);
+    return false;
+  }
 };
 
 /**
  * Sends a partner registration notification to the admin
  */
 export const sendPartnerRegistrationNotification = async (partnerData: any): Promise<boolean> => {
-  const adminEmail = getAdminEmail();
+  const adminEmail = await getAdminEmail();
   
   const subject = `Νέα αίτηση συνεργάτη: ${partnerData.businessName}`;
   
@@ -81,9 +109,14 @@ export const sendPartnerRegistrationNotification = async (partnerData: any): Pro
     Ημερομηνία αίτησης: ${new Date().toLocaleString('el-GR')}
   `;
   
-  return await sendEmail({
+  // Since we're implementing a real email system with the edge function,
+  // this function could be enhanced to call that function instead of the mock implementation
+  console.log('Email would be sent with the following content:', {
     to: adminEmail,
     subject,
     body: emailBody
   });
+  
+  // Return true to simulate successful email sending
+  return true;
 };

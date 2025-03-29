@@ -47,14 +47,27 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
 
     // Save the search request to the database
     try {
-      const { error } = await supabase.from('search_requests').insert({
+      // Insert the search request
+      const { data: insertedData, error } = await supabase.from('search_requests').insert({
         location: selectedRegion,
         prefecture: selectedPrefecture,
         services: selectedServices.length > 0 ? selectedServices : null,
         phone_number: phoneNumber
-      });
+      }).select('id').single();
 
       if (error) throw error;
+      
+      // If insertion was successful, trigger the notification edge function
+      if (insertedData?.id) {
+        try {
+          await supabase.functions.invoke('notify-search-request', {
+            body: { id: insertedData.id }
+          });
+        } catch (notifyError) {
+          // Just log the error but don't show to user
+          console.error('Error sending notification:', notifyError);
+        }
+      }
     } catch (error) {
       console.error('Error saving search request:', error);
       // Don't show error to user, just log it

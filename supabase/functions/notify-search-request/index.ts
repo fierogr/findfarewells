@@ -1,6 +1,9 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Resend } from "npm:resend@2.0.0";
+
+const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -39,19 +42,58 @@ serve(async (req) => {
         { headers: { 'Content-Type': 'application/json', ...corsHeaders }, status: 400 }
       );
     }
+
+    // Get admin email from settings table or use default
+    const { data: settings } = await supabaseAdmin
+      .from('settings')
+      .select('value')
+      .eq('key', 'admin_email')
+      .single();
     
-    // You'd typically send an email notification here using a service like SendGrid, Resend, etc.
-    // For now, we'll just log the details
-    console.log('New search request received:');
-    console.log('Phone Number:', searchRequest.phone_number);
-    console.log('Location:', searchRequest.location);
-    console.log('Prefecture:', searchRequest.prefecture);
-    console.log('Services:', searchRequest.services);
-    console.log('Created At:', searchRequest.created_at);
+    const adminEmail = settings?.value || 'admin@riprice.com';
+    
+    // Format services for email display
+    const servicesDisplay = searchRequest.services 
+      ? searchRequest.services.join(', ') 
+      : 'Καμία συγκεκριμένη υπηρεσία';
+    
+    // Format the date in Greek format
+    const createdAtDate = new Date(searchRequest.created_at);
+    const formattedDate = createdAtDate.toLocaleDateString('el-GR', {
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    // Send email using Resend
+    const emailResponse = await resend.emails.send({
+      from: 'Riprice <onboarding@resend.dev>',
+      to: adminEmail,
+      subject: `Νέο αίτημα αναζήτησης για ${searchRequest.prefecture}`,
+      html: `
+        <h2>Νέο αίτημα αναζήτησης</h2>
+        <p>Ένας χρήστης αναζήτησε γραφεία τελετών με τα ακόλουθα στοιχεία:</p>
+        
+        <h3>Στοιχεία Αναζήτησης:</h3>
+        <ul>
+          <li><strong>Περιοχή:</strong> ${searchRequest.location}</li>
+          <li><strong>Νομός:</strong> ${searchRequest.prefecture}</li>
+          <li><strong>Τηλέφωνο επικοινωνίας:</strong> ${searchRequest.phone_number}</li>
+          <li><strong>Ζητούμενες υπηρεσίες:</strong> ${servicesDisplay}</li>
+          <li><strong>Ημερομηνία αίτησης:</strong> ${formattedDate}</li>
+        </ul>
+        
+        <p>Μπορείτε να δείτε όλα τα αιτήματα αναζήτησης στον <a href="${Deno.env.get('PUBLIC_SITE_URL') || 'https://riprice.com'}/admin">πίνακα διαχείρισης</a>.</p>
+      `,
+    });
+    
+    console.log('Email notification sent:', emailResponse);
     
     // Return success response
     return new Response(
-      JSON.stringify({ success: true, message: 'Notification would be sent here' }),
+      JSON.stringify({ success: true, message: 'Email notification sent successfully' }),
       { headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
     

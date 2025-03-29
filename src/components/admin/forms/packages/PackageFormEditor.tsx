@@ -5,17 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { FUNERAL_HOME_SERVICES } from "@/constants/services";
 
 interface PackageFormData {
   name: string;
   description: string;
   price: string;
-  includedServices: string;
+  includedServices: string[];
 }
 
 interface PackageFormEditorProps {
   formData: PackageFormData;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleServiceToggle: (service: string) => void;
   handleAddPackage: () => void;
   resetForm: () => void;
   editIndex: number | null;
@@ -24,6 +27,7 @@ interface PackageFormEditorProps {
 const PackageFormEditor = ({ 
   formData, 
   handleChange, 
+  handleServiceToggle,
   handleAddPackage, 
   resetForm, 
   editIndex 
@@ -75,15 +79,24 @@ const PackageFormEditor = ({
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="includedServices" className="text-sm font-medium">Περιλαμβανόμενες Υπηρεσίες (χωρισμένες με κόμμα)</label>
-          <Textarea
-            id="includedServices"
-            name="includedServices"
-            value={formData.includedServices}
-            onChange={handleChange}
-            placeholder="π.χ. Βασική φροντίδα, Μεταφορά, Τελετή..."
-            rows={3}
-          />
+          <label className="text-sm font-medium">Περιλαμβανόμενες Υπηρεσίες</label>
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            {FUNERAL_HOME_SERVICES.map((service) => (
+              <div key={service} className="flex items-center space-x-2">
+                <Checkbox 
+                  id={`service-${service}`}
+                  checked={formData.includedServices.includes(service)}
+                  onCheckedChange={() => handleServiceToggle(service)}
+                />
+                <label
+                  htmlFor={`service-${service}`}
+                  className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {service}
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
       </CardContent>
       <CardFooter className="flex justify-end gap-2">

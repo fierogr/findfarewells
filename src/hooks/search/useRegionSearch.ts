@@ -17,7 +17,8 @@ export const useRegionSearch = () => {
   // Update available prefectures when region changes
   useEffect(() => {
     if (selectedRegion) {
-      setAvailablePrefectures(REGIONS_AND_PREFECTURES[selectedRegion] || []);
+      const prefectures = REGIONS_AND_PREFECTURES[selectedRegion];
+      setAvailablePrefectures(prefectures ? [...prefectures] : []);
       setSelectedPrefecture(""); // Reset prefecture when region changes
     } else {
       setAvailablePrefectures([]);
@@ -43,7 +44,10 @@ export const useRegionSearch = () => {
         phone_number: phoneNumber || ""
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error saving search request:', error);
+        return false;
+      }
       
       console.log("Search request saved successfully");
       return true;
@@ -85,13 +89,21 @@ export const useRegionSearch = () => {
     });
 
     // Construct the search URL with parameters
-    const prefectureParam = selectedPrefecture ? `prefecture=${encodeURIComponent(selectedPrefecture)}` : '';
-    const servicesParam = selectedServices.length > 0 
-      ? `services=${encodeURIComponent(selectedServices.join(','))}` 
-      : '';
+    const params = new URLSearchParams();
     
-    const searchParams = [prefectureParam, servicesParam].filter(Boolean).join('&');
-    const searchUrl = `/search${searchParams ? `?${searchParams}` : ''}`;
+    if (selectedRegion) {
+      params.set('region', selectedRegion);
+    }
+    
+    if (selectedPrefecture) {
+      params.set('prefecture', selectedPrefecture);
+    }
+    
+    if (selectedServices.length > 0) {
+      params.set('services', selectedServices.join(','));
+    }
+    
+    const searchUrl = `/search${params.toString() ? `?${params.toString()}` : ''}`;
     
     navigate(searchUrl);
   };

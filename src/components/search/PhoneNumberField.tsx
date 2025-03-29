@@ -11,9 +11,9 @@ interface PhoneNumberFieldProps {
 }
 
 const PhoneNumberField: React.FC<PhoneNumberFieldProps> = ({ 
-  value, 
+  value = "", 
   onChange, 
-  disabled 
+  disabled = false
 }) => {
   return (
     <div className="space-y-2">

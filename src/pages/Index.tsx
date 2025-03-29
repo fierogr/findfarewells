@@ -24,7 +24,7 @@ const Index = () => {
       params.set("prefecture", formData.prefecture);
     }
     
-    if (formData.services.length > 0) {
+    if (formData.services && formData.services.length > 0) {
       params.set("services", formData.services.join(','));
     }
     

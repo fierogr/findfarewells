@@ -65,6 +65,36 @@ const SearchResults = () => {
     fetchFuneralHomes();
   };
 
+  const handleNewSearch = (formData: { location: string; prefecture: string | null; services: string[] }) => {
+    // Construct URL parameters
+    const params = new URLSearchParams();
+    
+    if (formData.location) {
+      params.set("location", formData.location);
+    }
+    
+    if (formData.prefecture) {
+      params.set("prefecture", formData.prefecture);
+    }
+    
+    if (formData.services.length > 0) {
+      params.set("services", formData.services.join(','));
+    }
+    
+    // Navigate to search results with new parameters
+    navigate(`/search?${params.toString()}`);
+    
+    // Close the search dialog
+    setIsSearchOpen(false);
+    
+    // Fetch funeral homes with new parameters
+    fetchFuneralHomes(
+      formData.location, 
+      formData.prefecture, 
+      formData.services
+    );
+  };
+
   return (
     <div className="container py-8">
       <h1 className="text-3xl font-bold mb-6">Αποτελέσματα Αναζήτησης</h1>
@@ -75,6 +105,7 @@ const SearchResults = () => {
             variant="outline" 
             className="flex items-center gap-2"
             onClick={() => setIsSearchOpen(true)}
+            disabled={loading}
           >
             <Filter className="h-4 w-4" />
             Νέα Αναζήτηση
@@ -83,6 +114,7 @@ const SearchResults = () => {
           <SortButton 
             sortOrder={sortOrder}
             onClick={toggleSortOrder}
+            disabled={loading || sortedHomes.length <= 1}
           />
         </div>
       </div>
@@ -125,7 +157,12 @@ const SearchResults = () => {
       {/* Search dialog */}
       <RegionSearchDialog 
         open={isSearchOpen} 
-        onOpenChange={setIsSearchOpen} 
+        onOpenChange={setIsSearchOpen}
+        onSearch={handleNewSearch}
+        initialLocation={searchLocation}
+        initialPrefecture={searchPrefecture}
+        initialServices={searchServices}
+        isLoading={loading}
       />
 
       {/* Search results */}

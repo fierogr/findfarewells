@@ -1,11 +1,10 @@
 
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Phone } from "lucide-react";
+import { Phone, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import RegionPrefectureSelect from "./RegionPrefectureSelect";
 import ServicesCheckboxes from "./ServicesCheckboxes";
@@ -17,10 +16,22 @@ import { supabase } from "@/integrations/supabase/client";
 interface RegionSearchDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSearch?: (data: { location: string; prefecture: string | null; services: string[] }) => void;
+  initialLocation?: string;
+  initialPrefecture?: string | null;
+  initialServices?: string[];
+  isLoading?: boolean;
 }
 
-const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => {
-  const navigate = useNavigate();
+const RegionSearchDialog = ({ 
+  open, 
+  onOpenChange,
+  onSearch,
+  initialLocation = "",
+  initialPrefecture = null,
+  initialServices = [],
+  isLoading = false
+}: RegionSearchDialogProps) => {
   const {
     selectedRegion,
     selectedPrefecture,
@@ -31,15 +42,43 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
     setPhoneNumber,
     setSelectedRegion,
     setSelectedPrefecture,
+    setSelectedServices,
     handleServiceToggle,
-    handleReset
+    handleReset,
+    saveSearchRequest
   } = useRegionSearch();
 
+  // Initialize form with values from props when dialog opens
+  useEffect(() => {
+    if (open) {
+      if (initialLocation) {
+        setSelectedRegion(initialLocation);
+      }
+      
+      if (initialPrefecture) {
+        setSelectedPrefecture(initialPrefecture);
+      }
+      
+      if (initialServices && initialServices.length > 0) {
+        setSelectedServices(initialServices);
+      }
+    }
+  }, [open, initialLocation, initialPrefecture, initialServices, setSelectedRegion, setSelectedPrefecture, setSelectedServices]);
+
   const handleSubmit = async () => {
-    if (!selectedRegion || !selectedPrefecture || !phoneNumber) {
+    if (!selectedPrefecture && !selectedRegion) {
       toast({
-        title: "Απαιτούνται πεδία",
-        description: "Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία για να συνεχίσετε.",
+        title: "Απαιτούμενα πεδία",
+        description: "Παρακαλώ επιλέξτε τουλάχιστον μία περιοχή ή νομό για να συνεχίσετε.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!phoneNumber) {
+      toast({
+        title: "Απαιτούμενο πεδίο",
+        description: "Παρακαλώ εισάγετε ένα τηλέφωνο επικοινωνίας για να συνεχίσετε.",
         variant: "destructive",
       });
       return;
@@ -73,15 +112,17 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
       // Don't show error to user, just log it
     }
     
-    // Close the dialog and redirect to search results
+    // Call the onSearch callback if provided
+    if (onSearch) {
+      onSearch({
+        location: selectedRegion,
+        prefecture: selectedPrefecture,
+        services: selectedServices
+      });
+    }
+    
+    // Close the dialog
     onOpenChange(false);
-    
-    // Construct the search URL with parameters
-    const servicesParam = selectedServices.length > 0 
-      ? `&services=${encodeURIComponent(selectedServices.join(','))}` 
-      : '';
-    
-    navigate(`/search?prefecture=${encodeURIComponent(selectedPrefecture)}${servicesParam}`);
   };
 
   return (
@@ -100,6 +141,7 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
             onRegionChange={setSelectedRegion}
             onPrefectureChange={setSelectedPrefecture}
             regions={Object.keys(REGIONS_AND_PREFECTURES)}
+            disabled={isLoading || isSaving}
           />
 
           <Separator />
@@ -119,6 +161,7 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 className="pl-10"
                 required
+                disabled={isLoading || isSaving}
               />
             </div>
           </div>
@@ -130,19 +173,32 @@ const RegionSearchDialog = ({ open, onOpenChange }: RegionSearchDialogProps) => 
             services={["Πλήρεις Υπηρεσίες Κηδείας", "Αποτέφρωση", "Μεταφορά Σορού", "Μνημόσυνα", "Στολισμός", "Έκδοση Πιστοποιητικών"]}
             selectedServices={selectedServices}
             onServiceToggle={handleServiceToggle}
+            disabled={isLoading || isSaving}
           />
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-2 pt-4">
-            <Button variant="outline" onClick={handleReset} className="sm:flex-1">
+            <Button 
+              variant="outline" 
+              onClick={handleReset} 
+              className="sm:flex-1"
+              disabled={isLoading || isSaving}
+            >
               Επαναφορά
             </Button>
             <Button 
               onClick={handleSubmit} 
               className="sm:flex-1"
-              disabled={isSaving}
+              disabled={isLoading || isSaving}
             >
-              {isSaving ? "Υποβολή..." : "Αναζήτηση"}
+              {isLoading || isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Αναζήτηση...
+                </>
+              ) : (
+                "Αναζήτηση"
+              )}
             </Button>
           </div>
         </div>

@@ -17,7 +17,11 @@ export const getFuneralHomes = async (location?: string): Promise<FuneralHome[]>
     }
     
     // Transform database records to FuneralHome objects
-    const homes = data.map(transformPartnerToFuneralHome);
+    const homes = data.map(record => {
+      console.log(`Processing record with ID: ${record.id}, regions:`, record.regions);
+      return transformPartnerToFuneralHome(record);
+    });
+    
     console.log(`Fetched ${homes.length} funeral homes from Supabase`);
     return homes;
   } catch (error) {
@@ -48,6 +52,7 @@ export const getFuneralHomeById = async (id: string): Promise<FuneralHome | null
       return null;
     }
     
+    console.log('Fetched funeral home with regions:', data.regions);
     return transformPartnerToFuneralHome(data);
   } catch (error) {
     console.error('Error in getFuneralHomeById:', error);
@@ -82,6 +87,7 @@ export const addFuneralHome = async (funeralHome: FuneralHome): Promise<FuneralH
     }
     
     console.log('Successfully added funeral home to Supabase:', data.id);
+    console.log('Saved partner data with regions:', data.regions);
     return transformPartnerToFuneralHome(data);
   } catch (error) {
     console.error('Error in addFuneralHome:', error);
@@ -119,6 +125,7 @@ export const updateFuneralHome = async (id: string, updatedFuneralHome: FuneralH
     }
     
     console.log('Successfully updated funeral home in Supabase:', data.id);
+    console.log('Updated partner data with regions:', data.regions);
     return transformPartnerToFuneralHome(data);
   } catch (error) {
     console.error('Error in updateFuneralHome:', error);

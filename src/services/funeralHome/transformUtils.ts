@@ -18,8 +18,8 @@ export const transformPartnerToFuneralHome = (partner: any): FuneralHome => {
     about: partner.description || '',
     imageUrl: partner.image_url || "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80",
     coverImageUrl: "https://images.unsplash.com/photo-1468779065891-103dac4a7c48",
-    rating: partner.rating || 0,
-    reviewCount: partner.review_count || 0,
+    rating: 0, // Default value instead of using partner.rating
+    reviewCount: 0, // Default value instead of using partner.review_count
     services: Array.isArray(partner.services) ? partner.services : [],
     amenities: [],
     basicPrice: partner.packages && partner.packages.length > 0 ? 
@@ -48,8 +48,7 @@ export const transformFuneralHomeToPartner = (home: FuneralHome): any => {
     description: home.description,
     services: home.services,
     image_url: home.imageUrl,
-    rating: home.rating,
-    review_count: home.reviewCount,
+    // Removed rating and review_count as they don't exist in the database
     featured: home.featured,
     regions: home.regions,
     packages: home.packages

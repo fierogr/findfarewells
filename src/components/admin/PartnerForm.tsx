@@ -80,8 +80,8 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
         website: data.website || "",
         hours: initialData?.hours || "",
         about: initialData?.about || "",
-        rating: initialData?.rating || 0,
-        reviewCount: initialData?.reviewCount || 0,
+        rating: 0, // Default values instead of using initialData
+        reviewCount: 0, // Default values instead of using initialData
         basicPrice: basicPrice,
         featured: data.featured,
         amenities: initialData?.amenities || [],

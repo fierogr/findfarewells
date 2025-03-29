@@ -66,6 +66,9 @@ export const addFuneralHome = async (funeralHome: FuneralHome): Promise<FuneralH
     const partnerData = transformFuneralHomeToPartner(completeHome);
     delete partnerData.id; // Remove string ID to let Supabase generate a numeric ID
     
+    // Log the data we're sending to the database
+    console.log('Adding new partner with data:', partnerData);
+    
     const { data, error } = await supabase
       .from('partners')
       .insert(partnerData)
@@ -97,6 +100,9 @@ export const updateFuneralHome = async (id: string, updatedFuneralHome: FuneralH
     
     const partnerData = transformFuneralHomeToPartner(updatedFuneralHome);
     delete partnerData.id; // Remove ID from update data
+    
+    // Log the data we're sending to the database
+    console.log('Updating partner with data:', partnerData);
     
     const { data, error } = await supabase
       .from('partners')

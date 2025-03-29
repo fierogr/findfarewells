@@ -13,13 +13,17 @@ import {
 } from "@/components/ui/sheet";
 import { Filter, MapPin } from "lucide-react";
 
-// Greek services for filtering
+// Updated Greek services for filtering
 const commonServices = [
-  "Βασικό πακέτο",
-  "Αποτέφρωση",
-  "Έξτρα στολισμός", 
-  "Φαγητό",
-  "Μουσική"
+  "Βασικό πακέτο κηδείας",
+  "Οργάνωση μνημοσύνων", 
+  "Επαναπατρισμός σορών και αποστολή στο εξωτερικό",
+  "Στολισμός ναού - στεφάνια",
+  "Ιδιόκτητες αίθουσες δεξιώσεων",
+  "Λεωφορεία για τη μεταφορά των συγγενών",
+  "Αποτέφρωση - καύση νεκρών",
+  "24ωρη εξυπηρέτηση",
+  "Φαγητό - κεράσματα"
 ];
 
 // Greek regions for filtering

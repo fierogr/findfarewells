@@ -13,16 +13,14 @@ interface EmailContent {
   body: string;
 }
 
-// Supabase table name for settings
-const SETTINGS_TABLE = 'settings';
-
 /**
  * Get the admin email from database or return the default
  */
 export const getAdminEmail = async (): Promise<string> => {
   try {
+    // Now using the SQL-safe query that matches the database schema
     const { data, error } = await supabase
-      .from(SETTINGS_TABLE)
+      .from('settings')
       .select('value')
       .eq('key', 'admin_email')
       .single();
@@ -46,7 +44,7 @@ export const setAdminEmail = async (email: string): Promise<boolean> => {
   try {
     // Check if the admin_email setting already exists
     const { data } = await supabase
-      .from(SETTINGS_TABLE)
+      .from('settings')
       .select('*')
       .eq('key', 'admin_email')
       .single();
@@ -54,7 +52,7 @@ export const setAdminEmail = async (email: string): Promise<boolean> => {
     if (data) {
       // Update existing record
       const { error } = await supabase
-        .from(SETTINGS_TABLE)
+        .from('settings')
         .update({ value: email })
         .eq('key', 'admin_email');
       
@@ -62,7 +60,7 @@ export const setAdminEmail = async (email: string): Promise<boolean> => {
     } else {
       // Insert new record
       const { error } = await supabase
-        .from(SETTINGS_TABLE)
+        .from('settings')
         .insert({ key: 'admin_email', value: email });
       
       if (error) throw error;

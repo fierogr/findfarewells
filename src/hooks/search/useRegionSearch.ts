@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { REGIONS_AND_PREFECTURES } from "@/constants/geographicData";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useRegionSearch = () => {
   const navigate = useNavigate();
@@ -32,24 +33,33 @@ export const useRegionSearch = () => {
     );
   };
 
-  // This function logs the attempt but doesn't actually save to the database
+  // This function actually saves to the database now
   const saveSearchRequest = async () => {
     try {
       setIsSaving(true);
       
-      console.log("Would save search request with data:", {
+      console.log("Saving search request with data:", {
         location: selectedRegion || null,
         prefecture: selectedPrefecture || null,
         services: selectedServices.length > 0 ? selectedServices : null,
         phone_number: phoneNumber || ""
       });
       
-      // We're not actually saving to the database due to RLS issues
-      console.log("Database save skipped - would normally save search request");
+      const { data, error } = await supabase
+        .from('search_requests')
+        .insert({
+          location: selectedRegion || null,
+          prefecture: selectedPrefecture || null,
+          services: selectedServices.length > 0 ? selectedServices : null,
+          phone_number: phoneNumber || ""
+        });
       
-      // Simulate a short delay to make the UI feel responsive
-      await new Promise(resolve => setTimeout(resolve, 300));
+      if (error) {
+        console.error('Error saving search request:', error);
+        return false;
+      }
       
+      console.log("Search request saved successfully:", data);
       return true;
     } catch (error) {
       console.error('Error in saveSearchRequest:', error);
@@ -78,8 +88,16 @@ export const useRegionSearch = () => {
       return;
     }
     
-    // Log the attempt but don't wait for it to complete
-    saveSearchRequest();
+    // Save the search request and wait for it to complete
+    const saved = await saveSearchRequest();
+    
+    if (!saved) {
+      toast({
+        title: "Σφάλμα",
+        description: "Παρουσιάστηκε πρόβλημα κατά την αποθήκευση του αιτήματος. Παρακαλώ προσπαθήστε ξανά.",
+        variant: "destructive",
+      });
+    }
     
     console.log("Search params:", {
       region: selectedRegion,

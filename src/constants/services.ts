@@ -1,5 +1,5 @@
 
-// Updated list of funeral home services
+// Updated list of funeral home services in Greek
 export const FUNERAL_HOME_SERVICES = [
   "Βασικό πακέτο κηδείας",
   "Οργάνωση μνημοσύνων", 

@@ -12,7 +12,7 @@ import { FuneralHome, ServicePackage } from "@/types/funeralHome";
 import { partnerFormSchema, PartnerFormValues } from "./forms/combinedFormSchema";
 import BasicInfoForm from "./forms/BasicInfoForm";
 import DetailsForm from "./forms/DetailsForm";
-import PackagesForm from "./forms/PackagesForm";
+import { PackagesForm } from "./forms/packages";
 import RegionsForm from "./forms/RegionsForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 

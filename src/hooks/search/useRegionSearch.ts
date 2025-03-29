@@ -9,6 +9,7 @@ export const useRegionSearch = () => {
   const [selectedPrefecture, setSelectedPrefecture] = useState<string>("");
   const [availablePrefectures, setAvailablePrefectures] = useState<string[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
   const navigate = useNavigate();
 
   // Update available prefectures when region changes
@@ -55,6 +56,7 @@ export const useRegionSearch = () => {
     setSelectedRegion("");
     setSelectedPrefecture("");
     setSelectedServices([]);
+    setPhoneNumber("");
   };
 
   return {
@@ -62,9 +64,11 @@ export const useRegionSearch = () => {
     selectedPrefecture,
     selectedServices,
     availablePrefectures,
+    phoneNumber,
     setSelectedRegion,
     setSelectedPrefecture,
     setSelectedServices,
+    setPhoneNumber,
     handleServiceToggle,
     handleSearch,
     handleReset

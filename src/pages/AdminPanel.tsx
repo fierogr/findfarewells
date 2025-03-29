@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +10,7 @@ import UserRequests from "@/components/admin/UserRequests";
 import PartnerDetails from "@/components/admin/PartnerDetails";
 import EmailSettings from "@/components/admin/EmailSettings";
 import PartnerRequests from "@/components/admin/PartnerRequests";
+import SearchRequests from "@/components/admin/SearchRequests";
 import { useFuneralHomes } from "@/hooks/useFuneralHomes";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -73,6 +73,7 @@ const AdminPanel = () => {
             <TabsTrigger value="partners">Συνεργάτες</TabsTrigger>
             <TabsTrigger value="requests">Νέες Αιτήσεις</TabsTrigger>
             <TabsTrigger value="user-requests">Αιτήματα Χρηστών</TabsTrigger>
+            <TabsTrigger value="search-requests">Αιτήματα Αναζήτησης</TabsTrigger>
             <TabsTrigger value="stats">Στατιστικά</TabsTrigger>
             <TabsTrigger value="settings">Ρυθμίσεις</TabsTrigger>
           </TabsList>
@@ -117,6 +118,21 @@ const AdminPanel = () => {
               <CardContent>
                 <ScrollArea className="h-[calc(100vh-300px)]">
                   <UserRequests />
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="search-requests">
+            <Card>
+              <CardHeader>
+                <CardTitle>Αιτήματα Αναζήτησης</CardTitle>
+                <CardDescription>
+                  Προβολή όλων των αιτημάτων αναζήτησης από χρήστες.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[calc(100vh-300px)]">
+                  <SearchRequests />
                 </ScrollArea>
               </CardContent>
             </Card>

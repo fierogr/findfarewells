@@ -150,6 +150,33 @@ export type Database = {
         }
         Relationships: []
       }
+      search_requests: {
+        Row: {
+          created_at: string
+          id: string
+          location: string | null
+          phone_number: string
+          prefecture: string | null
+          services: string[] | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          phone_number: string
+          prefecture?: string | null
+          services?: string[] | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          phone_number?: string
+          prefecture?: string | null
+          services?: string[] | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -26,6 +26,9 @@ const FuneralHomeCard = ({
     return home.basicPrice;
   };
   
+  // Get the first package or an empty array if no packages
+  const mainPackage = home.packages && home.packages.length > 0 ? home.packages[0] : null;
+  
   // Δημιουργία fallback για την περίπτωση που το URL της εικόνας είναι άκυρο ή λείπει
   const getInitials = (name: string) => {
     return name
@@ -107,38 +110,12 @@ const FuneralHomeCard = ({
             
             {/* Description */}
             <p className="line-clamp-2 text-sm text-muted-foreground mb-4">{home.description}</p>
-            
-            {/* Services offered */}
-            {home.services && home.services.length > 0 && (
-              <div className="mt-auto mb-4">
-                <h4 className="text-sm font-medium mb-2">Παρεχόμενες Υπηρεσίες:</h4>
-                <div className="flex flex-wrap gap-1">
-                  {Array.isArray(home.services) && home.services.slice(0, 3).map((service, idx) => (
-                    <span 
-                      key={idx} 
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        selectedServices.includes(service) 
-                          ? 'bg-primary/20 text-primary' 
-                          : 'bg-secondary text-secondary-foreground'
-                      }`}
-                    >
-                      {service}
-                    </span>
-                  ))}
-                  {Array.isArray(home.services) && home.services.length > 3 && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-secondary text-secondary-foreground">
-                      +{home.services.length - 3}
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
           
           <div className="p-4 md:p-6 bg-secondary flex flex-col">
             <div className="text-center mb-4">
               <p className="text-sm text-muted-foreground mb-1">
-                {home.packages && home.packages.length > 0 ? home.packages[0].name : "Βασική Υπηρεσία"} Από
+                {mainPackage ? mainPackage.name : "Βασική Υπηρεσία"} Από
               </p>
               <p className="text-3xl font-semibold text-primary">
                 ${getDisplayPrice(home).toLocaleString()}
@@ -147,7 +124,7 @@ const FuneralHomeCard = ({
             </div>
             
             <div className="space-y-2 mb-4">
-              {Array.isArray(home.services) && home.services.slice(0, 3).map((service, i) => (
+              {mainPackage && mainPackage.includedServices.slice(0, 4).map((service, i) => (
                 <div key={i} className="flex items-center text-sm">
                   <svg className="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -155,8 +132,20 @@ const FuneralHomeCard = ({
                   {service}
                 </div>
               ))}
-              {Array.isArray(home.services) && home.services.length > 3 && (
-                <p className="text-xs text-muted-foreground">+{home.services.length - 3} επιπλέον υπηρεσίες</p>
+              {mainPackage && mainPackage.includedServices.length > 4 && (
+                <p className="text-xs text-muted-foreground">+{mainPackage.includedServices.length - 4} επιπλέον υπηρεσίες</p>
+              )}
+              
+              {!mainPackage && Array.isArray(home.services) && home.services.slice(0, 4).map((service, i) => (
+                <div key={i} className="flex items-center text-sm">
+                  <svg className="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {service}
+                </div>
+              ))}
+              {!mainPackage && Array.isArray(home.services) && home.services.length > 4 && (
+                <p className="text-xs text-muted-foreground">+{home.services.length - 4} επιπλέον υπηρεσίες</p>
               )}
             </div>
             

@@ -3,7 +3,6 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FuneralHome } from "@/types/funeralHome";
 import BasicInfoTab from "./BasicInfoTab";
-import ServicesTab from "./ServicesTab";
 import PackagesTab from "./PackagesTab";
 import AdditionalServicesTab from "./AdditionalServicesTab";
 import RegionsTab from "./RegionsTab";
@@ -32,7 +31,6 @@ const PartnerDetailsTabs = ({
     <Tabs defaultValue="basic" className="w-full">
       <TabsList className="mb-4">
         <TabsTrigger value="basic">Βασικά Στοιχεία</TabsTrigger>
-        <TabsTrigger value="services">Υπηρεσίες</TabsTrigger>
         <TabsTrigger value="packages">Πακέτα</TabsTrigger>
         <TabsTrigger value="additional">Επιπλέον Υπηρεσίες</TabsTrigger>
         <TabsTrigger value="regions">Περιοχές Εξυπηρέτησης</TabsTrigger>
@@ -43,13 +41,6 @@ const PartnerDetailsTabs = ({
         <BasicInfoTab 
           editedHome={editedHome} 
           onInputChange={onInputChange}
-        />
-      </TabsContent>
-
-      <TabsContent value="services">
-        <ServicesTab 
-          editedHome={editedHome} 
-          onServicesChange={onServicesChange}
         />
       </TabsContent>
 

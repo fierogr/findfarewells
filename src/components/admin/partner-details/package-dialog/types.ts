@@ -1,5 +1,6 @@
 
 import { z } from "zod";
+import { FUNERAL_HOME_SERVICES } from "@/constants/services";
 
 export const packageFormSchema = z.object({
   name: z.string().min(1, { message: "Το όνομα πακέτου είναι υποχρεωτικό" }),
@@ -9,3 +10,6 @@ export const packageFormSchema = z.object({
 });
 
 export type PackageFormValues = z.infer<typeof packageFormSchema>;
+
+// Export available services for reuse
+export const availableServices = FUNERAL_HOME_SERVICES;

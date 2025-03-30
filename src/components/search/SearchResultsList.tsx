@@ -39,8 +39,9 @@ const SearchResultsList = ({
     
     homes.forEach(home => {
       if (home.packages && home.packages.length > 0) {
-        // Add each package as a separate result
-        home.packages.forEach(pkg => {
+        // For each home, add its lowest-priced package first to maintain sorting order
+        const sortedPackages = [...home.packages].sort((a, b) => a.price - b.price);
+        sortedPackages.forEach(pkg => {
           results.push({ home, package: pkg });
         });
       } else {

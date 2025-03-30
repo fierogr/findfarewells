@@ -69,18 +69,24 @@ export const useFuneralHomeFiltering = (funeralHomes: FuneralHome[]) => {
     setSelectedRegions([]);
   };
 
-  const getDisplayPrice = (home: FuneralHome) => {
-    if (home.packages && home.packages.length > 0) {
-      return home.packages[0].price;
+  // Get the lowest price from a funeral home (either from packages or basic price)
+  const getLowestPrice = (home: FuneralHome): number => {
+    if (!home.packages || home.packages.length === 0) {
+      return home.basicPrice;
     }
-    return home.basicPrice;
+    
+    // Get the minimum price from all packages
+    const minPackagePrice = Math.min(...home.packages.map(pkg => pkg.price));
+    
+    // Return the lower of basic price or minimum package price
+    return Math.min(home.basicPrice, minPackagePrice);
   };
 
+  // Sort homes by price
   const getSortedHomes = () => {
-    // For home-based sorting (not package-based)
     return [...filteredHomes].sort((a, b) => {
-      const priceA = getDisplayPrice(a);
-      const priceB = getDisplayPrice(b);
+      const priceA = getLowestPrice(a);
+      const priceB = getLowestPrice(b);
       return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
     });
   };

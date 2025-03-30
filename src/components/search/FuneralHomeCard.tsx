@@ -126,7 +126,7 @@ const FuneralHomeCard = ({
                 {mainPackage ? mainPackage.name : "Βασική Υπηρεσία"} Από
               </p>
               <p className="text-3xl font-semibold text-primary">
-                ${getDisplayPrice().toLocaleString()}
+                {getDisplayPrice().toLocaleString()}€
               </p>
               <p className="text-xs text-muted-foreground">Συν ΦΠΑ</p>
             </div>

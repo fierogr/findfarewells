@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Clock } from "lucide-react";
@@ -7,6 +8,7 @@ import { FuneralHome, ServicePackage } from "@/types/funeralHome";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface FuneralHomeCardProps {
   home: FuneralHome;
@@ -47,34 +49,36 @@ const FuneralHomeCard = ({
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
       <CardContent className="p-0">
         <div className="grid grid-cols-1 md:grid-cols-3 h-full">
-          <div className="relative aspect-video md:aspect-auto">
-            {home.imageUrl ? (
-              <img 
-                src={home.imageUrl} 
-                alt={home.name} 
-                className="w-full h-full object-cover" 
-                onError={(e) => {
-                  // Fallback to placeholder image on error
-                  (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80";
-                }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-secondary">
-                <Avatar className="h-20 w-20">
-                  <AvatarFallback className="text-xl">{getInitials(home.name)}</AvatarFallback>
-                </Avatar>
-              </div>
-            )}
-            {home.featured && (
-              <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
-                Προτεινόμενο
-              </div>
-            )}
-            {packageToShow && (
-              <div className="absolute bottom-2 right-2 bg-secondary text-xs px-2 py-1 rounded">
-                {packageToShow.name}
-              </div>
-            )}
+          <div className="relative h-full">
+            <AspectRatio ratio={16 / 9} className="md:h-full">
+              {home.imageUrl ? (
+                <img 
+                  src={home.imageUrl} 
+                  alt={home.name} 
+                  className="w-full h-full object-cover" 
+                  onError={(e) => {
+                    // Fallback to placeholder image on error
+                    (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80";
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-secondary">
+                  <Avatar className="h-20 w-20">
+                    <AvatarFallback className="text-xl">{getInitials(home.name)}</AvatarFallback>
+                  </Avatar>
+                </div>
+              )}
+              {home.featured && (
+                <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
+                  Προτεινόμενο
+                </div>
+              )}
+              {packageToShow && (
+                <div className="absolute bottom-2 right-2 bg-secondary text-xs px-2 py-1 rounded">
+                  {packageToShow.name}
+                </div>
+              )}
+            </AspectRatio>
           </div>
           
           <div className="p-4 md:p-6 flex flex-col">

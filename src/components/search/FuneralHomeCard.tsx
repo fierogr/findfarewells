@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Clock } from "lucide-react";
@@ -22,6 +21,7 @@ const FuneralHomeCard = ({
   packageToShow = null
 }: FuneralHomeCardProps) => {
   const isMobile = useIsMobile();
+  const [imageError, setImageError] = React.useState(false);
   
   const getDisplayPrice = () => {
     if (packageToShow) {
@@ -45,20 +45,44 @@ const FuneralHomeCard = ({
       .substring(0, 2);
   };
   
+  // Default fallback image
+  const fallbackImage = "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80";
+  
+  // Normalize image URL to handle edge cases
+  const normalizeImageUrl = (url: string | undefined): string => {
+    if (!url || url.trim() === '') {
+      console.log("Missing image URL for", home.name);
+      return fallbackImage;
+    }
+    
+    // If the URL is already a full URL, return it
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    
+    // If it's a relative URL, convert to absolute
+    if (url.startsWith('/')) {
+      return `${window.location.origin}${url}`;
+    }
+    
+    console.log("Using fallback for invalid URL:", url);
+    return fallbackImage;
+  };
+  
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
       <CardContent className="p-0">
         <div className="grid grid-cols-1 md:grid-cols-3 h-full">
           <div className="relative h-full">
             <AspectRatio ratio={16 / 9} className="md:h-full">
-              {home.imageUrl ? (
+              {!imageError && home.imageUrl ? (
                 <img 
-                  src={home.imageUrl} 
+                  src={normalizeImageUrl(home.imageUrl)} 
                   alt={home.name} 
                   className="w-full h-full object-cover" 
                   onError={(e) => {
-                    // Fallback to placeholder image on error
-                    (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80";
+                    console.log("Image load error for:", home.name, home.imageUrl);
+                    setImageError(true);
                   }}
                 />
               ) : (

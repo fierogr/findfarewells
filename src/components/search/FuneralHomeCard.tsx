@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Clock } from "lucide-react";
@@ -34,7 +33,7 @@ const FuneralHomeCard = ({
   // Get the package to display - either the provided one or the first one
   const mainPackage = packageToShow || (home.packages && home.packages.length > 0 ? home.packages[0] : null);
   
-  // Δημιουργία fallback για την περίπτωση που το URL της εικόνας είναι άκυρο ή λείπει
+  // Create initials for Avatar fallback
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -55,7 +54,7 @@ const FuneralHomeCard = ({
                 alt={home.name} 
                 className="w-full h-full object-cover" 
                 onError={(e) => {
-                  // Σε περίπτωση σφάλματος φόρτωσης, αλλάζουμε σε εικόνα placeholder
+                  // Fallback to placeholder image on error
                   (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80";
                 }}
               />

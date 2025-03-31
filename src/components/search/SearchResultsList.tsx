@@ -145,7 +145,7 @@ const SearchResultsList = ({
     );
   }
   
-  // If no results found, show empty state (no blinking toast anymore)
+  // If no results found, show empty state
   if (homes.length === 0) {
     return (
       <EmptyResults 

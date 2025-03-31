@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Clock } from "lucide-react";
@@ -13,12 +14,16 @@ interface FuneralHomeCardProps {
   home: FuneralHome;
   selectedServices: string[];
   packageToShow?: ServicePackage | null;
+  onSelectPackage?: (home: FuneralHome, packageToShow: ServicePackage | null) => Promise<void>;
+  isSelecting?: boolean;
 }
 
 const FuneralHomeCard = ({
   home,
   selectedServices,
-  packageToShow = null
+  packageToShow = null,
+  onSelectPackage,
+  isSelecting = false
 }: FuneralHomeCardProps) => {
   const isMobile = useIsMobile();
   const [imageError, setImageError] = React.useState(false);
@@ -67,6 +72,12 @@ const FuneralHomeCard = ({
     
     console.log("Using fallback for invalid URL:", url);
     return fallbackImage;
+  };
+
+  const handleSelectPackage = () => {
+    if (onSelectPackage) {
+      onSelectPackage(home, mainPackage);
+    }
   };
   
   return (
@@ -185,6 +196,16 @@ const FuneralHomeCard = ({
               <Link to={`/funeral-home/${home.id}`}>
                 <Button className="w-full">Προβολή Λεπτομερειών</Button>
               </Link>
+              {onSelectPackage && (
+                <Button 
+                  variant="secondary" 
+                  className="w-full" 
+                  onClick={handleSelectPackage}
+                  disabled={isSelecting}
+                >
+                  {isSelecting ? "Επεξεργασία..." : "Επιλογή Πακέτου"}
+                </Button>
+              )}
               <Button variant="outline" className="w-full">Επικοινωνία</Button>
             </div>
           </div>

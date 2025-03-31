@@ -17,7 +17,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 }) => {
   return (
     <section className="relative py-20 md:py-32 overflow-hidden">
-      {/* Video Background */}
+      {/* Video Background - Increased height by 30% */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-black/50 z-10"></div>
         <iframe 
@@ -29,11 +29,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           allowFullScreen
           style={{ 
             width: '100%', 
-            height: '150%', // Increased height to eliminate black bars
+            height: '195%', // Increased from 150% to 195% (30% increase)
             objectFit: 'cover', 
             pointerEvents: 'none',
             position: 'absolute',
-            top: '-25%', // Adjust vertical position to center the video
+            top: '-32.5%', // Adjusted from -25% to -32.5% to maintain centering
             left: 0
           }}
         ></iframe>

@@ -90,7 +90,9 @@ const SearchResultsList = ({
         return;
       }
       
-      const { error } = await supabase
+      // Use a type assertion to bypass TypeScript's type checking
+      // This is a temporary solution until the Supabase types can be regenerated
+      const { error } = await (supabase as any)
         .from('package_selections')
         .insert({
           location: searchLocation || null,

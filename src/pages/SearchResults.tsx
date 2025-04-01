@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import FilterSheet from "@/components/search/FilterSheet";
@@ -18,7 +18,7 @@ const SearchResults = () => {
   const searchServices = searchParams.get("services") ? searchParams.get("services")!.split(',') : [];
   
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [initialSearchDone, setInitialSearchDone] = useState(false);
+  const initialSearchDone = useRef(false);
 
   const {
     sortedHomes,
@@ -36,10 +36,11 @@ const SearchResults = () => {
     clearFilters
   } = useSearchResults(searchLocation, searchPrefecture);
 
-  // Initial fetch on component mount
+  // Initial fetch on component mount - only once
   useEffect(() => {
-    if (!initialSearchDone) {
+    if (!initialSearchDone.current) {
       console.log("Initial search with parameters:", {
+        location: searchLocation,
         prefecture: searchPrefecture,
         services: searchServices
       });
@@ -58,32 +59,37 @@ const SearchResults = () => {
         });
       }
       
-      setInitialSearchDone(true);
+      initialSearchDone.current = true;
     }
-  }, [searchLocation, searchPrefecture, fetchFuneralHomes, clearFilters, toggleServiceSelection, searchServices, initialSearchDone]);
+  }, [searchLocation, searchPrefecture, fetchFuneralHomes, clearFilters, toggleServiceSelection, searchServices]);
 
-  // Re-run search when the URL parameters change
+  // Re-run search when the URL parameters change (only if initial search is done)
   useEffect(() => {
+    const currentParams = new URLSearchParams(location.search);
+    const currentLocation = currentParams.get("location") || "";
+    const currentPrefecture = currentParams.get("prefecture") || null;
+    const currentServices = currentParams.get("services") ? currentParams.get("services")!.split(',') : [];
+
     // Only run this effect if the initial search has already been done
     // and when actual URL parameters change
-    if (initialSearchDone) {
+    if (initialSearchDone.current) {
       console.log("URL parameters changed, running new search");
-      fetchFuneralHomes(searchLocation, searchPrefecture, searchServices);
+      fetchFuneralHomes(currentLocation, currentPrefecture, currentServices);
       
       // Update selected services
       clearFilters();
-      searchServices.forEach(service => {
+      currentServices.forEach(service => {
         toggleServiceSelection(service);
       });
     }
-  }, [location.search, initialSearchDone, clearFilters, fetchFuneralHomes, searchLocation, searchPrefecture, searchServices, toggleServiceSelection]);
+  }, [location.search, clearFilters, fetchFuneralHomes, toggleServiceSelection]);
 
   const handleClearFilters = () => {
     clearFilters();
     // Reset URL parameters
     navigate('/search');
     // Fetch all funeral homes without filters
-    fetchFuneralHomes(searchLocation);
+    fetchFuneralHomes("", null, []);
   };
 
   const handleNewSearch = (formData: { location: string; prefecture: string | null; services: string[] }) => {
@@ -108,12 +114,7 @@ const SearchResults = () => {
     // Close the search dialog
     setIsSearchOpen(false);
     
-    // Fetch funeral homes with new parameters
-    fetchFuneralHomes(
-      formData.location, 
-      formData.prefecture, 
-      formData.services
-    );
+    // Fetch funeral homes with new parameters - this will be triggered by the URL change effect
   };
 
   return (

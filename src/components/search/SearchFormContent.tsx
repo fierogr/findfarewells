@@ -61,9 +61,19 @@ const SearchFormContent: React.FC<SearchFormContentProps> = ({
 
       <Separator />
 
-      {/* Services Checkboxes */}
+      {/* Services Checkboxes - Updated with new service list */}
       <ServicesCheckboxes 
-        services={["Πλήρεις Υπηρεσίες Κηδείας", "Αποτέφρωση", "Μεταφορά Σορού", "Μνημόσυνα", "Στολισμός", "Έκδοση Πιστοποιητικών"]}
+        services={[
+          "Βασικό πακέτο κηδείας",
+          "Οργάνωση μνημοσύνων", 
+          "Επαναπατρισμός σορών και αποστολή στο εξωτερικό",
+          "Στολισμός ναού - στεφάνια",
+          "Ιδιόκτητες αίθουσες δεξιώσεων",
+          "Λεωφορεία για τη μεταφορά των συγγενών",
+          "Αποτέφρωση - καύση νεκρών",
+          "24ωρη εξυπηρέτηση",
+          "Φαγητό - κεράσματα"
+        ]}
         selectedServices={selectedServices}
         onServiceToggle={onServiceToggle}
         disabled={isLoading}

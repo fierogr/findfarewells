@@ -1,4 +1,3 @@
-
 import { FuneralHome } from '@/types/funeralHome';
 
 // Mock data for funeral homes
@@ -21,11 +20,11 @@ export const mockFuneralHomes: FuneralHome[] = [
     rating: 4.8,
     reviewCount: 124,
     services: [
-      "Traditional Funeral Services",
-      "Cremation Services",
-      "Memorial Services",
-      "Pre-Planning Services",
-      "Grief Support"
+      "Βασικό πακέτο κηδείας",
+      "Οργάνωση μνημοσύνων", 
+      "Επαναπατρισμός σορών και αποστολή στο εξωτερικό",
+      "Στολισμός ναού - στεφάνια",
+      "24ωρη εξυπηρέτηση"
     ],
     amenities: [
       "Chapel Seating for 150",
@@ -151,7 +150,8 @@ export const mockFuneralHomes: FuneralHome[] = [
         date: "January 22, 2023",
         comment: "We were very pleased with the services provided by Peaceful Haven. The facilities were beautiful and the staff was knowledgeable and supportive. The only reason for 4 stars instead of 5 is that there was a small miscommunication about timing, but they resolved it quickly."
       }
-    ]
+    ],
+    regions: ["Νομός Θεσσαλονίκης", "Νομός Σερρών"]
   },
   {
     id: "2",
@@ -170,11 +170,11 @@ export const mockFuneralHomes: FuneralHome[] = [
     rating: 4.6,
     reviewCount: 98,
     services: [
-      "Traditional Funerals",
-      "Cremation Services",
-      "Green Burial Options",
-      "Pre-Planning",
-      "Online Memorials"
+      "Βασικό πακέτο κηδείας",
+      "Αποτέφρωση - καύση νεκρών",
+      "Ιδιόκτητες αίθουσες δεξιώσεων",
+      "Φαγητό - κεράσματα", 
+      "24ωρη εξυπηρέτηση"
     ],
     amenities: [
       "Modern Chapel for 200",
@@ -296,7 +296,8 @@ export const mockFuneralHomes: FuneralHome[] = [
         date: "February 17, 2023",
         comment: "From start to finish, Eternal Rest provided exceptional service. They guided us through every decision with patience and understanding. The celebration of life they helped us create for my husband was perfect."
       }
-    ]
+    ],
+    regions: ["Νομός Θεσσαλονίκης", "Νομός Κιλκίς"]
   },
   {
     id: "3",
@@ -315,12 +316,11 @@ export const mockFuneralHomes: FuneralHome[] = [
     rating: 4.9,
     reviewCount: 156,
     services: [
-      "Traditional Funeral Services",
-      "Cremation Options",
-      "Memorial Services",
-      "Veteran Services",
-      "International Shipping",
-      "Preplanning"
+      "Βασικό πακέτο κηδείας",
+      "Αποτέφρωση - καύση νεκρών",
+      "Ιδιόκτητες αίθουσες δεξιώσεων",
+      "Φαγητό - κεράσματα",
+      "24ωρη εξυπηρέτηση"
     ],
     amenities: [
       "Historic Chapel",
@@ -445,7 +445,8 @@ export const mockFuneralHomes: FuneralHome[] = [
         date: "March 30, 2023",
         comment: "Very professional staff and beautiful facilities. They were accommodating of our cultural traditions and helped us create a meaningful service. The only minor issue was parking limitations on a particularly busy day."
       }
-    ]
+    ],
+    regions: ["Νομός Θεσσαλονίκης", "Νομός Κιλκίς"]
   },
   {
     id: "4",
@@ -464,11 +465,11 @@ export const mockFuneralHomes: FuneralHome[] = [
     rating: 4.7,
     reviewCount: 89,
     services: [
-      "Traditional Services",
-      "Cremation Services",
-      "Outdoor Ceremonies",
-      "Riverside Scattering",
-      "Pre-Planning Options"
+      "Βασικό πακέτο κηδείας",
+      "Αποτέφρωση - καύση νεκρών",
+      "Ιδιόκτητες αίθουσες δεξιώσεων",
+      "Φαγητό - κεράσματα",
+      "24ωρη εξυπηρέτηση"
     ],
     amenities: [
       "Riverside Chapel",
@@ -587,7 +588,8 @@ export const mockFuneralHomes: FuneralHome[] = [
         date: "February 28, 2023",
         comment: "Riverside Chapel provided an exceptional experience during a difficult time. The waterfront setting was calming, and the staff showed genuine care for our family. They accommodated all our requests and helped us create a truly personal service."
       }
-    ]
+    ],
+    regions: ["Νομός Θεσσαλονίκης", "Νομός Κιλκίς"]
   },
   {
     id: "5",
@@ -606,12 +608,11 @@ export const mockFuneralHomes: FuneralHome[] = [
     rating: 4.5,
     reviewCount: 112,
     services: [
-      "Traditional Services",
-      "Cremation Options",
-      "Cultural & Religious Ceremonies",
-      "Veterans Services",
-      "International Repatriation",
-      "Preplanning"
+      "Βασικό πακέτο κηδείας",
+      "Αποτέφρωση - καύση νεκρών",
+      "Ιδιόκτητες αίθουσες δεξιώσεων",
+      "Φαγητό - κεράσματα",
+      "24ωρη εξυπηρέτηση"
     ],
     amenities: [
       "Historic Chapel",
@@ -731,6 +732,7 @@ export const mockFuneralHomes: FuneralHome[] = [
         date: "March 18, 2023",
         comment: "They honored our Chinese funeral customs perfectly and handled all aspects with dignity. The funeral director was knowledgeable about our traditions and guided us through the process with patience and understanding. We are deeply grateful for their exceptional service during this difficult time."
       }
-    ]
+    ],
+    regions: ["Νομός Θεσσαλονίκης", "Νομός Κιλκίς"]
   }
 ];

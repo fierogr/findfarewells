@@ -12,7 +12,7 @@ import { FuneralHome, ServicePackage } from "@/types/funeralHome";
 import { partnerFormSchema, PartnerFormValues } from "./forms/combinedFormSchema";
 import BasicInfoForm from "./forms/BasicInfoForm";
 import DetailsForm from "./forms/DetailsForm";
-import PackagesForm from "./forms/PackagesForm";
+import { PackagesForm } from "./forms/packages";
 import RegionsForm from "./forms/RegionsForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -62,6 +62,11 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
     try {
       setIsSubmitting(true);
       
+      // Calculate basicPrice from the first package if available
+      const basicPrice = packages.length > 0 ? packages[0].price : 0;
+      
+      console.log("Submitting form with regions:", selectedRegions);
+      
       const partnerData: FuneralHome = {
         id: initialData?.id || crypto.randomUUID(),
         name: data.name,
@@ -77,9 +82,9 @@ const PartnerForm = ({ open, onClose, onSave, initialData }: PartnerFormProps) =
         website: data.website || "",
         hours: initialData?.hours || "",
         about: initialData?.about || "",
-        rating: initialData?.rating || 0,
-        reviewCount: initialData?.reviewCount || 0,
-        basicPrice: packages.length > 0 ? packages[0].price : (initialData?.basicPrice || 0),
+        rating: 0, // Default values instead of using initialData
+        reviewCount: 0, // Default values instead of using initialData
+        basicPrice: basicPrice,
         featured: data.featured,
         amenities: initialData?.amenities || [],
         packages: packages,

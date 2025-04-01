@@ -9,12 +9,14 @@ export const filterHomesByPrefecture = (homes: any[], prefecture: string | null)
     return homes;
   }
   
-  return homes.filter(home => {
+  console.log(`Filtering by prefecture ${prefecture}, homes before filter:`, homes.length);
+  
+  const filtered = homes.filter(home => {
     // If home.regions is null, convert it to an empty array
     const regions = home.regions || [];
     
     // Check if the home has regions and if the prefecture is included
-    return Array.isArray(regions) && regions.some(region => {
+    const included = Array.isArray(regions) && regions.some(region => {
       // Case-insensitive comparison
       if (typeof region === 'string') {
         return region.toLowerCase() === prefecture.toLowerCase() || 
@@ -23,7 +25,16 @@ export const filterHomesByPrefecture = (homes: any[], prefecture: string | null)
       }
       return false;
     });
+    
+    if (included) {
+      console.log(`Home ${home.name} matches prefecture ${prefecture} with regions:`, regions);
+    }
+    
+    return included;
   });
+  
+  console.log(`Filtered by prefecture ${prefecture}: ${filtered.length} homes match`);
+  return filtered;
 };
 
 /**
@@ -64,7 +75,7 @@ export const filterHomesByRegion = async (
     const isMatch = cityMatch || stateMatch || addressMatch || regionMatch || nameMatch;
     
     if (isMatch) {
-      console.log(`Match found for "${location}" in home: ${home.name}`);
+      console.log(`Match found for "${location}" in home: ${home.name}, regions:`, home.regions);
       filteredHomes.push(home);
     }
   }

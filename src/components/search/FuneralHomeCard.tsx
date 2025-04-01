@@ -4,29 +4,43 @@ import { Link } from "react-router-dom";
 import { MapPin, Phone, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { FuneralHome } from "@/types/funeralHome";
+import { FuneralHome, ServicePackage } from "@/types/funeralHome";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface FuneralHomeCardProps {
   home: FuneralHome;
   selectedServices: string[];
+  packageToShow?: ServicePackage | null;
+  onSelectPackage?: (home: FuneralHome, packageToShow: ServicePackage | null) => Promise<void>;
+  isSelecting?: boolean;
 }
 
 const FuneralHomeCard = ({
   home,
-  selectedServices
+  selectedServices,
+  packageToShow = null,
+  onSelectPackage,
+  isSelecting = false
 }: FuneralHomeCardProps) => {
   const isMobile = useIsMobile();
+  const [imageError, setImageError] = React.useState(false);
   
-  const getDisplayPrice = (home: FuneralHome) => {
-    if (home.packages && home.packages.length > 0) {
+  const getDisplayPrice = () => {
+    if (packageToShow) {
+      return packageToShow.price;
+    } else if (home.packages && home.packages.length > 0) {
       return home.packages[0].price;
     }
     return home.basicPrice;
   };
   
-  // Δημιουργία fallback για την περίπτωση που το URL της εικόνας είναι άκυρο ή λείπει
+  // Get the package to display - either the provided one or the first one
+  const mainPackage = packageToShow || (home.packages && home.packages.length > 0 ? home.packages[0] : null);
+  
+  // Create initials for Avatar fallback
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -36,38 +50,70 @@ const FuneralHomeCard = ({
       .substring(0, 2);
   };
   
-  console.log("Rendering FuneralHomeCard for:", home.name);
-  console.log("Regions:", home.regions);
-  console.log("Services:", home.services);
-  console.log("Image URL:", home.imageUrl);
+  // Default fallback image
+  const fallbackImage = "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80";
+  
+  // Normalize image URL to handle edge cases
+  const normalizeImageUrl = (url: string | undefined): string => {
+    if (!url || url.trim() === '') {
+      console.log("Missing image URL for", home.name);
+      return fallbackImage;
+    }
+    
+    // If the URL is already a full URL, return it
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    
+    // If it's a relative URL, convert to absolute
+    if (url.startsWith('/')) {
+      return `${window.location.origin}${url}`;
+    }
+    
+    console.log("Using fallback for invalid URL:", url);
+    return fallbackImage;
+  };
+
+  const handleSelectPackage = () => {
+    if (onSelectPackage) {
+      onSelectPackage(home, mainPackage);
+    }
+  };
   
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
       <CardContent className="p-0">
         <div className="grid grid-cols-1 md:grid-cols-3 h-full">
-          <div className="relative aspect-video md:aspect-auto">
-            {home.imageUrl ? (
-              <img 
-                src={home.imageUrl} 
-                alt={home.name} 
-                className="w-full h-full object-cover" 
-                onError={(e) => {
-                  // Σε περίπτωση σφάλματος φόρτωσης, αλλάζουμε σε εικόνα placeholder
-                  (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80";
-                }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-secondary">
-                <Avatar className="h-20 w-20">
-                  <AvatarFallback className="text-xl">{getInitials(home.name)}</AvatarFallback>
-                </Avatar>
-              </div>
-            )}
-            {home.featured && (
-              <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
-                Προτεινόμενο
-              </div>
-            )}
+          <div className="relative h-full">
+            <AspectRatio ratio={16 / 9} className="md:h-full">
+              {!imageError && home.imageUrl ? (
+                <img 
+                  src={normalizeImageUrl(home.imageUrl)} 
+                  alt={home.name} 
+                  className="w-full h-full object-cover" 
+                  onError={(e) => {
+                    console.log("Image load error for:", home.name, home.imageUrl);
+                    setImageError(true);
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-secondary">
+                  <Avatar className="h-20 w-20">
+                    <AvatarFallback className="text-xl">{getInitials(home.name)}</AvatarFallback>
+                  </Avatar>
+                </div>
+              )}
+              {home.featured && (
+                <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
+                  Προτεινόμενο
+                </div>
+              )}
+              {packageToShow && (
+                <div className="absolute bottom-2 right-2 bg-secondary text-xs px-2 py-1 rounded">
+                  {packageToShow.name}
+                </div>
+              )}
+            </AspectRatio>
           </div>
           
           <div className="p-4 md:p-6 flex flex-col">
@@ -107,47 +153,21 @@ const FuneralHomeCard = ({
             
             {/* Description */}
             <p className="line-clamp-2 text-sm text-muted-foreground mb-4">{home.description}</p>
-            
-            {/* Services offered */}
-            {home.services && home.services.length > 0 && (
-              <div className="mt-auto mb-4">
-                <h4 className="text-sm font-medium mb-2">Παρεχόμενες Υπηρεσίες:</h4>
-                <div className="flex flex-wrap gap-1">
-                  {Array.isArray(home.services) && home.services.slice(0, 3).map((service, idx) => (
-                    <span 
-                      key={idx} 
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        selectedServices.includes(service) 
-                          ? 'bg-primary/20 text-primary' 
-                          : 'bg-secondary text-secondary-foreground'
-                      }`}
-                    >
-                      {service}
-                    </span>
-                  ))}
-                  {Array.isArray(home.services) && home.services.length > 3 && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-secondary text-secondary-foreground">
-                      +{home.services.length - 3}
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
           
           <div className="p-4 md:p-6 bg-secondary flex flex-col">
             <div className="text-center mb-4">
               <p className="text-sm text-muted-foreground mb-1">
-                {home.packages && home.packages.length > 0 ? home.packages[0].name : "Βασική Υπηρεσία"} Από
+                {mainPackage ? mainPackage.name : "Βασική Υπηρεσία"} Από
               </p>
               <p className="text-3xl font-semibold text-primary">
-                ${getDisplayPrice(home).toLocaleString()}
+                {getDisplayPrice().toLocaleString()}€
               </p>
               <p className="text-xs text-muted-foreground">Συν ΦΠΑ</p>
             </div>
             
             <div className="space-y-2 mb-4">
-              {Array.isArray(home.services) && home.services.slice(0, 3).map((service, i) => (
+              {mainPackage && mainPackage.includedServices.slice(0, 4).map((service, i) => (
                 <div key={i} className="flex items-center text-sm">
                   <svg className="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -155,8 +175,20 @@ const FuneralHomeCard = ({
                   {service}
                 </div>
               ))}
-              {Array.isArray(home.services) && home.services.length > 3 && (
-                <p className="text-xs text-muted-foreground">+{home.services.length - 3} επιπλέον υπηρεσίες</p>
+              {mainPackage && mainPackage.includedServices.length > 4 && (
+                <p className="text-xs text-muted-foreground">+{mainPackage.includedServices.length - 4} επιπλέον υπηρεσίες</p>
+              )}
+              
+              {!mainPackage && Array.isArray(home.services) && home.services.slice(0, 4).map((service, i) => (
+                <div key={i} className="flex items-center text-sm">
+                  <svg className="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {service}
+                </div>
+              ))}
+              {!mainPackage && Array.isArray(home.services) && home.services.length > 4 && (
+                <p className="text-xs text-muted-foreground">+{home.services.length - 4} επιπλέον υπηρεσίες</p>
               )}
             </div>
             
@@ -164,6 +196,16 @@ const FuneralHomeCard = ({
               <Link to={`/funeral-home/${home.id}`}>
                 <Button className="w-full">Προβολή Λεπτομερειών</Button>
               </Link>
+              {onSelectPackage && (
+                <Button 
+                  variant="secondary" 
+                  className="w-full" 
+                  onClick={handleSelectPackage}
+                  disabled={isSelecting}
+                >
+                  {isSelecting ? "Επεξεργασία..." : "Επιλογή Πακέτου"}
+                </Button>
+              )}
               <Button variant="outline" className="w-full">Επικοινωνία</Button>
             </div>
           </div>

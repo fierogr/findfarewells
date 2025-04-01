@@ -49,7 +49,7 @@ const Navbar = () => {
             </Link>
           </Button>
           
-          {isAdmin && (
+          {isAuthenticated && isAdmin && (
             <Button variant="ghost" size="sm" asChild>
               <Link to="/admin" className="flex items-center">
                 <Shield className="mr-1.5 h-4 w-4" />

@@ -19,6 +19,7 @@ const AdminLogin = () => {
   // Redirect to admin page if already authenticated and is admin
   useEffect(() => {
     if (isAuthenticated && isAdmin) {
+      console.log("Already authenticated and admin, redirecting to admin panel");
       navigate("/admin");
     }
   }, [isAuthenticated, isAdmin, navigate]);
@@ -34,11 +35,10 @@ const AdminLogin = () => {
         toast.success("Επιτυχής σύνδεση");
         
         // Force navigation to admin page after successful login
-        // with a larger delay to ensure auth state is updated
         setTimeout(() => {
-          console.log("Redirecting to admin panel...");
-          navigate("/admin");
-        }, 1000); // Increased delay to ensure auth state is properly updated
+          console.log("Login successful, redirecting to admin panel");
+          navigate("/admin", { replace: true });
+        }, 1500); // Increased delay to ensure auth state is properly updated
       }
     } catch (err) {
       console.error("Login error:", err);

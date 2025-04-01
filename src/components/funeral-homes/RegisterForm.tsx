@@ -6,6 +6,7 @@ import { BusinessInfoFields } from "./registration/BusinessInfoFields";
 import { ContactInfoFields } from "./registration/ContactInfoFields";
 import { AddressFields } from "./registration/AddressFields";
 import { DescriptionFields } from "./registration/DescriptionFields";
+import { RegionsFields } from "./registration/RegionsFields";
 import { SubmitButton } from "./registration/SubmitButton";
 import { useRegistrationForm } from "./registration/useRegistrationForm";
 
@@ -33,7 +34,11 @@ export const RegisterForm = () => {
           
           <DescriptionFields form={form} />
           
-          {/* Remove RegionsFields component as requested */}
+          <RegionsFields 
+            form={form} 
+            selectedRegions={selectedRegions} 
+            setSelectedRegions={setSelectedRegions} 
+          />
           
           <SubmitButton 
             isSubmitting={isSubmitting} 

@@ -1,5 +1,5 @@
 
-import React, { useMemo } from "react";
+import React from "react";
 import FuneralHomeCard from "./FuneralHomeCard";
 import LoadingState from "./LoadingState";
 import EmptyResults from "./EmptyResults";
@@ -33,19 +33,17 @@ const SearchResultsList = ({
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 10;
   
-  // Expand homes to include all packages - memoized for performance
-  const expandedResults = useMemo(() => {
-    if (loading || homes.length === 0) return [];
-    
+  // Expand homes to include all packages
+  const expandedResults = React.useMemo(() => {
     const results: PackageWithHome[] = [];
     
     homes.forEach(home => {
-      if (Array.isArray(home.packages) && home.packages.length > 0) {
+      if (home.packages && home.packages.length > 0) {
         // For each home, add its lowest-priced package first to maintain sorting order
         const sortedPackages = [...home.packages].sort((a, b) => a.price - b.price);
-        
-        // Only add the first (lowest price) package to avoid duplication
-        results.push({ home, package: sortedPackages[0] });
+        sortedPackages.forEach(pkg => {
+          results.push({ home, package: pkg });
+        });
       } else {
         // If no packages, add the home once with null package
         results.push({ home, package: null });
@@ -53,30 +51,21 @@ const SearchResultsList = ({
     });
     
     return results;
-  }, [homes, loading]);
+  }, [homes]);
   
-  // Paginate results - memoized for performance
-  const paginatedResults = useMemo(() => {
-    if (expandedResults.length === 0) return [];
-    
+  // Paginate results
+  const paginatedResults = React.useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return expandedResults.slice(startIndex, endIndex);
   }, [expandedResults, currentPage]);
   
-  const totalPages = Math.max(1, Math.ceil(expandedResults.length / itemsPerPage));
+  const totalPages = Math.ceil(expandedResults.length / itemsPerPage);
   
-  // Reset page when results change
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [homes.length]);
-  
-  // If still loading, show loading state
   if (loading) {
     return <LoadingState />;
   }
   
-  // If there was an error, show error state
   if (error) {
     return (
       <div className="text-center py-10">
@@ -85,7 +74,6 @@ const SearchResultsList = ({
     );
   }
   
-  // If no results found, show empty state
   if (homes.length === 0) {
     return (
       <EmptyResults 
@@ -96,7 +84,7 @@ const SearchResultsList = ({
   }
   
   return (
-    <div className="mb-10">
+    <div>
       <div className="grid grid-cols-1 gap-6 mb-6">
         {paginatedResults.map((item, index) => (
           <FuneralHomeCard 
@@ -118,7 +106,7 @@ const SearchResultsList = ({
               />
             </PaginationItem>
             
-            {Array.from({ length: totalPages }).map((_, index) => (
+            {[...Array(totalPages)].map((_, index) => (
               <PaginationItem key={index}>
                 <PaginationLink
                   onClick={() => setCurrentPage(index + 1)}

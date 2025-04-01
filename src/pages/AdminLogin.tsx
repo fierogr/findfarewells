@@ -33,10 +33,12 @@ const AdminLogin = () => {
       if (!error) {
         toast.success("Επιτυχής σύνδεση");
         
-        // Immediately check if user is admin and redirect
+        // Force navigation to admin page after successful login
+        // with a larger delay to ensure auth state is updated
         setTimeout(() => {
+          console.log("Redirecting to admin panel...");
           navigate("/admin");
-        }, 500); // Small delay to ensure auth state is updated
+        }, 1000); // Increased delay to ensure auth state is properly updated
       }
     } catch (err) {
       console.error("Login error:", err);

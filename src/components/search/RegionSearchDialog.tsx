@@ -39,6 +39,7 @@ const RegionSearchDialog = ({
     setSelectedServices,
     handleServiceToggle,
     handleReset,
+    saveSearchRequest
   } = useRegionSearch();
 
   // Initialize form with values from props when dialog opens
@@ -55,8 +56,14 @@ const RegionSearchDialog = ({
       if (initialServices && initialServices.length > 0) {
         setSelectedServices(initialServices);
       }
+      
+      // Try to restore phone number from session storage if available
+      const savedPhoneNumber = sessionStorage.getItem('searchPhoneNumber');
+      if (savedPhoneNumber) {
+        setPhoneNumber(savedPhoneNumber);
+      }
     }
-  }, [open, initialLocation, initialPrefecture, initialServices, setSelectedRegion, setSelectedPrefecture, setSelectedServices]);
+  }, [open, initialLocation, initialPrefecture, initialServices, setSelectedRegion, setSelectedPrefecture, setSelectedServices, setPhoneNumber]);
 
   const handleSubmit = async () => {
     try {
@@ -78,9 +85,14 @@ const RegionSearchDialog = ({
         });
         return;
       }
+      
+      // Save the phone number to session storage
+      if (phoneNumber) {
+        sessionStorage.setItem('searchPhoneNumber', phoneNumber);
+      }
 
-      // Skip DB storage - this would log the search attempt in development
-      console.log("Proceeding with search without saving to database");
+      // Save search request to database (this will also update sessionStorage)
+      await saveSearchRequest();
       
       // Call the onSearch callback if provided
       if (onSearch) {

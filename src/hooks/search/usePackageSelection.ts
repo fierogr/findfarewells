@@ -15,9 +15,10 @@ export const usePackageSelection = (searchLocation: string, searchPrefecture: st
       const phoneNumber = sessionStorage.getItem('searchPhoneNumber');
       
       if (!phoneNumber) {
+        // Make the error message more helpful
         toast({
-          title: "Προσοχή",
-          description: "Παρακαλώ επαναλάβετε την αναζήτηση για να καταχωρήσετε το πακέτο",
+          title: "Τηλέφωνο απαιτείται",
+          description: "Παρακαλώ επιλέξτε 'Νέα Αναζήτηση' και συμπληρώστε το τηλέφωνό σας για να συνεχίσετε.",
           variant: "destructive",
         });
         return;

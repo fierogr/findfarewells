@@ -14,6 +14,14 @@ export const useRegionSearch = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
+  // Attempt to load phone number from session storage on initial mount
+  useEffect(() => {
+    const savedPhone = sessionStorage.getItem('searchPhoneNumber');
+    if (savedPhone) {
+      setPhoneNumber(savedPhone);
+    }
+  }, []);
+
   // Update available prefectures when region changes
   useEffect(() => {
     if (selectedRegion) {
@@ -45,7 +53,7 @@ export const useRegionSearch = () => {
         phone_number: phoneNumber || ""
       });
       
-      // Save phone number to sessionStorage for later use
+      // Always save phone number to sessionStorage for later use
       if (phoneNumber) {
         sessionStorage.setItem('searchPhoneNumber', phoneNumber);
       }
@@ -134,7 +142,7 @@ export const useRegionSearch = () => {
     setSelectedRegion("");
     setSelectedPrefecture("");
     setSelectedServices([]);
-    setPhoneNumber("");
+    // Don't reset phone number to improve user experience
   };
 
   return {

@@ -31,9 +31,12 @@ const AdminLogin = () => {
       const { error } = await login(email, password);
       
       if (!error) {
-        // Check if user is admin immediately after login
-        // The auth state change will handle redirection via the useEffect above
         toast.success("Επιτυχής σύνδεση");
+        
+        // Immediately check if user is admin and redirect
+        setTimeout(() => {
+          navigate("/admin");
+        }, 500); // Small delay to ensure auth state is updated
       }
     } catch (err) {
       console.error("Login error:", err);

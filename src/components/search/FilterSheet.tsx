@@ -70,7 +70,7 @@ const FilterSheet = ({
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-[300px] sm:w-[450px] overflow-y-auto">
+      <SheetContent className="w-[300px] sm:w-[450px]">
         <SheetHeader>
           <SheetTitle>Φίλτρα</SheetTitle>
           <SheetDescription>
@@ -80,18 +80,18 @@ const FilterSheet = ({
         <Separator className="my-4" />
         
         {/* Services Section */}
-        <div className="grid grid-cols-1 gap-4 mb-6">
+        <div className="grid grid-cols-1 gap-4 my-4">
           <div className="space-y-4">
             <h3 className="font-medium">Υπηρεσίες</h3>
             {commonServices.map((service) => (
               <div key={service} className="flex items-start space-x-2">
                 <Checkbox 
-                  id={`service-${service.replace(/\s+/g, '-')}`}
+                  id={`service-${service}`}
                   checked={selectedServices.includes(service)}
                   onCheckedChange={() => onServiceToggle(service)}
                 />
                 <label
-                  htmlFor={`service-${service.replace(/\s+/g, '-')}`}
+                  htmlFor={`service-${service}`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
                   {service}
@@ -104,7 +104,7 @@ const FilterSheet = ({
         <Separator className="my-4" />
         
         {/* Regions Section */}
-        <div className="grid grid-cols-1 gap-4 mb-6">
+        <div className="grid grid-cols-1 gap-4 my-4">
           <div className="space-y-4">
             <h3 className="font-medium flex items-center gap-2">
               <MapPin className="h-4 w-4" />
@@ -113,12 +113,12 @@ const FilterSheet = ({
             {commonRegions.map((region) => (
               <div key={region} className="flex items-start space-x-2">
                 <Checkbox 
-                  id={`region-${region.replace(/\s+/g, '-')}`}
+                  id={`region-${region}`}
                   checked={selectedRegions.includes(region)}
                   onCheckedChange={() => onRegionToggle(region)}
                 />
                 <label
-                  htmlFor={`region-${region.replace(/\s+/g, '-')}`}
+                  htmlFor={`region-${region}`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
                   {region}

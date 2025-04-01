@@ -45,11 +45,6 @@ export const useRegionSearch = () => {
         phone_number: phoneNumber || ""
       });
       
-      // Save phone number to sessionStorage for later use
-      if (phoneNumber) {
-        sessionStorage.setItem('searchPhoneNumber', phoneNumber);
-      }
-      
       const { data, error } = await supabase
         .from('search_requests')
         .insert({

@@ -13,7 +13,7 @@ const SearchResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
-  const searchLocation = searchParams.get("region") || searchParams.get("location") || "";
+  const searchLocation = searchParams.get("location") || "";
   const searchPrefecture = searchParams.get("prefecture") || null;
   const searchServices = searchParams.get("services") ? searchParams.get("services")!.split(',') : [];
   
@@ -66,7 +66,7 @@ const SearchResults = () => {
   // Re-run search when the URL parameters change (only if initial search is done)
   useEffect(() => {
     const currentParams = new URLSearchParams(location.search);
-    const currentLocation = currentParams.get("region") || currentParams.get("location") || "";
+    const currentLocation = currentParams.get("location") || "";
     const currentPrefecture = currentParams.get("prefecture") || null;
     const currentServices = currentParams.get("services") ? currentParams.get("services")!.split(',') : [];
 
@@ -97,7 +97,7 @@ const SearchResults = () => {
     const params = new URLSearchParams();
     
     if (formData.location) {
-      params.set("region", formData.location);
+      params.set("location", formData.location);
     }
     
     if (formData.prefecture) {

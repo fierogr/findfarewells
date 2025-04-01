@@ -1,12 +1,13 @@
 
 import React, { useMemo, useState } from "react";
-import { FuneralHome } from "@/types/funeralHome";
+import FuneralHomeCard from "./FuneralHomeCard";
 import LoadingState from "./LoadingState";
 import EmptyResults from "./EmptyResults";
+import { FuneralHome, ServicePackage } from "@/types/funeralHome";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
-import ResultsPagination from "./results/ResultsPagination";
-import ResultsList from "./results/ResultsList";
-import { usePackageSelection } from "@/hooks/search/usePackageSelection";
 
 interface SearchResultsListProps {
   homes: FuneralHome[];
@@ -16,6 +17,11 @@ interface SearchResultsListProps {
   onClearFilters: () => void;
   searchLocation: string;
   searchPrefecture: string | null;
+}
+
+interface PackageWithHome {
+  home: FuneralHome;
+  package: ServicePackage | null;
 }
 
 const SearchResultsList = ({
@@ -28,14 +34,15 @@ const SearchResultsList = ({
   searchPrefecture
 }: SearchResultsListProps) => {
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [isSelecting, setIsSelecting] = useState<boolean>(false);
   const itemsPerPage = 10;
-  const { isSelecting, handlePackageSelect } = usePackageSelection(searchLocation, searchPrefecture);
+  const navigate = useNavigate();
   
   // Expand homes to include all packages - memoized for performance
   const expandedResults = useMemo(() => {
     if (loading || homes.length === 0) return [];
     
-    const results = [];
+    const results: PackageWithHome[] = [];
     
     homes.forEach(home => {
       if (Array.isArray(home.packages) && home.packages.length > 0) {
@@ -69,6 +76,63 @@ const SearchResultsList = ({
     setCurrentPage(1);
   }, [homes.length]);
   
+  const handlePackageSelect = async (home: FuneralHome, selectedPackage: ServicePackage | null) => {
+    setIsSelecting(true);
+    try {
+      const phoneNumber = sessionStorage.getItem('searchPhoneNumber');
+      
+      if (!phoneNumber) {
+        toast({
+          title: "Προσοχή",
+          description: "Παρακαλώ επαναλάβετε την αναζήτηση για να καταχωρήσετε το πακέτο",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Use a type assertion to bypass TypeScript's type checking
+      // This is a temporary solution until the Supabase types can be regenerated
+      const { error } = await (supabase as any)
+        .from('package_selections')
+        .insert({
+          location: searchLocation || null,
+          prefecture: searchPrefecture || null,
+          phone_number: phoneNumber,
+          partner_id: home.id,
+          partner_name: home.name,
+          package_name: selectedPackage?.name || 'Βασικό πακέτο',
+          package_price: selectedPackage?.price || home.basicPrice || 0,
+          package_id: selectedPackage?.id || null
+        });
+      
+      if (error) {
+        console.error("Error saving package selection:", error);
+        toast({
+          title: "Σφάλμα",
+          description: "Δεν ήταν δυνατή η αποθήκευση της επιλογής σας. Παρακαλώ δοκιμάστε ξανά.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Επιτυχία",
+          description: "Η επιλογή του πακέτου καταχωρήθηκε επιτυχώς!",
+        });
+        
+        // Navigate to funeral home details page
+        navigate(`/funeral-home/${home.id}`);
+      }
+    } catch (error) {
+      console.error("Error in package selection:", error);
+      toast({
+        title: "Σφάλμα",
+        description: "Προέκυψε ένα σφάλμα κατά την επιλογή πακέτου. Παρακαλώ δοκιμάστε ξανά.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSelecting(false);
+    }
+  };
+  
   // If still loading, show loading state
   if (loading) {
     return <LoadingState />;
@@ -95,18 +159,50 @@ const SearchResultsList = ({
   
   return (
     <div className="mb-10">
-      <ResultsList 
-        paginatedResults={paginatedResults}
-        selectedServices={selectedServices}
-        onSelectPackage={handlePackageSelect}
-        isSelecting={isSelecting}
-      />
+      <div className="grid grid-cols-1 gap-6 mb-6">
+        {paginatedResults.map((item, index) => (
+          <FuneralHomeCard 
+            key={`${item.home.id}-${item.package?.id || 'basic'}-${index}`}
+            home={item.home}
+            packageToShow={item.package}
+            selectedServices={selectedServices}
+            onSelectPackage={handlePackageSelect}
+            isSelecting={isSelecting}
+          />
+        ))}
+      </div>
       
-      <ResultsPagination 
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        totalPages={totalPages}
-      />
+      {totalPages > 1 && (
+        <Pagination className="mt-8">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+            
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  onClick={() => setCurrentPage(index + 1)}
+                  isActive={currentPage === index + 1}
+                  className="cursor-pointer"
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            
+            <PaginationItem>
+              <PaginationNext 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 };

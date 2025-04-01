@@ -4,6 +4,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 import { useRegionSearch } from "@/hooks/search/useRegionSearch";
 import { REGIONS_AND_PREFECTURES } from "@/constants/geographicData";
+import { supabase } from "@/integrations/supabase/client";
 import DialogHeader from "./DialogHeader";
 import SearchFormContent from "./SearchFormContent";
 
@@ -60,7 +61,7 @@ const RegionSearchDialog = ({
 
   const handleSubmit = async () => {
     try {
-      // Validate form inputs - require at least location or phone
+      // Validate form inputs
       if (!phoneNumber) {
         toast({
           title: "Απαιτούμενο πεδίο",
@@ -79,8 +80,29 @@ const RegionSearchDialog = ({
         return;
       }
 
-      // Skip DB storage - this would log the search attempt in development
-      console.log("Proceeding with search without saving to database");
+      // Save the search request to the database
+      const { data: insertedData, error } = await supabase.from('search_requests').insert({
+        location: selectedRegion || null,
+        prefecture: selectedPrefecture || null,
+        services: selectedServices.length > 0 ? selectedServices : null,
+        phone_number: phoneNumber
+      }).select('id').single();
+
+      if (error) throw error;
+      
+      // If insertion was successful, trigger the notification edge function
+      if (insertedData?.id) {
+        try {
+          await supabase.functions.invoke('notify-search-request', {
+            body: { id: insertedData.id }
+          });
+        } catch (notifyError) {
+          // Just log the error but don't show to user
+          console.error('Error sending notification:', notifyError);
+        }
+      }
+
+      console.log("Search request saved successfully, calling onSearch callback");
       
       // Call the onSearch callback if provided
       if (onSearch) {
@@ -97,10 +119,10 @@ const RegionSearchDialog = ({
       onOpenChange(false);
       
     } catch (error) {
-      console.error('Error during search process:', error);
+      console.error('Error saving search request:', error);
       toast({
         title: "Σφάλμα",
-        description: "Παρουσιάστηκε σφάλμα κατά την επεξεργασία του αιτήματος. Παρακαλώ δοκιμάστε ξανά.",
+        description: "Παρουσιάστηκε σφάλμα κατά την αποθήκευση του αιτήματος. Παρακαλώ δοκιμάστε ξανά.",
         variant: "destructive",
       });
     }
@@ -109,10 +131,7 @@ const RegionSearchDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader 
-          title="Αναζήτηση Γραφείων Τελετών" 
-          description="Συμπληρώστε τα παρακάτω πεδία για να βρείτε γραφεία τελετών στην περιοχή σας."
-        />
+        <DialogHeader title="Αναζήτηση Γραφείων Τελετών" />
         
         <SearchFormContent
           selectedRegion={selectedRegion}

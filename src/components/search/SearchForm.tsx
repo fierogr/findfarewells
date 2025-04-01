@@ -15,7 +15,7 @@ interface SearchFormProps {
 
 const SearchForm = ({ 
   location = "", 
-  phoneNumber = "", 
+  phoneNumber = "",
   onLocationChange, 
   onPhoneNumberChange,
   onSubmit,
@@ -32,8 +32,8 @@ const SearchForm = ({
     e.preventDefault();
     if (isLoading) return;
     
-    // Only submit if at least one field has been filled out and form was touched
-    if (isTouched && ((location && location.trim()) || (phoneNumber && phoneNumber.trim()))) {
+    // Only submit if at least one field has been filled out
+    if ((location && location.trim()) || (phoneNumber && phoneNumber.trim())) {
       onSubmit(e);
     }
   };

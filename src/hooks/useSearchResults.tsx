@@ -1,5 +1,5 @@
 
-import { useEffect, useCallback, useState, useRef } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useFuneralHomeFetch } from "./search/useFuneralHomeFetch";
 import { useFuneralHomeFiltering } from "./search/useFuneralHomeFiltering";
 import { filterHomesByPrefecture } from "@/utils/searchUtils";
@@ -13,18 +13,10 @@ export const useSearchResults = (initialLocation: string, prefecture: string | n
     prefecture: string | null;
     services: string[];
   } | null>(null);
-  const initialSearchCompleted = useRef(false);
   
   // Wrap the original fetch function to include prefecture filtering and loading state
   const fetchFuneralHomes = useCallback(
     async (location: string, prefecture: string | null = null, services: string[] = []) => {
-      // Skip empty searches
-      if (!location && !prefecture && (!services || services.length === 0)) {
-        if (initialSearchCompleted.current) {
-          return;
-        }
-      }
-      
       // Avoid duplicate searches with the same parameters
       const searchParamsString = JSON.stringify({ location, prefecture, services });
       const lastParamsString = lastSearchParams ? JSON.stringify(lastSearchParams) : null;
@@ -42,7 +34,6 @@ export const useSearchResults = (initialLocation: string, prefecture: string | n
         await originalFetchFuneralHomes(location, prefecture, services);
         // Update last search params to prevent duplicate searches
         setLastSearchParams({ location, prefecture, services });
-        initialSearchCompleted.current = true;
       } catch (error) {
         console.error("Error in search:", error);
         toast({

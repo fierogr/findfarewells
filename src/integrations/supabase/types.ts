@@ -84,53 +84,6 @@ export type Database = {
         }
         Relationships: []
       }
-      package_selections: {
-        Row: {
-          created_at: string
-          id: string
-          location: string | null
-          package_id: string | null
-          package_name: string
-          package_price: number
-          partner_id: number | null
-          partner_name: string
-          phone_number: string
-          prefecture: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          location?: string | null
-          package_id?: string | null
-          package_name: string
-          package_price: number
-          partner_id?: number | null
-          partner_name: string
-          phone_number: string
-          prefecture?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          location?: string | null
-          package_id?: string | null
-          package_name?: string
-          package_price?: number
-          partner_id?: number | null
-          partner_name?: string
-          phone_number?: string
-          prefecture?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "package_selections_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "partners"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       partners: {
         Row: {
           address: string | null

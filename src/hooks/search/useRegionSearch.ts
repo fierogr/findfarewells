@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { REGIONS_AND_PREFECTURES } from "@/constants/geographicData";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 export const useRegionSearch = () => {
   const navigate = useNavigate();
@@ -33,36 +33,27 @@ export const useRegionSearch = () => {
     );
   };
 
-  // This function actually saves to the database now
   const saveSearchRequest = async () => {
     try {
       setIsSaving(true);
       
-      console.log("Saving search request with data:", {
+      const { error } = await supabase.from('search_requests').insert({
         location: selectedRegion || null,
         prefecture: selectedPrefecture || null,
         services: selectedServices.length > 0 ? selectedServices : null,
         phone_number: phoneNumber || ""
       });
-      
-      const { data, error } = await supabase
-        .from('search_requests')
-        .insert({
-          location: selectedRegion || null,
-          prefecture: selectedPrefecture || null,
-          services: selectedServices.length > 0 ? selectedServices : null,
-          phone_number: phoneNumber || ""
-        });
-      
+
       if (error) {
         console.error('Error saving search request:', error);
         return false;
       }
       
-      console.log("Search request saved successfully:", data);
+      console.log("Search request saved successfully");
       return true;
     } catch (error) {
-      console.error('Error in saveSearchRequest:', error);
+      console.error('Error saving search request:', error);
+      // Don't show error to user, just log it
       return false;
     } finally {
       setIsSaving(false);
@@ -88,16 +79,8 @@ export const useRegionSearch = () => {
       return;
     }
     
-    // Save the search request and wait for it to complete
-    const saved = await saveSearchRequest();
-    
-    if (!saved) {
-      toast({
-        title: "Σφάλμα",
-        description: "Παρουσιάστηκε πρόβλημα κατά την αποθήκευση του αιτήματος. Παρακαλώ προσπαθήστε ξανά.",
-        variant: "destructive",
-      });
-    }
+    // Save the search request to the database
+    await saveSearchRequest();
     
     console.log("Search params:", {
       region: selectedRegion,

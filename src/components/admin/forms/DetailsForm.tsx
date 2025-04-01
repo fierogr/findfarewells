@@ -1,3 +1,4 @@
+
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
@@ -18,17 +19,18 @@ const formSchema = z.object({
   featured: z.boolean().default(false),
 });
 
-// Updated funeral services in Greece
+// Common funeral services in Greece
 const availableServices = [
-  { id: "basic_funeral", label: "Βασικό πακέτο κηδείας" },
-  { id: "memorial", label: "Οργάνωση μνημοσύνων" },
-  { id: "repatriation", label: "Επαναπατρισμός σορών και αποστολή στο εξωτερικό" },
-  { id: "decoration", label: "Στολισμός ναού - στεφάνια" },
-  { id: "reception_halls", label: "Ιδιόκτητες αίθουσες δεξιώσεων" },
-  { id: "transport", label: "Λεωφορεία για τη μεταφορά των συγγενών" },
-  { id: "cremation", label: "Αποτέφρωση - καύση νεκρών" },
-  { id: "24h_service", label: "24ωρη εξυπηρέτηση" },
-  { id: "catering", label: "Φαγητό - κεράσματα" },
+  { id: "funeral", label: "Κηδεία" },
+  { id: "memorial", label: "Μνημόσυνο" },
+  { id: "transport", label: "Μεταφορά σορού" },
+  { id: "cremation", label: "Αποτέφρωση" },
+  { id: "embalming", label: "Ταρίχευση" },
+  { id: "flowers", label: "Άνθη/Στεφάνια" },
+  { id: "documentation", label: "Έγγραφα/Άδειες" },
+  { id: "obituary", label: "Αγγελία/Νεκρολογία" },
+  { id: "catering", label: "Μπουφές/Καφές" },
+  { id: "chapel", label: "Ιδιωτικό παρεκκλήσι" },
 ];
 
 interface DetailsFormProps {

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { FuneralHome, ServicePackage } from "@/types/funeralHome";
+import { FuneralHome } from "@/types/funeralHome";
 
 export const useFuneralHomeFiltering = (funeralHomes: FuneralHome[]) => {
   const [filteredHomes, setFilteredHomes] = useState<FuneralHome[]>([]);
@@ -19,13 +19,7 @@ export const useFuneralHomeFiltering = (funeralHomes: FuneralHome[]) => {
         selectedServices.every(service => 
           home.services.some(homeService => 
             homeService.toLowerCase().includes(service.toLowerCase())
-          ) || 
-          // Also check services in packages
-          (home.packages && home.packages.some(pkg => 
-            pkg.includedServices.some(includedService => 
-              includedService.toLowerCase().includes(service.toLowerCase())
-            )
-          ))
+          )
         )
       );
     }
@@ -69,24 +63,17 @@ export const useFuneralHomeFiltering = (funeralHomes: FuneralHome[]) => {
     setSelectedRegions([]);
   };
 
-  // Get the lowest price from a funeral home (either from packages or basic price)
-  const getLowestPrice = (home: FuneralHome): number => {
-    if (!home.packages || home.packages.length === 0) {
-      return home.basicPrice;
+  const getDisplayPrice = (home: FuneralHome) => {
+    if (home.packages && home.packages.length > 0) {
+      return home.packages[0].price;
     }
-    
-    // Get the minimum price from all packages
-    const minPackagePrice = Math.min(...home.packages.map(pkg => pkg.price));
-    
-    // Return the lower of basic price or minimum package price
-    return Math.min(home.basicPrice, minPackagePrice);
+    return home.basicPrice;
   };
 
-  // Sort homes by price
   const getSortedHomes = () => {
     return [...filteredHomes].sort((a, b) => {
-      const priceA = getLowestPrice(a);
-      const priceB = getLowestPrice(b);
+      const priceA = getDisplayPrice(a);
+      const priceB = getDisplayPrice(b);
       return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
     });
   };

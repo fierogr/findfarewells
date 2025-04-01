@@ -6,17 +6,13 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Filter, MapPin } from "lucide-react";
 
-// Updated Greek services for filtering
+// Greek services for filtering - reusing the same list from FilterSheet
 const commonServices = [
-  "Βασικό πακέτο κηδείας",
-  "Οργάνωση μνημοσύνων",
-  "Επαναπατρισμός σορών και αποστολή στο εξωτερικό",
-  "Στολισμός ναού - στεφάνια",
-  "Ιδιόκτητες αίθουσες δεξιώσεων",
-  "Λεωφορεία για τη μεταφορά των συγγενών",
-  "Αποτέφρωση - καύση νεκρών",
-  "24ωρη εξυπηρέτηση",
-  "Φαγητό - κεράσματα"
+  "Βασικό πακέτο",
+  "Αποτέφρωση",
+  "Έξτρα στολισμός", 
+  "Φαγητό",
+  "Μουσική"
 ];
 
 // Greek regions for filtering

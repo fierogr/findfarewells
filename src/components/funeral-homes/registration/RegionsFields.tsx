@@ -4,7 +4,8 @@ import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/for
 import { Checkbox } from "@/components/ui/checkbox";
 import { UseFormReturn } from "react-hook-form";
 import { RegistrationFormValues } from "@/schemas/registrationFormSchema";
-import { REGIONS_AND_PREFECTURES } from "@/constants/geographicData";
+
+const greekRegions = ["Νομός Θεσσαλονίκης", "Νομός Σερρών", "Νομός Κιλκίς", "Νομός Πέλλας", "Νομός Ημαθίας", "Νομός Χαλκιδικής"];
 
 interface RegionsFieldsProps {
   form: UseFormReturn<RegistrationFormValues>;
@@ -29,27 +30,20 @@ export const RegionsFields = ({
     <div className="space-y-4">
       <FormItem>
         <FormLabel>Περιοχές Εξυπηρέτησης</FormLabel>
-        <div className="mt-2 space-y-6">
-          {Object.entries(REGIONS_AND_PREFECTURES).map(([region, prefectures]) => (
-            <div key={region} className="space-y-2">
-              <h4 className="font-medium text-sm">{region}</h4>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {prefectures.map((prefecture) => (
-                  <div key={prefecture} className="flex items-center space-x-2">
-                    <Checkbox 
-                      id={`region-${prefecture}`}
-                      checked={selectedRegions.includes(prefecture)}
-                      onCheckedChange={() => toggleRegion(prefecture)}
-                    />
-                    <label
-                      htmlFor={`region-${prefecture}`}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      {prefecture}
-                    </label>
-                  </div>
-                ))}
-              </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+          {greekRegions.map((region) => (
+            <div key={region} className="flex items-center space-x-2">
+              <Checkbox 
+                id={`region-${region}`}
+                checked={selectedRegions.includes(region)}
+                onCheckedChange={() => toggleRegion(region)}
+              />
+              <label
+                htmlFor={`region-${region}`}
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {region}
+              </label>
             </div>
           ))}
         </div>

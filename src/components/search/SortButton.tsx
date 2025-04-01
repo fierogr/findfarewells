@@ -1,17 +1,15 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDownUp } from "lucide-react";
 
 export interface SortButtonProps {
   sortOrder: "asc" | "desc";
   onClick: () => void;
-  disabled?: boolean;
+  disabled?: boolean; // Add optional disabled property
 }
 
 const SortButton = ({ sortOrder, onClick, disabled }: SortButtonProps) => {
-  const isAscending = sortOrder === "asc";
-  
   return (
     <Button 
       variant="outline" 
@@ -20,12 +18,8 @@ const SortButton = ({ sortOrder, onClick, disabled }: SortButtonProps) => {
       onClick={onClick}
       disabled={disabled}
     >
-      {isAscending ? (
-        <ArrowUp className="h-4 w-4" />
-      ) : (
-        <ArrowDown className="h-4 w-4" />
-      )}
-      Τιμή: {isAscending ? "Χαμηλή → Υψηλή" : "Υψηλή → Χαμηλή"}
+      <ArrowDownUp className="h-4 w-4" />
+      Τιμή {sortOrder === "asc" ? "Αύξουσα" : "Φθίνουσα"}
     </Button>
   );
 };

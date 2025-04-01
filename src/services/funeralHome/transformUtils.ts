@@ -1,66 +1,57 @@
 
-import { FuneralHome } from '@/types/funeralHome';
+import { FuneralHome, ServicePackage } from '@/types/funeralHome';
 
-// Transform a database partner record to a FuneralHome object
-export const transformPartnerToFuneralHome = (partnerRecord: any): FuneralHome => {
-  console.log("Transforming partner record with regions:", partnerRecord.regions);
-  
-  // Ensure image URL is handled properly
-  let imageUrl = partnerRecord.image_url || '';
-  
-  // Make sure we have a valid URL or use a default
-  if (!imageUrl || imageUrl.trim() === '') {
-    imageUrl = 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80';
-  }
-  
+// Helper function to transform a Supabase partner record to a FuneralHome object
+export const transformPartnerToFuneralHome = (partner: any): FuneralHome => {
   return {
-    id: partnerRecord.id.toString(),
-    name: partnerRecord.name || partnerRecord.business_name || '',
-    address: partnerRecord.address || '',
-    city: partnerRecord.city || '',
-    state: partnerRecord.state || '',
-    zip: partnerRecord.zip || '',
-    phone: partnerRecord.phone || partnerRecord.telephone || '',
-    email: partnerRecord.email || '',
-    description: partnerRecord.description || '',
-    services: Array.isArray(partnerRecord.services) ? partnerRecord.services : [],
-    website: partnerRecord.website || '',
-    hours: '',
-    about: '',
-    rating: 0,
-    reviewCount: 0,
-    imageUrl: imageUrl,
-    basicPrice: 0,
-    featured: partnerRecord.featured || false,
+    id: partner.id.toString(), // Convert numeric ID to string
+    name: partner.name || '',
+    address: partner.address || '',
+    city: partner.city || '',
+    state: partner.state || '',
+    zip: partner.zip || '',
+    phone: partner.phone || partner.telephone || '',
+    email: partner.email || '',
+    website: partner.website || '',
+    hours: "Mon-Fri: 9am-5pm, Sat: 10am-2pm, Sun: Closed", // Default value
+    description: partner.description || '',
+    about: partner.description || '',
+    imageUrl: partner.image_url || "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80",
+    coverImageUrl: "https://images.unsplash.com/photo-1468779065891-103dac4a7c48",
+    rating: partner.rating || 0,
+    reviewCount: partner.review_count || 0,
+    services: Array.isArray(partner.services) ? partner.services : [],
     amenities: [],
-    packages: Array.isArray(partnerRecord.packages) ? partnerRecord.packages : [],
+    basicPrice: partner.basic_price || 0,
+    featured: partner.featured || false,
+    packages: Array.isArray(partner.packages) ? partner.packages : [],
     additionalServices: [],
     reviews: [],
-    regions: Array.isArray(partnerRecord.regions) ? partnerRecord.regions : [],
+    regions: Array.isArray(partner.regions) ? partner.regions : []
   };
 };
 
-// Transform a FuneralHome object to a database partner record
-export const transformFuneralHomeToPartner = (funeralHome: FuneralHome): any => {
-  console.log("Transforming FuneralHome to partner with regions:", funeralHome.regions);
-  
+// Helper function to transform a FuneralHome object to a Supabase partner record
+export const transformFuneralHomeToPartner = (home: FuneralHome): any => {
+  // Don't try to convert the ID to number here, handle it separately in each function
   return {
-    id: parseInt(funeralHome.id, 10),
-    name: funeralHome.name,
-    business_name: funeralHome.name,
-    address: funeralHome.address,
-    city: funeralHome.city,
-    state: funeralHome.state,
-    zip: funeralHome.zip,
-    phone: funeralHome.phone,
-    telephone: funeralHome.phone,
-    email: funeralHome.email,
-    website: funeralHome.website,
-    description: funeralHome.description,
-    services: funeralHome.services,
-    image_url: funeralHome.imageUrl,
-    featured: funeralHome.featured,
-    packages: funeralHome.packages,
-    regions: Array.isArray(funeralHome.regions) ? funeralHome.regions : [],
+    id: home.id, // This will be handled in add/update functions
+    name: home.name,
+    address: home.address,
+    city: home.city,
+    state: home.state,
+    zip: home.zip,
+    phone: home.phone,
+    email: home.email,
+    website: home.website,
+    description: home.description,
+    services: home.services,
+    image_url: home.imageUrl,
+    rating: home.rating,
+    review_count: home.reviewCount,
+    basic_price: home.basicPrice,
+    featured: home.featured,
+    regions: home.regions,
+    packages: home.packages
   };
 };

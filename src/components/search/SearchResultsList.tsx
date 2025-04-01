@@ -1,12 +1,10 @@
 
-import React, { useMemo, useState } from "react";
-import { FuneralHome } from "@/types/funeralHome";
+import React, { useMemo } from "react";
+import FuneralHomeCard from "./FuneralHomeCard";
 import LoadingState from "./LoadingState";
 import EmptyResults from "./EmptyResults";
-import { useNavigate } from "react-router-dom";
-import ResultsPagination from "./results/ResultsPagination";
-import ResultsList from "./results/ResultsList";
-import { usePackageSelection } from "@/hooks/search/usePackageSelection";
+import { FuneralHome, ServicePackage } from "@/types/funeralHome";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 interface SearchResultsListProps {
   homes: FuneralHome[];
@@ -16,6 +14,11 @@ interface SearchResultsListProps {
   onClearFilters: () => void;
   searchLocation: string;
   searchPrefecture: string | null;
+}
+
+interface PackageWithHome {
+  home: FuneralHome;
+  package: ServicePackage | null;
 }
 
 const SearchResultsList = ({
@@ -29,13 +32,12 @@ const SearchResultsList = ({
 }: SearchResultsListProps) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 10;
-  const { isSelecting, handlePackageSelect } = usePackageSelection(searchLocation, searchPrefecture);
   
   // Expand homes to include all packages - memoized for performance
   const expandedResults = useMemo(() => {
     if (loading || homes.length === 0) return [];
     
-    const results = [];
+    const results: PackageWithHome[] = [];
     
     homes.forEach(home => {
       if (Array.isArray(home.packages) && home.packages.length > 0) {
@@ -95,18 +97,48 @@ const SearchResultsList = ({
   
   return (
     <div className="mb-10">
-      <ResultsList 
-        paginatedResults={paginatedResults}
-        selectedServices={selectedServices}
-        onSelectPackage={handlePackageSelect}
-        isSelecting={isSelecting}
-      />
+      <div className="grid grid-cols-1 gap-6 mb-6">
+        {paginatedResults.map((item, index) => (
+          <FuneralHomeCard 
+            key={`${item.home.id}-${item.package?.id || 'basic'}-${index}`}
+            home={item.home}
+            packageToShow={item.package}
+            selectedServices={selectedServices}
+          />
+        ))}
+      </div>
       
-      <ResultsPagination 
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        totalPages={totalPages}
-      />
+      {totalPages > 1 && (
+        <Pagination className="mt-8">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+            
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  onClick={() => setCurrentPage(index + 1)}
+                  isActive={currentPage === index + 1}
+                  className="cursor-pointer"
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            
+            <PaginationItem>
+              <PaginationNext 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 };

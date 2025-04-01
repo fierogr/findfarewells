@@ -33,7 +33,7 @@ export const RegisterForm = () => {
           
           <DescriptionFields form={form} />
           
-          {/* Regions fields removed as requested */}
+          {/* Remove RegionsFields component as requested */}
           
           <SubmitButton 
             isSubmitting={isSubmitting} 

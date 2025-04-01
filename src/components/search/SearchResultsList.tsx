@@ -1,10 +1,12 @@
 
-import React from "react";
-import FuneralHomeCard from "./FuneralHomeCard";
+import React, { useMemo, useState } from "react";
+import { FuneralHome } from "@/types/funeralHome";
 import LoadingState from "./LoadingState";
 import EmptyResults from "./EmptyResults";
-import { FuneralHome, ServicePackage } from "@/types/funeralHome";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { useNavigate } from "react-router-dom";
+import ResultsPagination from "./results/ResultsPagination";
+import ResultsList from "./results/ResultsList";
+import { usePackageSelection } from "@/hooks/search/usePackageSelection";
 
 interface SearchResultsListProps {
   homes: FuneralHome[];
@@ -14,11 +16,6 @@ interface SearchResultsListProps {
   onClearFilters: () => void;
   searchLocation: string;
   searchPrefecture: string | null;
-}
-
-interface PackageWithHome {
-  home: FuneralHome;
-  package: ServicePackage | null;
 }
 
 const SearchResultsList = ({
@@ -32,18 +29,21 @@ const SearchResultsList = ({
 }: SearchResultsListProps) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 10;
+  const { isSelecting, handlePackageSelect } = usePackageSelection(searchLocation, searchPrefecture);
   
-  // Expand homes to include all packages
-  const expandedResults = React.useMemo(() => {
-    const results: PackageWithHome[] = [];
+  // Expand homes to include all packages - memoized for performance
+  const expandedResults = useMemo(() => {
+    if (loading || homes.length === 0) return [];
+    
+    const results = [];
     
     homes.forEach(home => {
-      if (home.packages && home.packages.length > 0) {
+      if (Array.isArray(home.packages) && home.packages.length > 0) {
         // For each home, add its lowest-priced package first to maintain sorting order
         const sortedPackages = [...home.packages].sort((a, b) => a.price - b.price);
-        sortedPackages.forEach(pkg => {
-          results.push({ home, package: pkg });
-        });
+        
+        // Only add the first (lowest price) package to avoid duplication
+        results.push({ home, package: sortedPackages[0] });
       } else {
         // If no packages, add the home once with null package
         results.push({ home, package: null });
@@ -51,21 +51,30 @@ const SearchResultsList = ({
     });
     
     return results;
-  }, [homes]);
+  }, [homes, loading]);
   
-  // Paginate results
-  const paginatedResults = React.useMemo(() => {
+  // Paginate results - memoized for performance
+  const paginatedResults = useMemo(() => {
+    if (expandedResults.length === 0) return [];
+    
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return expandedResults.slice(startIndex, endIndex);
   }, [expandedResults, currentPage]);
   
-  const totalPages = Math.ceil(expandedResults.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(expandedResults.length / itemsPerPage));
   
+  // Reset page when results change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [homes.length]);
+  
+  // If still loading, show loading state
   if (loading) {
     return <LoadingState />;
   }
   
+  // If there was an error, show error state
   if (error) {
     return (
       <div className="text-center py-10">
@@ -74,6 +83,7 @@ const SearchResultsList = ({
     );
   }
   
+  // If no results found, show empty state
   if (homes.length === 0) {
     return (
       <EmptyResults 
@@ -84,49 +94,19 @@ const SearchResultsList = ({
   }
   
   return (
-    <div>
-      <div className="grid grid-cols-1 gap-6 mb-6">
-        {paginatedResults.map((item, index) => (
-          <FuneralHomeCard 
-            key={`${item.home.id}-${item.package?.id || 'basic'}-${index}`}
-            home={item.home}
-            packageToShow={item.package}
-            selectedServices={selectedServices}
-          />
-        ))}
-      </div>
+    <div className="mb-10">
+      <ResultsList 
+        paginatedResults={paginatedResults}
+        selectedServices={selectedServices}
+        onSelectPackage={handlePackageSelect}
+        isSelecting={isSelecting}
+      />
       
-      {totalPages > 1 && (
-        <Pagination className="mt-8">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              />
-            </PaginationItem>
-            
-            {[...Array(totalPages)].map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(index + 1)}
-                  isActive={currentPage === index + 1}
-                  className="cursor-pointer"
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            
-            <PaginationItem>
-              <PaginationNext 
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
+      <ResultsPagination 
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        totalPages={totalPages}
+      />
     </div>
   );
 };

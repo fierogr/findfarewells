@@ -5,6 +5,14 @@ import { FuneralHome } from '@/types/funeralHome';
 export const transformPartnerToFuneralHome = (partnerRecord: any): FuneralHome => {
   console.log("Transforming partner record with regions:", partnerRecord.regions);
   
+  // Ensure image URL is handled properly
+  let imageUrl = partnerRecord.image_url || '';
+  
+  // Make sure we have a valid URL or use a default
+  if (!imageUrl || imageUrl.trim() === '') {
+    imageUrl = 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80';
+  }
+  
   return {
     id: partnerRecord.id.toString(),
     name: partnerRecord.name || partnerRecord.business_name || '',
@@ -21,7 +29,7 @@ export const transformPartnerToFuneralHome = (partnerRecord: any): FuneralHome =
     about: '',
     rating: 0,
     reviewCount: 0,
-    imageUrl: partnerRecord.image_url || 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80',
+    imageUrl: imageUrl,
     basicPrice: 0,
     featured: partnerRecord.featured || false,
     amenities: [],

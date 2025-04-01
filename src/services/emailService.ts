@@ -77,44 +77,20 @@ export const setAdminEmail = async (email: string): Promise<boolean> => {
  * Sends a partner registration notification to the admin
  */
 export const sendPartnerRegistrationNotification = async (partnerData: any): Promise<boolean> => {
-  const adminEmail = await getAdminEmail();
-  
-  const subject = `Νέα αίτηση συνεργάτη: ${partnerData.businessName}`;
-  
-  // Format email body
-  const emailBody = `
-    Νέα αίτηση συνεργάτη έχει υποβληθεί:
+  try {
+    // Call the Supabase Edge Function to send the email notification
+    const { error } = await supabase.functions.invoke('notify-partner-registration', {
+      body: { record: partnerData }
+    });
     
-    Στοιχεία Επιχείρησης:
-    ---------------------
-    Επωνυμία: ${partnerData.businessName}
-    Ιδιοκτήτης: ${partnerData.ownerName}
-    Email: ${partnerData.email}
-    Τηλέφωνο: ${partnerData.phone}
+    if (error) {
+      console.error('Error invoking notify-partner-registration function:', error);
+      return false;
+    }
     
-    Διεύθυνση:
-    ---------------------
-    Οδός: ${partnerData.address}
-    Πόλη: ${partnerData.city}
-    ΤΚ: ${partnerData.postalCode}
-    
-    Πληροφορίες:
-    ---------------------
-    Ιστοσελίδα: ${partnerData.website || "Δεν παρέχεται"}
-    Περιγραφή: ${partnerData.description}
-    Υπηρεσίες: ${partnerData.services || "Δεν παρέχεται"}
-    
-    Ημερομηνία αίτησης: ${new Date().toLocaleString('el-GR')}
-  `;
-  
-  // Since we're implementing a real email system with the edge function,
-  // this function could be enhanced to call that function instead of the mock implementation
-  console.log('Email would be sent with the following content:', {
-    to: adminEmail,
-    subject,
-    body: emailBody
-  });
-  
-  // Return true to simulate successful email sending
-  return true;
+    return true;
+  } catch (error) {
+    console.error('Error in sendPartnerRegistrationNotification:', error);
+    return false;
+  }
 };

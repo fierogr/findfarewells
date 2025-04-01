@@ -23,7 +23,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
@@ -41,6 +40,7 @@ const SearchRequests = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   useEffect(() => {
     fetchSearchRequests();
@@ -76,13 +76,19 @@ const SearchRequests = () => {
       
       if (error) throw error;
       
+      // Immediately update UI state
       setSearchRequests(prev => prev.filter(request => request.id !== requestToDelete));
+      
+      // Refetch to ensure sync with database
+      await fetchSearchRequests();
+      
       toast.success('Το αίτημα αναζήτησης διαγράφηκε επιτυχώς');
     } catch (err) {
       console.error('Error deleting search request:', err);
       toast.error('Σφάλμα κατά τη διαγραφή του αιτήματος αναζήτησης');
     } finally {
       setRequestToDelete(null);
+      setIsAlertOpen(false);
     }
   };
 
@@ -148,33 +154,16 @@ const SearchRequests = () => {
                   </TableCell>
                   <TableCell>{formatDate(request.created_at)}</TableCell>
                   <TableCell>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => setRequestToDelete(request.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Διαγραφή αιτήματος</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Είστε βέβαιοι ότι θέλετε να διαγράψετε οριστικά αυτό το αίτημα αναζήτησης;
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel onClick={() => setRequestToDelete(null)}>
-                            Άκυρο
-                          </AlertDialogCancel>
-                          <AlertDialogAction onClick={handleDeleteRequest} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                            Διαγραφή
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => {
+                        setRequestToDelete(request.id);
+                        setIsAlertOpen(true);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))
@@ -182,6 +171,31 @@ const SearchRequests = () => {
           </TableBody>
         </Table>
       </div>
+
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Διαγραφή αιτήματος</AlertDialogTitle>
+            <AlertDialogDescription>
+              Είστε βέβαιοι ότι θέλετε να διαγράψετε οριστικά αυτό το αίτημα αναζήτησης;
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setRequestToDelete(null);
+              setIsAlertOpen(false);
+            }}>
+              Άκυρο
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteRequest} 
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Διαγραφή
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

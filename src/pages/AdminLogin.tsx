@@ -18,7 +18,7 @@ const AdminLogin = () => {
 
   // Debug the auth state
   useEffect(() => {
-    console.log("AdminLogin component mounted/updated - Auth state:", { isAuthenticated, isAdmin });
+    console.log("AdminLogin component - Auth state:", { isAuthenticated, isAdmin });
     
     // Redirect to admin page if already authenticated and is admin
     if (isAuthenticated && isAdmin) {
@@ -38,9 +38,11 @@ const AdminLogin = () => {
       if (!error) {
         toast.success("Επιτυχής σύνδεση");
         
-        // Give the auth context time to update and check again
-        setTimeout(() => {
-          console.log("Checking admin status after login - isAdmin:", isAdmin);
+        // Force a delay to ensure the admin status is updated
+        setTimeout(async () => {
+          // Get current auth state from context
+          const { isAuthenticated, isAdmin } = useAuth();
+          console.log("Checking auth state after login delay:", { isAuthenticated, isAdmin });
           
           if (isAdmin) {
             console.log("User confirmed as admin, redirecting to /admin");
@@ -49,7 +51,7 @@ const AdminLogin = () => {
             console.log("User not confirmed as admin after login");
             toast.error("Ο λογαριασμός σας δεν έχει δικαιώματα διαχειριστή");
           }
-        }, 3000); // Increased timeout for auth state update
+        }, 500);
       }
     } catch (err) {
       console.error("Login error:", err);

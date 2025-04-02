@@ -4,12 +4,17 @@ import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ProtectedRoute = () => {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
+  const { isAuthenticated, isAdmin, loading, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("ProtectedRoute: Auth state updated - isAdmin:", isAdmin, "isAuthenticated:", isAuthenticated, "loading:", loading);
-  }, [isAuthenticated, isAdmin, loading]);
+    console.log("ProtectedRoute - Auth state:", { 
+      isAuthenticated, 
+      isAdmin, 
+      loading,
+      userId: user?.id 
+    });
+  }, [isAuthenticated, isAdmin, loading, user]);
 
   // Show loading state while checking authentication
   if (loading) {

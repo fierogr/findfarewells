@@ -33,15 +33,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         console.error("Error checking admin status:", error);
         setIsAdmin(false);
-        return;
+        return false;
       }
       
       console.log("Admin check response:", data);
       setIsAdmin(!!data);
       console.log("Updated isAdmin state to:", !!data);
+      return !!data;
     } catch (err) {
       console.error("Error in admin check:", err);
       setIsAdmin(false);
+      return false;
     }
   };
 
@@ -89,12 +91,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
+      console.log("Attempting login with email:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error("Login error:", error.message);
         toast({
           title: "Login failed",
           description: error.message,
@@ -103,13 +107,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error };
       }
       
+      console.log("Login successful, user:", data.user?.id);
+      
       // After successful login, explicitly check admin status
       if (data.user) {
-        await checkAdminStatus(data.user.id);
+        const isUserAdmin = await checkAdminStatus(data.user.id);
+        console.log("User admin status after login:", isUserAdmin);
       }
 
       return { error: null };
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Unexpected login error:", error);
       toast({
         title: "Login failed",
         description: "An unexpected error occurred",

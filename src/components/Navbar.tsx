@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { MapPin, UserPlus, Shield, LogIn, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
@@ -7,21 +7,8 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const { isAuthenticated, isAdmin, logout, user } = useAuth();
-  const [showAdminButton, setShowAdminButton] = useState(false);
   
-  // Use effect to track admin status changes
-  useEffect(() => {
-    console.log("Navbar: Auth state updated - isAdmin:", isAdmin, "isAuthenticated:", isAuthenticated);
-    
-    // Only show admin button if user is both authenticated and an admin
-    if (isAuthenticated && isAdmin) {
-      console.log("Setting showAdminButton to true");
-      setShowAdminButton(true);
-    } else {
-      console.log("Setting showAdminButton to false");
-      setShowAdminButton(false);
-    }
-  }, [isAuthenticated, isAdmin]);
+  console.log("Navbar rendering - Auth state:", { isAuthenticated, isAdmin, userId: user?.id });
 
   const handleLogout = async () => {
     console.log("Logging out");
@@ -69,7 +56,7 @@ const Navbar = () => {
             </Link>
           </Button>
           
-          {showAdminButton && (
+          {isAuthenticated && isAdmin && (
             <Button variant="ghost" size="sm" asChild>
               <Link to="/admin" className="flex items-center">
                 <Shield className="mr-1.5 h-4 w-4" />

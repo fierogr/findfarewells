@@ -12,7 +12,15 @@ const Navbar = () => {
   // Use effect to track admin status changes
   useEffect(() => {
     console.log("Navbar: Auth state updated - isAdmin:", isAdmin, "isAuthenticated:", isAuthenticated);
-    setShowAdminButton(isAuthenticated && isAdmin);
+    
+    // Only show admin button if user is both authenticated and an admin
+    if (isAuthenticated && isAdmin) {
+      console.log("Setting showAdminButton to true");
+      setShowAdminButton(true);
+    } else {
+      console.log("Setting showAdminButton to false");
+      setShowAdminButton(false);
+    }
   }, [isAuthenticated, isAdmin]);
 
   return (

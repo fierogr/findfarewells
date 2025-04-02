@@ -1,18 +1,26 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MapPin, UserPlus, Shield, LogIn, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const { isAuthenticated, isAdmin, logout, user } = useAuth();
+  const navigate = useNavigate();
   
   console.log("Navbar rendering - Auth state:", { isAuthenticated, isAdmin, userId: user?.id });
 
   const handleLogout = async () => {
-    console.log("Logging out");
-    await logout();
+    try {
+      console.log("Logging out");
+      await logout();
+      console.log("Logged out successfully");
+      // Force navigation to home page after logout
+      navigate("/");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   return (
@@ -67,7 +75,12 @@ const Navbar = () => {
           )}
           
           {isAuthenticated ? (
-            <Button variant="outline" size="sm" onClick={handleLogout} className="flex items-center">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleLogout} 
+              className="flex items-center"
+            >
               <LogOut className="mr-1.5 h-4 w-4" />
               <span className="hidden sm:inline">Αποσύνδεση</span>
               <span className="sm:hidden">Έξοδος</span>

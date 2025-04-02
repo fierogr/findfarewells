@@ -14,7 +14,15 @@ const ProtectedRoute = () => {
       loading,
       userId: user?.id 
     });
-  }, [isAuthenticated, isAdmin, loading, user]);
+    
+    if (!loading && !isAuthenticated) {
+      console.log("User not authenticated, navigating to admin-login");
+      navigate("/admin-login", { replace: true });
+    } else if (!loading && isAuthenticated && !isAdmin) {
+      console.log("User authenticated but not admin, navigating to admin-login");
+      navigate("/admin-login", { replace: true });
+    }
+  }, [isAuthenticated, isAdmin, loading, navigate, user]);
 
   // Show loading state while checking authentication
   if (loading) {
@@ -25,16 +33,9 @@ const ProtectedRoute = () => {
     );
   }
 
-  // Redirect to login page if not authenticated
-  if (!isAuthenticated) {
-    console.log("User not authenticated, redirecting to admin-login");
-    return <Navigate to="/admin-login" replace />;
-  }
-  
-  // Redirect to login page if authenticated but not an admin
-  if (!isAdmin) {
-    console.log("User authenticated but not admin, redirecting to admin-login");
-    return <Navigate to="/admin-login" replace />;
+  // Redirect to login page if not authenticated or not admin
+  if (!isAuthenticated || !isAdmin) {
+    return null; // We're handling the redirect in the useEffect hook
   }
 
   // Render the protected route if authenticated and admin

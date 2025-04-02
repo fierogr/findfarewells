@@ -159,7 +159,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    try {
+      console.log("AuthContext: Starting logout process");
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Logout error:", error.message);
+        toast({
+          title: "Logout failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        throw error;
+      }
+      
+      // Manually reset auth state to ensure UI updates immediately
+      setIsAuthenticated(false);
+      setIsAdmin(false);
+      setUser(null);
+      setSession(null);
+      
+      console.log("AuthContext: Logout completed successfully");
+      
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out",
+      });
+    } catch (error: any) {
+      console.error("Unexpected logout error:", error);
+      throw error;
+    }
   };
 
   return (

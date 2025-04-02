@@ -16,10 +16,11 @@ const AdminLogin = () => {
   const { isAuthenticated, isAdmin, login, signup } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect to admin page if already authenticated and is admin
+  // Debug the auth state
   useEffect(() => {
     console.log("AdminLogin component mounted/updated - Auth state:", { isAuthenticated, isAdmin });
     
+    // Redirect to admin page if already authenticated and is admin
     if (isAuthenticated && isAdmin) {
       console.log("User is authenticated and admin, redirecting to /admin");
       navigate("/admin");
@@ -37,19 +38,18 @@ const AdminLogin = () => {
       if (!error) {
         toast.success("Επιτυχής σύνδεση");
         
-        // Force a redirect after a delay to ensure auth state has time to update
+        // Give the auth context time to update and check again
         setTimeout(() => {
-          console.log("Login successful, checking admin status before redirect");
+          console.log("Checking admin status after login - isAdmin:", isAdmin);
           
-          // After successful login, check if the user is an admin and redirect
           if (isAdmin) {
-            console.log("User is admin, redirecting to /admin");
+            console.log("User confirmed as admin, redirecting to /admin");
             navigate("/admin");
           } else {
-            console.log("User is not admin, staying on login page");
-            toast.info("Ο λογαριασμός σας δεν έχει δικαιώματα διαχειριστή");
+            console.log("User not confirmed as admin after login");
+            toast.error("Ο λογαριασμός σας δεν έχει δικαιώματα διαχειριστή");
           }
-        }, 2000); // Increased timeout for auth state update
+        }, 3000); // Increased timeout for auth state update
       }
     } catch (err) {
       console.error("Login error:", err);

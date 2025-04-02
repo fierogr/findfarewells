@@ -23,6 +23,11 @@ const Navbar = () => {
     }
   }, [isAuthenticated, isAdmin]);
 
+  const handleLogout = async () => {
+    console.log("Logging out");
+    await logout();
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
@@ -75,7 +80,7 @@ const Navbar = () => {
           )}
           
           {isAuthenticated ? (
-            <Button variant="outline" size="sm" onClick={() => logout()} className="flex items-center">
+            <Button variant="outline" size="sm" onClick={handleLogout} className="flex items-center">
               <LogOut className="mr-1.5 h-4 w-4" />
               <span className="hidden sm:inline">Αποσύνδεση</span>
               <span className="sm:hidden">Έξοδος</span>

@@ -1,7 +1,7 @@
 
 import React from "react";
 import { FuneralHome, ServicePackage } from "@/types/funeralHome";
-import FuneralHomeCard from "../FuneralHomeCard";
+import { FuneralHomeCard } from "../funeral-home";
 
 interface PackageWithHome {
   home: FuneralHome;

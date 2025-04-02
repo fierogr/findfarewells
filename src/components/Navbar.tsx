@@ -1,12 +1,19 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, UserPlus, Shield, LogIn, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
-  const { isAuthenticated, isAdmin, logout } = useAuth();
+  const { isAuthenticated, isAdmin, logout, user } = useAuth();
+  const [showAdminButton, setShowAdminButton] = useState(false);
+  
+  // Use effect to track admin status changes
+  useEffect(() => {
+    console.log("Navbar: Auth state updated - isAdmin:", isAdmin, "isAuthenticated:", isAuthenticated);
+    setShowAdminButton(isAuthenticated && isAdmin);
+  }, [isAuthenticated, isAdmin]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -49,7 +56,7 @@ const Navbar = () => {
             </Link>
           </Button>
           
-          {isAdmin && (
+          {showAdminButton && (
             <Button variant="ghost" size="sm" asChild>
               <Link to="/admin" className="flex items-center">
                 <Shield className="mr-1.5 h-4 w-4" />

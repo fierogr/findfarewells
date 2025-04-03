@@ -23,13 +23,13 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      console.log("Logging out");
+      console.log("Navbar: Initiating logout");
       await logout();
-      console.log("Logged out successfully");
+      console.log("Navbar: Logout successful, navigating to home");
       // Force navigation to home page after logout
       navigate("/", { replace: true });
     } catch (error) {
-      console.error("Error during logout:", error);
+      console.error("Navbar: Error during logout:", error);
       toast.error("Failed to log out. Please try again.");
     }
   };
@@ -91,6 +91,7 @@ const Navbar = () => {
               size="sm" 
               onClick={handleLogout} 
               className="flex items-center"
+              type="button"
             >
               <LogOut className="mr-1.5 h-4 w-4" />
               <span className="hidden sm:inline">Αποσύνδεση</span>

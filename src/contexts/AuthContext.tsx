@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
@@ -221,8 +220,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       console.log("Starting logout process");
-      setLoading(true);
       
+      // First update the UI state to prevent any flash of authenticated content
+      setIsAuthenticated(false);
+      setIsAdmin(false);
+      setUser(null);
+      setSession(null);
+      
+      // Then call Supabase to sign out
       const { error } = await supabase.auth.signOut();
       
       if (error) {
@@ -230,26 +235,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toast.error("Logout failed", {
           description: error.message,
         });
-        setLoading(false);
         throw error;
       }
-      
-      // Manually reset auth state to ensure immediate UI update
-      setIsAuthenticated(false);
-      setIsAdmin(false);
-      setUser(null);
-      setSession(null);
       
       console.log("Logout completed successfully");
       
       toast.success("Logged out", {
         description: "You have been successfully logged out",
       });
-      
-      setLoading(false);
     } catch (error: any) {
       console.error("Unexpected logout error:", error);
-      setLoading(false);
+      // Restore auth state if logout fails
+      if (user) {
+        setIsAuthenticated(true);
+        if (user.id) {
+          const isUserAdmin = await checkAdminStatus(user.id);
+          setIsAdmin(isUserAdmin);
+        }
+        setUser(user);
+      }
       throw error;
     }
   };

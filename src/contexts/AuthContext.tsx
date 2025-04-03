@@ -28,6 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const checkAdminStatus = async (userId: string) => {
     try {
       console.log("Checking admin status for user ID:", userId);
+      // Use RPC call to check if user is admin
       const { data, error } = await supabase.rpc('is_admin');
       
       if (error) {
@@ -49,6 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     console.log("Auth provider initializing");
+    setLoading(true);
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -66,6 +68,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else {
           setIsAdmin(false);
         }
+        
+        // Make sure loading is set to false after everything is updated
+        setLoading(false);
       }
     );
 
@@ -91,6 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
+      setLoading(true);
       console.log("Attempting login with email:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -104,6 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: error.message,
           variant: "destructive",
         });
+        setLoading(false);
         return { error };
       }
       
@@ -114,7 +121,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const isUserAdmin = await checkAdminStatus(data.user.id);
         console.log("User admin status after login:", isUserAdmin);
       }
-
+      
+      setLoading(false);
       return { error: null };
     } catch (error: any) {
       console.error("Unexpected login error:", error);
@@ -123,6 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "An unexpected error occurred",
         variant: "destructive",
       });
+      setLoading(false);
       return { error };
     }
   };
@@ -161,6 +170,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       console.log("AuthContext: Starting logout process");
+      setLoading(true);
+      
       const { error } = await supabase.auth.signOut();
       
       if (error) {
@@ -170,6 +181,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: error.message,
           variant: "destructive",
         });
+        setLoading(false);
         throw error;
       }
       
@@ -185,8 +197,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: "Logged out",
         description: "You have been successfully logged out",
       });
+      
+      setLoading(false);
     } catch (error: any) {
       console.error("Unexpected logout error:", error);
+      setLoading(false);
       throw error;
     }
   };

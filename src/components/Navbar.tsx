@@ -1,15 +1,24 @@
 
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { MapPin, UserPlus, Shield, LogIn, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
-  const { isAuthenticated, isAdmin, logout, user } = useAuth();
+  const { isAuthenticated, isAdmin, logout, user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
-  console.log("Navbar rendering - Auth state:", { isAuthenticated, isAdmin, userId: user?.id });
+  useEffect(() => {
+    console.log("Navbar rendering - Auth state:", { 
+      isAuthenticated, 
+      isAdmin, 
+      userId: user?.id,
+      loading,
+      path: location.pathname
+    });
+  }, [isAuthenticated, isAdmin, user, loading, location]);
 
   const handleLogout = async () => {
     try {
@@ -17,7 +26,7 @@ const Navbar = () => {
       await logout();
       console.log("Logged out successfully");
       // Force navigation to home page after logout
-      navigate("/");
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Error during logout:", error);
     }

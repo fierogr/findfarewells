@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,50 +13,53 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { isAuthenticated, isAdmin, login, signup } = useAuth();
+  const { isAuthenticated, isAdmin, login, signup, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Debug the auth state
   useEffect(() => {
-    console.log("AdminLogin component - Auth state:", { isAuthenticated, isAdmin });
+    console.log("AdminLogin component - Auth state:", { 
+      isAuthenticated, 
+      isAdmin, 
+      loading,
+      path: location.pathname 
+    });
     
     // Redirect to admin page if already authenticated and is admin
-    if (isAuthenticated && isAdmin) {
+    if (!loading && isAuthenticated && isAdmin) {
       console.log("User is authenticated and admin, redirecting to /admin");
-      navigate("/admin");
+      navigate("/admin", { replace: true });
     }
-  }, [isAuthenticated, isAdmin, navigate]);
+  }, [isAuthenticated, isAdmin, navigate, loading, location]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error("Συμπληρώστε όλα τα πεδία");
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
       console.log("Attempting login with:", email);
       const { error } = await login(email, password);
       
-      if (!error) {
-        toast.success("Επιτυχής σύνδεση");
-        
-        // Force a delay to ensure the admin status is updated
-        setTimeout(async () => {
-          // Get current auth state from context
-          const { isAuthenticated, isAdmin } = useAuth();
-          console.log("Checking auth state after login delay:", { isAuthenticated, isAdmin });
-          
-          if (isAdmin) {
-            console.log("User confirmed as admin, redirecting to /admin");
-            navigate("/admin");
-          } else {
-            console.log("User not confirmed as admin after login");
-            toast.error("Ο λογαριασμός σας δεν έχει δικαιώματα διαχειριστή");
-          }
-        }, 500);
+      if (error) {
+        console.error("Login error:", error);
+        toast.error("Λάθος στοιχεία σύνδεσης");
+        setIsLoading(false);
+        return;
       }
+      
+      toast.success("Επιτυχής σύνδεση");
+      
+      // The auth state change will trigger the redirect in the useEffect
     } catch (err) {
       console.error("Login error:", err);
       toast.error("Σφάλμα κατά τη σύνδεση");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -74,15 +77,21 @@ const AdminLogin = () => {
     try {
       const { error } = await signup(email, password);
       
-      if (!error) {
-        toast.success("Η εγγραφή ολοκληρώθηκε", {
-          description: "Ο λογαριασμός σας δημιουργήθηκε. Θα πρέπει να σας ανατεθεί ρόλος διαχειριστή για να αποκτήσετε πρόσβαση.",
-        });
+      if (error) {
+        console.error("Signup error:", error);
+        toast.error("Σφάλμα κατά την εγγραφή");
+        setIsLoading(false);
+        return;
       }
+      
+      toast.success("Η εγγραφή ολοκληρώθηκε", {
+        description: "Ο λογαριασμός σας δημιουργήθηκε. Θα πρέπει να σας ανατεθεί ρόλος διαχειριστή για να αποκτήσετε πρόσβαση.",
+      });
+      
+      setIsLoading(false);
     } catch (err) {
       console.error("Signup error:", err);
       toast.error("Σφάλμα κατά την εγγραφή");
-    } finally {
       setIsLoading(false);
     }
   };

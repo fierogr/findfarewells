@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -23,12 +24,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
 
   const checkAdminStatus = async (userId: string) => {
     try {
       console.log("Checking admin status for user ID:", userId);
-      // Use RPC call to check if user is admin
+      
+      // Make a direct RPC call to check admin status
       const { data, error } = await supabase.rpc('is_admin');
       
       if (error) {
@@ -37,9 +39,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
       
-      console.log("Admin check response:", data);
+      console.log("Admin check result:", data);
+      
+      // Set admin status based on the response
       setIsAdmin(!!data);
       console.log("Updated isAdmin state to:", !!data);
+      
       return !!data;
     } catch (err) {
       console.error("Error in admin check:", err);
@@ -55,34 +60,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
-        console.log("Auth state changed:", event);
+        console.log("Auth state changed:", event, newSession?.user?.id);
         
-        // Update session and user first
-        setSession(newSession);
-        setUser(newSession?.user ?? null);
-        setIsAuthenticated(!!newSession?.user);
-        
-        // Then check admin status if user is authenticated
         if (newSession?.user) {
+          setUser(newSession.user);
+          setSession(newSession);
+          setIsAuthenticated(true);
+          
+          // Check admin status after authentication
           await checkAdminStatus(newSession.user.id);
         } else {
+          setUser(null);
+          setSession(null);
+          setIsAuthenticated(false);
           setIsAdmin(false);
         }
         
-        // Make sure loading is set to false after everything is updated
         setLoading(false);
       }
     );
 
     // Check for existing session
     supabase.auth.getSession().then(async ({ data: { session: initialSession } }) => {
-      console.log("Initial session check:", initialSession ? "Session found" : "No session");
-      
-      setSession(initialSession);
-      setUser(initialSession?.user ?? null);
-      setIsAuthenticated(!!initialSession?.user);
+      console.log("Initial session check:", initialSession?.user?.id);
       
       if (initialSession?.user) {
+        setUser(initialSession.user);
+        setSession(initialSession);
+        setIsAuthenticated(true);
+        
+        // Check admin status if session exists
         await checkAdminStatus(initialSession.user.id);
       }
       
@@ -98,6 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       console.log("Attempting login with email:", email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -105,10 +113,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error("Login error:", error.message);
-        toast({
-          title: "Login failed",
+        toast.error("Login failed", {
           description: error.message,
-          variant: "destructive",
         });
         setLoading(false);
         return { error };
@@ -116,20 +122,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       console.log("Login successful, user:", data.user?.id);
       
-      // After successful login, explicitly check admin status
+      // After successful login, check admin status
       if (data.user) {
-        const isUserAdmin = await checkAdminStatus(data.user.id);
-        console.log("User admin status after login:", isUserAdmin);
+        await checkAdminStatus(data.user.id);
       }
+      
+      toast.success("Login successful", {
+        description: "You have been logged in successfully",
+      });
       
       setLoading(false);
       return { error: null };
     } catch (error: any) {
       console.error("Unexpected login error:", error);
-      toast({
-        title: "Login failed",
+      toast.error("Login failed", {
         description: "An unexpected error occurred",
-        variant: "destructive",
       });
       setLoading(false);
       return { error };
@@ -144,24 +151,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        toast({
-          title: "Signup failed",
+        toast.error("Signup failed", {
           description: error.message,
-          variant: "destructive",
         });
         return { error };
       }
 
-      toast({
-        title: "Signup successful",
+      toast.success("Signup successful", {
         description: "Please check your email for verification instructions",
       });
       return { error: null };
     } catch (error) {
-      toast({
-        title: "Signup failed",
+      toast.error("Signup failed", {
         description: "An unexpected error occurred",
-        variant: "destructive",
       });
       return { error };
     }
@@ -169,32 +171,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      console.log("AuthContext: Starting logout process");
+      console.log("Starting logout process");
       setLoading(true);
       
       const { error } = await supabase.auth.signOut();
       
       if (error) {
         console.error("Logout error:", error.message);
-        toast({
-          title: "Logout failed",
+        toast.error("Logout failed", {
           description: error.message,
-          variant: "destructive",
         });
         setLoading(false);
         throw error;
       }
       
-      // Manually reset auth state to ensure UI updates immediately
+      // Manually reset auth state
       setIsAuthenticated(false);
       setIsAdmin(false);
       setUser(null);
       setSession(null);
       
-      console.log("AuthContext: Logout completed successfully");
+      console.log("Logout completed successfully");
       
-      toast({
-        title: "Logged out",
+      toast.success("Logged out", {
         description: "You have been successfully logged out",
       });
       

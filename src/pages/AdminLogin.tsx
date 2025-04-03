@@ -37,7 +37,7 @@ const AdminLogin = () => {
     e.preventDefault();
     
     if (!email || !password) {
-      toast.error("Συμπληρώστε όλα τα πεδία");
+      toast.error("Please fill in all fields");
       return;
     }
     
@@ -49,17 +49,16 @@ const AdminLogin = () => {
       
       if (error) {
         console.error("Login error:", error);
-        toast.error("Λάθος στοιχεία σύνδεσης");
+        toast.error("Invalid login credentials");
         setIsLoading(false);
         return;
       }
       
-      toast.success("Επιτυχής σύνδεση");
-      
-      // The auth state change will trigger the redirect in the useEffect
+      // Login successful - the auth state change will trigger the redirect in useEffect
+      toast.success("Login successful");
     } catch (err) {
       console.error("Login error:", err);
-      toast.error("Σφάλμα κατά τη σύνδεση");
+      toast.error("An error occurred during login");
       setIsLoading(false);
     }
   };
@@ -68,7 +67,7 @@ const AdminLogin = () => {
     e.preventDefault();
     
     if (!email || !password) {
-      toast.error("Συμπληρώστε όλα τα πεδία");
+      toast.error("Please fill in all fields");
       return;
     }
     
@@ -79,19 +78,19 @@ const AdminLogin = () => {
       
       if (error) {
         console.error("Signup error:", error);
-        toast.error("Σφάλμα κατά την εγγραφή");
+        toast.error("Error during signup");
         setIsLoading(false);
         return;
       }
       
-      toast.success("Η εγγραφή ολοκληρώθηκε", {
-        description: "Ο λογαριασμός σας δημιουργήθηκε. Θα πρέπει να σας ανατεθεί ρόλος διαχειριστή για να αποκτήσετε πρόσβαση.",
+      toast.success("Account created", {
+        description: "Your account has been created. Admin access will need to be granted separately.",
       });
       
       setIsLoading(false);
     } catch (err) {
       console.error("Signup error:", err);
-      toast.error("Σφάλμα κατά την εγγραφή");
+      toast.error("Error during signup");
       setIsLoading(false);
     }
   };

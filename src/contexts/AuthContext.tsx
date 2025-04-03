@@ -14,6 +14,7 @@ type AuthContextType = {
   signup: (email: string, password: string) => Promise<{ error: any | null }>;
   logout: () => Promise<void>;
   loading: boolean;
+  makeAdmin: (userId: string, email: string) => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -49,6 +50,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err) {
       console.error("Error in admin check:", err);
       setIsAdmin(false);
+      return false;
+    }
+  };
+
+  // New function to make a user an admin
+  const makeAdmin = async (userId: string, email: string): Promise<boolean> => {
+    try {
+      console.log("Adding user to admin_users:", userId, email);
+      
+      const { data, error } = await supabase.functions.invoke('manage-admin', {
+        body: { action: 'add-admin', userId, email }
+      });
+      
+      if (error) {
+        console.error("Error making user admin:", error);
+        toast.error("Failed to grant admin privileges");
+        return false;
+      }
+      
+      console.log("Admin addition response:", data);
+      
+      // Refresh admin status
+      if (userId === user?.id) {
+        await checkAdminStatus(userId);
+      }
+      
+      toast.success("Admin privileges granted successfully");
+      return true;
+    } catch (err) {
+      console.error("Error in makeAdmin:", err);
+      toast.error("Failed to grant admin privileges");
       return false;
     }
   };
@@ -151,26 +183,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signup = async (email: string, password: string) => {
     try {
+      setLoading(true);
+      console.log("Attempting signup with email:", email);
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (error) {
+        console.error("Signup error:", error.message);
         toast.error("Signup failed", {
           description: error.message,
         });
+        setLoading(false);
         return { error };
       }
 
+      console.log("Signup successful, user:", data.user?.id);
+      
       toast.success("Signup successful", {
         description: "Please check your email for verification instructions",
       });
+      
+      setLoading(false);
       return { error: null };
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Unexpected signup error:", error);
       toast.error("Signup failed", {
         description: "An unexpected error occurred",
       });
+      setLoading(false);
       return { error };
     }
   };
@@ -220,6 +263,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signup,
     logout,
     loading,
+    makeAdmin,
   };
 
   console.log("Auth context current state:", { isAuthenticated, isAdmin, userId: user?.id });

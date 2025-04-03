@@ -8,14 +8,19 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { isAuthenticated, isAdmin, login, signup, loading } = useAuth();
+  const [adminCode, setAdminCode] = useState("");
+  const { isAuthenticated, isAdmin, login, signup, loading, makeAdmin, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // For testing purposes, the admin code is "admin123"
+  const ADMIN_CODE = "admin123";
 
   // Debug the auth state
   useEffect(() => {
@@ -23,7 +28,8 @@ const AdminLogin = () => {
       isAuthenticated, 
       isAdmin, 
       loading,
-      path: location.pathname 
+      path: location.pathname,
+      userId: user?.id
     });
     
     // Redirect to admin page if already authenticated and is admin
@@ -31,7 +37,7 @@ const AdminLogin = () => {
       console.log("User is authenticated and admin, redirecting to /admin");
       navigate("/admin", { replace: true });
     }
-  }, [isAuthenticated, isAdmin, navigate, loading, location]);
+  }, [isAuthenticated, isAdmin, navigate, loading, location, user]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,10 +93,48 @@ const AdminLogin = () => {
         description: "Your account has been created. Admin access will need to be granted separately.",
       });
       
+      // If admin code is provided and correct, make this user an admin
+      if (adminCode === ADMIN_CODE && user) {
+        await makeAdminUser();
+      }
+      
       setIsLoading(false);
     } catch (err) {
       console.error("Signup error:", err);
       toast.error("Error during signup");
+      setIsLoading(false);
+    }
+  };
+
+  const makeAdminUser = async () => {
+    if (!user) {
+      toast.error("You must be logged in to become an admin");
+      return;
+    }
+    
+    if (adminCode !== ADMIN_CODE) {
+      toast.error("Invalid admin code");
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      
+      const success = await makeAdmin(user.id, user.email || "");
+      
+      if (success) {
+        toast.success("Admin privileges granted!");
+        
+        // Navigate to admin page after a short delay
+        setTimeout(() => {
+          navigate("/admin", { replace: true });
+        }, 1000);
+      }
+      
+      setIsLoading(false);
+    } catch (err) {
+      console.error("Error making user admin:", err);
+      toast.error("Failed to grant admin privileges");
       setIsLoading(false);
     }
   };
@@ -135,6 +179,27 @@ const AdminLogin = () => {
                     required
                   />
                 </div>
+                
+                {isAuthenticated && !isAdmin && (
+                  <div className="space-y-2 border-t pt-4 mt-4">
+                    <Label htmlFor="admin-code">Admin Code</Label>
+                    <Input
+                      id="admin-code"
+                      type="password"
+                      value={adminCode}
+                      onChange={(e) => setAdminCode(e.target.value)}
+                      placeholder="Enter admin code"
+                    />
+                    <Button 
+                      type="button" 
+                      className="w-full mt-2" 
+                      onClick={makeAdminUser}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Processing..." : "Become Admin"}
+                    </Button>
+                  </div>
+                )}
               </CardContent>
               <CardFooter>
                 <Button type="submit" className="w-full" disabled={isLoading}>
@@ -168,8 +233,18 @@ const AdminLogin = () => {
                     required
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="register-admin-code">Admin Code (Optional)</Label>
+                  <Input
+                    id="register-admin-code"
+                    type="password"
+                    value={adminCode}
+                    onChange={(e) => setAdminCode(e.target.value)}
+                    placeholder="Enter admin code if you have one"
+                  />
+                </div>
                 <p className="text-sm text-muted-foreground">
-                  Η εγγραφή δεν παρέχει αυτόματα δικαιώματα διαχειριστή. Θα πρέπει να ζητήσετε πρόσβαση από έναν υπάρχοντα διαχειριστή.
+                  Η εγγραφή δεν παρέχει αυτόματα δικαιώματα διαχειριστή. Θα πρέπει να εισάγετε τον κωδικό διαχειριστή ή να ζητήσετε πρόσβαση από έναν υπάρχοντα διαχειριστή.
                 </p>
               </CardContent>
               <CardFooter>

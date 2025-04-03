@@ -91,6 +91,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Check admin status if session exists
         await checkAdminStatus(initialSession.user.id);
+      } else {
+        // Make sure all auth states are properly reset if no session
+        setUser(null);
+        setSession(null);
+        setIsAuthenticated(false);
+        setIsAdmin(false);
       }
       
       setLoading(false);
@@ -185,7 +191,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw error;
       }
       
-      // Manually reset auth state
+      // Manually reset auth state to ensure immediate UI update
       setIsAuthenticated(false);
       setIsAdmin(false);
       setUser(null);
@@ -205,19 +211,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const value = {
+    isAuthenticated,
+    isAdmin,
+    user,
+    session,
+    login,
+    signup,
+    logout,
+    loading,
+  };
+
+  console.log("Auth context current state:", { isAuthenticated, isAdmin, userId: user?.id });
+
   return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated,
-        isAdmin,
-        user,
-        session,
-        login,
-        signup,
-        logout,
-        loading,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

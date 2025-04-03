@@ -1,11 +1,10 @@
 
 import React, { useEffect } from "react";
-import { Navigate, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ProtectedRoute = () => {
   const { isAuthenticated, isAdmin, loading, user } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {

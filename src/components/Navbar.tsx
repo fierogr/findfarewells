@@ -4,6 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { MapPin, UserPlus, Shield, LogIn, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const { isAuthenticated, isAdmin, logout, user, loading } = useAuth();
@@ -29,6 +30,7 @@ const Navbar = () => {
       navigate("/", { replace: true });
     } catch (error) {
       console.error("Error during logout:", error);
+      toast.error("Failed to log out. Please try again.");
     }
   };
 
